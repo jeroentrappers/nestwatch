@@ -224,6 +224,9 @@ pub struct ConnectedListener {
     pub name: String,
     /// Its listen mode.
     pub mode: ListenMode,
+    /// Its sound activation threshold in dBFS (meaningful when `mode` is
+    /// activated; shown as the ring tick, design README §4).
+    pub threshold_dbfs: f32,
     /// Whether audio currently flows to it (`level.open`).
     pub open: bool,
     /// Whether it holds talk-back.
@@ -490,6 +493,7 @@ impl Shared {
                     .unwrap_or_default(),
                 name: s.name.clone().unwrap_or_default(),
                 mode: s.mode,
+                threshold_dbfs: s.threshold_dbfs,
                 open: s.gate.as_ref().is_some_and(|g| g.is_flowing()),
                 talking: talker == Some(id),
                 watching: s.video.is_some(),
