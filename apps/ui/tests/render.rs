@@ -5,10 +5,10 @@
 use std::rc::Rc;
 
 use dioxus::prelude::*;
-use lull_ui::components::app::LullAppProps;
-use lull_ui::demo::DemoBackend;
-use lull_ui::model::{Platform, Prefs, Role, Theme};
-use lull_ui::{BackendHandle, LullApp, strings as s};
+use nestwatch_ui::components::app::NestwatchAppProps;
+use nestwatch_ui::demo::DemoBackend;
+use nestwatch_ui::model::{Platform, Prefs, Role, Theme};
+use nestwatch_ui::{BackendHandle, NestwatchApp, strings as s};
 
 fn render(platform: Platform, prefs: Prefs, invitation: Option<String>) -> String {
     let backend = BackendHandle::new(DemoBackend::new(
@@ -18,8 +18,8 @@ fn render(platform: Platform, prefs: Prefs, invitation: Option<String>) -> Strin
         Rc::new(|_: Theme| {}),
     ));
     let mut dom = VirtualDom::new_with_props(
-        LullApp,
-        LullAppProps {
+        NestwatchApp,
+        NestwatchAppProps {
             backend,
             invitation,
         },
@@ -91,7 +91,7 @@ fn station_and_add_station_render() {
     let add = render(
         Platform::Web,
         prefs(Role::Listener),
-        Some("http://127.0.0.1:47180/#lull%3A%2F%2Finvite".into()),
+        Some("http://127.0.0.1:47180/#nestwatch%3A%2F%2Finvite".into()),
     );
     assert!(add.contains(s::PAIRING), "{add}");
     assert!(add.contains(s::NEARBY_UNAVAILABLE));

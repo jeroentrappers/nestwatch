@@ -1,6 +1,6 @@
 {
   "spec": "protocol.md 5.3",
-  "argon2": "Argon2id v0x13, password = normalised code (ASCII), salt = SHA-256(\"lull/1 code salt\" || station_device_id)[0..16], m = 19456 KiB, t = 2, p = 1, length = 32, no secret, no associated data",
+  "argon2": "Argon2id v0x13, password = normalised code (ASCII), salt = SHA-256(\"nestwatch/1 code salt\" || station_device_id)[0..16], m = 19456 KiB, t = 2, p = 1, length = 32, no secret, no associated data",
   "normalisation": [
     {
       "input": "7K3QD-9XW2M",

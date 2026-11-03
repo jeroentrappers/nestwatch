@@ -1,5 +1,5 @@
 {
-  "description": "LWP/1 prefaces and Noise prologue (protocol.md §4)",
+  "description": "NWP/1 prefaces and Noise prologue (protocol.md §4)",
   "invalid": [
     {
       "hex": "4c554c4c01",

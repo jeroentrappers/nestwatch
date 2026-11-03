@@ -1,4 +1,4 @@
-# Lull
+# Nestwatch
 
 A private, local-first baby monitor for every device you own.
 
@@ -14,7 +14,7 @@ A private, local-first baby monitor for every device you own.
   over your own VPN (Tailscale, WireGuard). End-to-end encrypted with the
   Noise Protocol Framework.
 
-Lull is not a medical device and does not replace supervision.
+Nestwatch is not a medical device and does not replace supervision.
 
 ## Status
 
@@ -26,7 +26,7 @@ Specification phase. Start with [specs/](specs/README.md).
 | Design system | done (`design/`) |
 | Rust core | planned |
 | Desktop apps (Dioxus) and browser listener (wasm) | first version (`apps/`) |
-| UniFFI bindings for Kotlin and Swift (`crates/lull-ffi`) | first version |
+| UniFFI bindings for Kotlin and Swift (`crates/nestwatch-ffi`) | first version |
 | Android app (Compose) | first version (`apps/android`) |
 | iOS app (SwiftUI) on the Rust core | planned |
 

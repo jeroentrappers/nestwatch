@@ -5,12 +5,12 @@
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, Mutex};
 
-use lull_core::listener::{Alert, ListenerEngine, ListenerEvent};
-use lull_platform::{
+use nestwatch_core::listener::{Alert, ListenerEngine, ListenerEvent};
+use nestwatch_platform::{
     AudioStream, CaptureRequest, DesktopPlatform, Notification, PlaybackRequest, PlaybackSource,
     Samples, StreamFormat, Urgency,
 };
-use lull_ui::strings as s;
+use nestwatch_ui::strings as s;
 
 /// Samples of the alert tone at 16 kHz (two 200 ms tones).
 const TONE_SAMPLES: u32 = 6_720;

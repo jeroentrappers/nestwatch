@@ -1,0 +1,16 @@
+[package]
+name = "nestwatch-session"
+description = "Sans-I/O NWP/1 session state machines for Nestwatch stations and listeners"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+nestwatch-crypto = { path = "../nestwatch-crypto" }
+nestwatch-proto = { path = "../nestwatch-proto" }
+thiserror = "2"
+
+[lints]
+workspace = true

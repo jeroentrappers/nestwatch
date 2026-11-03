@@ -1,5 +1,5 @@
 {
-  "description": "LWP/1 records: type (u8) || body (protocol.md §6). Control messages use RFC 8949 core deterministic encoding.",
+  "description": "NWP/1 records: type (u8) || body (protocol.md §6). Control messages use RFC 8949 core deterministic encoding.",
   "invalid": [
     {
       "hex": "",
@@ -48,7 +48,7 @@
       "name": "control-hello",
       "record": {
         "message": {
-          "app": "lull/0.1.0",
+          "app": "nestwatch/0.1.0",
           "audio": [
             1,
             2

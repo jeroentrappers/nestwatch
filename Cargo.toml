@@ -1,15 +1,15 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "tools/lull-cli", "apps/ui", "apps/web", "apps/desktop"]
+members = ["crates/*", "tools/nestwatch-cli", "apps/ui", "apps/web", "apps/desktop"]
 # The desktop app needs the WebKitGTK development libraries on Linux; keep it
 # out of plain `cargo build`/`cargo test` at the root.
-default-members = ["crates/*", "tools/lull-cli", "apps/ui", "apps/web"]
+default-members = ["crates/*", "tools/nestwatch-cli", "apps/ui", "apps/web"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
 license = "AGPL-3.0-or-later"
-repository = "https://github.com/jeroentrappers/lull"
+repository = "https://github.com/jeroentrappers/nestwatch"
 rust-version = "1.85"
 
 [workspace.lints.rust]

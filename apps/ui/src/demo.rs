@@ -455,8 +455,8 @@ impl Backend for DemoBackend {
             && let StationRun::Running(m) = &mut *ui.station.write()
         {
             m.pairing = Some(PairingModel {
-                invite_uri: "lull://invite?v=1&s=q2X8Yb5Nw1Kc7Rt3Vm9Lp4Hd6Fg0Js2Az8Ce5Ui1Oy3&t=Z9x8W7v6U5t4S3r2Q1p0Ng&n=Nursery&a=192.168.1.20%3A47100&a=100.101.102.103%3A47100".into(),
-                web_url: Some("http://192.168.1.20:47180/#lull%3A%2F%2Finvite%3Fv%3D1".into()),
+                invite_uri: "nestwatch://invite?v=1&s=q2X8Yb5Nw1Kc7Rt3Vm9Lp4Hd6Fg0Js2Az8Ce5Ui1Oy3&t=Z9x8W7v6U5t4S3r2Q1p0Ng&n=Nursery&a=192.168.1.20%3A47100&a=100.101.102.103%3A47100".into(),
+                web_url: Some("http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1".into()),
                 code: "7KQ2M-X9RTA".into(),
                 remaining_ms: 552_000,
                 pairings: 0,

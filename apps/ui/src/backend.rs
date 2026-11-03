@@ -3,7 +3,7 @@
 //! (architecture.md §5): state arrives in [`Ui`] signals, intents are
 //! plain method calls.
 //!
-//! Implementations: [`crate::adapter::EngineBackend`] over the lull-core
+//! Implementations: [`crate::adapter::EngineBackend`] over the nestwatch-core
 //! engines (native desktop: station and listener; browser: listener) and
 //! [`crate::demo::DemoBackend`] with made-up data for design previews.
 

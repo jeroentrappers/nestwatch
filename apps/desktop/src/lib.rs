@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Lull desktop host (platforms.md §2.4): runs the station and listener
-//! engines on `lull-platform`'s [`DesktopPlatform`] and adapts them to the
-//! `lull-ui` [`Host`] port. The Dioxus window lives in the binary
+//! Nestwatch desktop host (platforms.md §2.4): runs the station and listener
+//! engines on `nestwatch-platform`'s [`DesktopPlatform`] and adapts them to the
+//! `nestwatch-ui` [`Host`] port. The Dioxus window lives in the binary
 //! (feature `window`); everything here builds without a webview.
 //!
 //! - Storage: the OS key store (security.md §5, PLATFORM-1..3) as the
-//!   engines' [`Storage`]; `LULL_DATA_DIR` selects a plain directory
+//!   engines' [`Storage`]; `NESTWATCH_DATA_DIR` selects a plain directory
 //!   instead (tests, several instances on one machine).
 //! - Station: microphone → `push_capture`, `pull_talkback` → speaker,
 //!   camera started on `CameraWanted` and stopped on `CameraNotWanted`,
@@ -23,20 +23,20 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Duration;
 
-use lull_core::{Clock, Storage};
-use lull_platform::DesktopPlatform;
-use lull_ui::adapter::Host;
-use lull_ui::adapter::station::RunningStation;
-use lull_ui::model::{Capabilities, Platform, Prefs, Theme};
-use lull_ui::{LocalFuture, Ui};
+use nestwatch_core::{Clock, Storage};
+use nestwatch_platform::DesktopPlatform;
+use nestwatch_ui::adapter::Host;
+use nestwatch_ui::adapter::station::RunningStation;
+use nestwatch_ui::model::{Capabilities, Platform, Prefs, Theme};
+use nestwatch_ui::{LocalFuture, Ui};
 
 /// Where the browser listener bundle is served from (protocol.md §3.3):
-/// `$LULL_WEB_DIR`, then `web/` next to the executable, then
-/// `../share/lull/web` relative to it, then the workspace build output
-/// `target/lull-web` (development). `None` serves a placeholder page.
+/// `$NESTWATCH_WEB_DIR`, then `web/` next to the executable, then
+/// `../share/nestwatch/web` relative to it, then the workspace build output
+/// `target/nestwatch-web` (development). `None` serves a placeholder page.
 pub fn web_dir() -> Option<PathBuf> {
     web_dir_from(
-        std::env::var_os("LULL_WEB_DIR").map(PathBuf::from),
+        std::env::var_os("NESTWATCH_WEB_DIR").map(PathBuf::from),
         std::env::current_exe().ok(),
     )
 }
@@ -47,24 +47,24 @@ pub fn web_dir_from(env: Option<PathBuf>, exe: Option<PathBuf>) -> Option<PathBu
     candidates.extend(env);
     if let Some(dir) = exe.as_deref().and_then(|e| e.parent()) {
         candidates.push(dir.join("web"));
-        candidates.push(dir.join("../share/lull/web"));
+        candidates.push(dir.join("../share/nestwatch/web"));
     }
     candidates.push(PathBuf::from(concat!(
         env!("CARGO_MANIFEST_DIR"),
-        "/../../target/lull-web"
+        "/../../target/nestwatch-web"
     )));
     candidates
         .into_iter()
         .find(|d| d.join("index.html").is_file())
 }
 
-/// Engine storage: `$LULL_DATA_DIR` as a directory, else the OS key store.
+/// Engine storage: `$NESTWATCH_DATA_DIR` as a directory, else the OS key store.
 pub fn engine_storage(platform: &DesktopPlatform) -> Arc<dyn Storage> {
-    match std::env::var_os("LULL_DATA_DIR") {
-        Some(d) => match lull_core::DirStorage::open(PathBuf::from(d)) {
+    match std::env::var_os("NESTWATCH_DATA_DIR") {
+        Some(d) => match nestwatch_core::DirStorage::open(PathBuf::from(d)) {
             Ok(s) => Arc::new(s),
             Err(e) => {
-                log::error!("LULL_DATA_DIR unusable ({e}); using the key store");
+                log::error!("NESTWATCH_DATA_DIR unusable ({e}); using the key store");
                 Arc::new(storage::KeyStoreStorage::new(platform.key_store.clone()))
             }
         },
@@ -74,12 +74,12 @@ pub fn engine_storage(platform: &DesktopPlatform) -> Arc<dyn Storage> {
 
 /// File with UI preferences (not secrets).
 pub fn prefs_path() -> PathBuf {
-    if let Some(d) = std::env::var_os("LULL_DATA_DIR") {
+    if let Some(d) = std::env::var_os("NESTWATCH_DATA_DIR") {
         return PathBuf::from(d).join("ui-prefs.txt");
     }
     dirs::config_dir()
         .unwrap_or_else(|| PathBuf::from("."))
-        .join("lull")
+        .join("nestwatch")
         .join("ui-prefs.txt")
 }
 
@@ -163,10 +163,10 @@ impl Host for DesktopHost {
 /// Builds the UI backend over a started listener engine.
 pub fn backend(
     host: DesktopHost,
-    listener: lull_core::listener::ListenerEngine,
-) -> lull_ui::BackendHandle {
+    listener: nestwatch_core::listener::ListenerEngine,
+) -> nestwatch_ui::BackendHandle {
     let clock = host.clock.clone();
-    lull_ui::BackendHandle::new(lull_ui::adapter::EngineBackend::new(
+    nestwatch_ui::BackendHandle::new(nestwatch_ui::adapter::EngineBackend::new(
         Rc::new(host),
         clock,
         listener,
@@ -221,14 +221,14 @@ mod tests {
 
     #[test]
     fn web_dir_prefers_the_environment_then_the_executable() {
-        let root = std::env::temp_dir().join(format!("lull-web-dir-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("nestwatch-web-dir-{}", std::process::id()));
         let env = root.join("env");
         let exe_web = root.join("bin/web");
         for d in [&env, &exe_web] {
             std::fs::create_dir_all(d).unwrap();
             std::fs::write(d.join("index.html"), "x").unwrap();
         }
-        let exe = Some(root.join("bin/lull-desktop"));
+        let exe = Some(root.join("bin/nestwatch-desktop"));
         assert_eq!(web_dir_from(Some(env.clone()), exe.clone()), Some(env));
         assert_eq!(web_dir_from(None, exe), Some(exe_web));
         let _ = std::fs::remove_dir_all(root);

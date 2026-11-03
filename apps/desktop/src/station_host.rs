@@ -4,21 +4,21 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use lull_core::station::{
+use nestwatch_core::station::{
     AssetSource, BindScope, CameraAvailability, CameraFrame, ListenConfig, PixelFormat,
     StationConfig, StationEngine, StationError, StationEvent, WebConfig, WebOptions,
 };
-use lull_core::{CameraFacing, Clock, Storage};
-use lull_platform::{
+use nestwatch_core::{CameraFacing, Clock, Storage};
+use nestwatch_platform::{
     AudioStream, CameraRequest, CameraStream, CaptureRequest, DesktopPlatform, Facing, PixelData,
     PlatformError, PlaybackRequest, PlaybackSource, Samples, SleepInhibition, StreamFormat,
     VideoFrame,
 };
-use lull_ui::adapter::station::RunningStation;
+use nestwatch_ui::adapter::station::RunningStation;
 
-/// Station settings from the environment (tests, servers): `LULL_STATION_NAME`,
-/// `LULL_TCP_PORT`, `LULL_HTTP_PORT`, `LULL_HTTPS_PORT`, `LULL_LOOPBACK=1`,
-/// `LULL_NO_MDNS=1`.
+/// Station settings from the environment (tests, servers): `NESTWATCH_STATION_NAME`,
+/// `NESTWATCH_TCP_PORT`, `NESTWATCH_HTTP_PORT`, `NESTWATCH_HTTPS_PORT`, `NESTWATCH_LOOPBACK=1`,
+/// `NESTWATCH_NO_MDNS=1`.
 #[derive(Debug, Clone, Default)]
 pub struct StationOptions {
     /// Name used until the user renames the station.
@@ -47,12 +47,12 @@ impl StationOptions {
     /// Reads the environment.
     pub fn from_env() -> Self {
         Self {
-            name: std::env::var("LULL_STATION_NAME").ok(),
-            tcp_port: env_port("LULL_TCP_PORT"),
-            http_port: env_port("LULL_HTTP_PORT"),
-            https_port: env_port("LULL_HTTPS_PORT"),
-            loopback: env_flag("LULL_LOOPBACK"),
-            no_mdns: env_flag("LULL_NO_MDNS"),
+            name: std::env::var("NESTWATCH_STATION_NAME").ok(),
+            tcp_port: env_port("NESTWATCH_TCP_PORT"),
+            http_port: env_port("NESTWATCH_HTTP_PORT"),
+            https_port: env_port("NESTWATCH_HTTPS_PORT"),
+            loopback: env_flag("NESTWATCH_LOOPBACK"),
+            no_mdns: env_flag("NESTWATCH_NO_MDNS"),
         }
     }
 }
@@ -73,7 +73,7 @@ fn port(p: Option<u16>, default: ListenConfig, loopback: bool) -> ListenConfig {
     c
 }
 
-const PLACEHOLDER_APP: &[u8] = b"<!doctype html><meta charset=utf-8><title>Lull</title>\
+const PLACEHOLDER_APP: &[u8] = b"<!doctype html><meta charset=utf-8><title>Nestwatch</title>\
 <p>This station was built without the browser listener app (apps/web/build.sh).</p>";
 
 /// The station's device handles; dropping it stops them.
@@ -144,7 +144,7 @@ pub async fn start(
 }
 
 fn default_name() -> String {
-    "Lull station".into()
+    "Nestwatch station".into()
 }
 
 fn start_devices(platform: &DesktopPlatform, engine: &StationEngine) -> Devices {
@@ -184,7 +184,7 @@ fn start_devices(platform: &DesktopPlatform, engine: &StationEngine) -> Devices 
         }
     };
     // platforms.md §2.4, PLATFORM-4.
-    let sleep = match platform.power.inhibit_sleep("Lull station is monitoring") {
+    let sleep = match platform.power.inhibit_sleep("Nestwatch station is monitoring") {
         Ok(s) => Some(s),
         Err(e) => {
             log::warn!("cannot prevent system sleep ({e})");

@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Lull"
+rootProject.name = "Nestwatch"
 include(":app")

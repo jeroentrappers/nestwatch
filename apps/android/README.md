@@ -1,13 +1,13 @@
-# Lull for Android
+# Nestwatch for Android
 
 Kotlin + Jetpack Compose app (minSdk 23, target and compile SDK 36) on the
-Rust core through `crates/lull-ffi` (UniFFI, JNA). Station and listener,
-the screens of `design/README.md` §5 with the Lull tokens mapped to
+Rust core through `crates/nestwatch-ffi` (UniFFI, JNA). Station and listener,
+the screens of `design/README.md` §5 with the Nestwatch tokens mapped to
 Material 3 (§6).
 
 | Concern | Where |
 |---------|-------|
-| Engines | `core/Lull.kt` owns the `Station` and `Listener` objects and republishes snapshots, events and video frames as flows |
+| Engines | `core/Nestwatch.kt` owns the `Station` and `Listener` objects and republishes snapshots, events and video frames as flows |
 | Storage (device key, trust, settings) | `core/KeystoreStorage.kt`: AES-256-GCM under an Android Keystore key, files in `noBackupFilesDir`, backups off (ANDROID-2) |
 | Station | `service/StationService.kt`: foreground service (microphone, camera if granted; plain on API 23–29), wake and Wi-Fi locks, `AudioRecord` → `push_capture_i16`, talk-back `AudioTrack`, CameraX on `CameraWanted` only, battery, NSD advertising |
 | Listener | `service/ListenerService.kt`: foreground service (mediaPlayback on API 29+), `pull_playback` → `AudioTrack`, talk-back microphone, NSD browsing under a multicast lock, alert notifications |
@@ -29,8 +29,8 @@ echo "sdk.dir=$HOME/Android/Sdk" > local.properties
 ./gradlew assembleDebug testDebugUnitTest
 ```
 
-The `cargoNdkBuild` task builds `liblull_ffi.so` (release profile) for
-`lull.abis` (`gradle.properties`; `-Plull.abis=x86_64` for a quick emulator
+The `cargoNdkBuild` task builds `libnestwatch_ffi.so` (release profile) for
+`nestwatch.abis` (`gradle.properties`; `-Pnestwatch.abis=x86_64` for a quick emulator
 build), and `uniffiBindings` generates the Kotlin bindings from it into
 `app/build/generated/uniffi`.
 
@@ -39,15 +39,15 @@ build), and `uniffiBindings` generates the Kotlin bindings from it into
 The emulator reaches the host at `10.0.2.2`:
 
 ```sh
-cargo run --release -p lull-cli -- --data /tmp/st station --pair --tone \
+cargo run --release -p nestwatch-cli -- --data /tmp/st station --pair --tone \
   --no-mdns --no-web --port 47210 --endpoint 10.0.2.2:47210
-adb shell "am start -a android.intent.action.VIEW -d '<invite>' org.lull.android"
+adb shell "am start -a android.intent.action.VIEW -d '<invite>' org.nestwatch.android"
 ```
 
 For a station in the emulator, forward its port and pair by code:
 
 ```sh
 adb forward tcp:47290 tcp:47100
-cargo run --release -p lull-cli -- --data /tmp/ls listen --code <code> \
+cargo run --release -p nestwatch-cli -- --data /tmp/ls listen --code <code> \
   --station-id <id> --route 127.0.0.1:47290 --no-mdns
 ```

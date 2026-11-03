@@ -3,8 +3,8 @@
 
 use std::sync::Arc;
 
-use lull_core::{Storage, StorageError};
-use lull_platform::KeyStore;
+use nestwatch_core::{Storage, StorageError};
+use nestwatch_platform::KeyStore;
 
 /// Named engine values (`device-key`, `station-trust`, ...) as secrets in
 /// the OS key store (Secret Service / Keychain / Credential Manager, or the
@@ -29,7 +29,7 @@ impl KeyStoreStorage {
     }
 }
 
-fn err(e: lull_platform::PlatformError) -> StorageError {
+fn err(e: nestwatch_platform::PlatformError) -> StorageError {
     StorageError::Backend(e.to_string())
 }
 
@@ -53,7 +53,7 @@ impl Storage for KeyStoreStorage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use lull_platform::keystore::MemoryKeyStore;
+    use nestwatch_platform::keystore::MemoryKeyStore;
 
     #[test]
     fn engine_keys_roundtrip_through_a_key_store() {
@@ -74,8 +74,8 @@ mod tests {
             assert_eq!(s.get(key).unwrap(), None);
         }
         // The engines can start on it.
-        let key = lull_core::load_or_create_device_key(&s).unwrap();
-        let again = lull_core::load_or_create_device_key(&s).unwrap();
+        let key = nestwatch_core::load_or_create_device_key(&s).unwrap();
+        let again = nestwatch_core::load_or_create_device_key(&s).unwrap();
         assert_eq!(key.device_id(), again.device_id());
     }
 }

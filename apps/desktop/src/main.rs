@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Lull desktop app (Linux, macOS, Windows): a Dioxus window over the
+//! Nestwatch desktop app (Linux, macOS, Windows): a Dioxus window over the
 //! station and listener engines (platforms.md §2.4).
 //!
 //! Closing the window hides it; the station and listener keep running and
@@ -14,17 +14,17 @@ use dioxus::desktop::{
     Config, LogicalSize, WindowBuilder, WindowCloseBehaviour, use_tray_menu_event_handler, window,
 };
 use dioxus::prelude::*;
-use lull_core::listener::{ListenerConfig, ListenerEngine};
-use lull_core::{Clock, SystemClock};
-use lull_desktop::station_host::StationOptions;
-use lull_desktop::{DesktopHost, listener_host};
-use lull_platform::{DesktopOptions, DesktopPlatform};
-use lull_ui::model::{StationRun, Theme};
-use lull_ui::{APP_CSS, BackendHandle, LULL_CSS, LullApp, Ui, logic};
+use nestwatch_core::listener::{ListenerConfig, ListenerEngine};
+use nestwatch_core::{Clock, SystemClock};
+use nestwatch_desktop::station_host::StationOptions;
+use nestwatch_desktop::{DesktopHost, listener_host};
+use nestwatch_platform::{DesktopOptions, DesktopPlatform};
+use nestwatch_ui::model::{StationRun, Theme};
+use nestwatch_ui::{APP_CSS, BackendHandle, NESTWATCH_CSS, NestwatchApp, Ui, logic};
 
 struct Boot {
     platform: DesktopPlatform,
-    storage: Arc<dyn lull_core::Storage>,
+    storage: Arc<dyn nestwatch_core::Storage>,
     clock: Arc<dyn Clock>,
     listener: ListenerEngine,
 }
@@ -56,7 +56,7 @@ fn js_string(s: &str) -> String {
 
 /// The tray tooltip: state in words (platforms.md §2.4).
 fn tray_state(ui: &Ui) -> String {
-    let mut parts = vec![lull_ui::strings::APP.to_owned()];
+    let mut parts = vec![nestwatch_ui::strings::APP.to_owned()];
     if let StationRun::Running(m) = &*ui.station.read() {
         parts.push(format!(
             "{}: {}",
@@ -90,10 +90,10 @@ fn App() -> Element {
                 true
             }),
         };
-        lull_desktop::backend(host, b.listener)
+        nestwatch_desktop::backend(host, b.listener)
     });
     rsx! {
-        LullApp { backend: backend.clone() }
+        NestwatchApp { backend: backend.clone() }
         Tray { backend }
     }
 }
@@ -103,10 +103,10 @@ fn App() -> Element {
 fn Tray(backend: BackendHandle) -> Element {
     let tray = use_hook(|| {
         let menu = Menu::new();
-        let show = MenuItem::with_id("show", "Show Lull", true, None);
-        let quit = MenuItem::with_id("quit", "Quit Lull", true, None);
+        let show = MenuItem::with_id("show", "Show Nestwatch", true, None);
+        let quit = MenuItem::with_id("quit", "Quit Nestwatch", true, None);
         let _ = menu.append_items(&[&show, &PredefinedMenuItem::separator(), &quit]);
-        let icon = TrayIcon::from_rgba(lull_desktop::logo_rgba(32), 32, 32).ok();
+        let icon = TrayIcon::from_rgba(nestwatch_desktop::logo_rgba(32), 32, 32).ok();
         init_tray_icon(menu, icon)
     });
     let ui = use_context::<Ui>();
@@ -142,14 +142,14 @@ fn main() {
     let _enter = rt.enter();
     let platform = DesktopPlatform::detect(&DesktopOptions::default());
     log::info!("platform backends:\n{}", platform.report);
-    let storage = lull_desktop::engine_storage(&platform);
+    let storage = nestwatch_desktop::engine_storage(&platform);
     let clock: Arc<dyn Clock> = Arc::new(SystemClock::new());
     let mut cfg = ListenerConfig::new("Desktop listener");
-    cfg.discovery = std::env::var("LULL_NO_MDNS").is_err();
+    cfg.discovery = std::env::var("NESTWATCH_NO_MDNS").is_err();
     let listener = match ListenerEngine::start(cfg, storage.clone(), clock.clone()) {
         Ok(l) => l,
         Err(e) => {
-            eprintln!("lull-desktop: cannot start the listener: {e}");
+            eprintln!("nestwatch-desktop: cannot start the listener: {e}");
             std::process::exit(1);
         }
     };
@@ -164,12 +164,12 @@ fn main() {
         })
     });
     let icon =
-        dioxus::desktop::tao::window::Icon::from_rgba(lull_desktop::logo_rgba(64), 64, 64).ok();
-    let head = format!("<style>{LULL_CSS}</style><style>{APP_CSS}</style>");
+        dioxus::desktop::tao::window::Icon::from_rgba(nestwatch_desktop::logo_rgba(64), 64, 64).ok();
+    let head = format!("<style>{NESTWATCH_CSS}</style><style>{APP_CSS}</style>");
     let config = Config::new()
         .with_window(
             WindowBuilder::new()
-                .with_title("Lull")
+                .with_title("Nestwatch")
                 .with_window_icon(icon.clone())
                 .with_inner_size(LogicalSize::new(1180.0, 820.0))
                 .with_min_inner_size(LogicalSize::new(360.0, 560.0)),

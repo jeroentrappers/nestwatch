@@ -7,7 +7,7 @@ plugins {
 
 /** Cargo workspace root (two levels above this project). */
 val workspaceDir: File = rootDir.resolve("../..").canonicalFile
-val abis: List<String> = (findProperty("lull.abis") as String? ?: "arm64-v8a,armeabi-v7a,x86_64")
+val abis: List<String> = (findProperty("nestwatch.abis") as String? ?: "arm64-v8a,armeabi-v7a,x86_64")
     .split(',').map { it.trim() }.filter { it.isNotEmpty() }
 val rustJniDir = layout.buildDirectory.dir("rustJniLibs")
 val bindingsDir = layout.buildDirectory.dir("generated/uniffi/kotlin")
@@ -15,12 +15,12 @@ val bindingsDir = layout.buildDirectory.dir("generated/uniffi/kotlin")
 val cargo: String = System.getenv("CARGO") ?: "cargo"
 
 android {
-    namespace = "org.lull.android"
+    namespace = "org.nestwatch.android"
     compileSdk = 36
     ndkVersion = "30.0.16248370"
 
     defaultConfig {
-        applicationId = "org.lull.android"
+        applicationId = "org.nestwatch.android"
         minSdk = 23
         targetSdk = 36
         versionCode = 1
@@ -66,12 +66,12 @@ android {
 }
 
 /**
- * Builds lull-ffi for every ABI with cargo-ndk (release profile: Argon2id
+ * Builds nestwatch-ffi for every ABI with cargo-ndk (release profile: Argon2id
  * and the media chain are far too slow unoptimised) into rustJniLibs.
  */
 val cargoNdkBuild = tasks.register<Exec>("cargoNdkBuild") {
     group = "rust"
-    description = "Builds liblull_ffi.so for ${abis.joinToString()} with cargo-ndk"
+    description = "Builds libnestwatch_ffi.so for ${abis.joinToString()} with cargo-ndk"
     workingDir = workspaceDir
     inputs.files(fileTree(workspaceDir.resolve("crates")) { exclude("**/target/**") })
     inputs.file(workspaceDir.resolve("Cargo.lock"))
@@ -79,7 +79,7 @@ val cargoNdkBuild = tasks.register<Exec>("cargoNdkBuild") {
     outputs.dir(rustJniDir)
     val args = mutableListOf(cargo, "ndk", "--platform", "23")
     abis.forEach { args += listOf("-t", it) }
-    args += listOf("-o", rustJniDir.get().asFile.path, "build", "--release", "-p", "lull-ffi", "--lib")
+    args += listOf("-o", rustJniDir.get().asFile.path, "build", "--release", "-p", "nestwatch-ffi", "--lib")
     commandLine(args)
     environment("PATH", "${System.getProperty("user.home")}/.cargo/bin:${System.getenv("PATH")}")
     androidComponents.sdkComponents.ndkDirectory.orNull?.let { environment("ANDROID_NDK_HOME", it.asFile.path) }
@@ -91,11 +91,11 @@ val uniffiBindings = tasks.register<Exec>("uniffiBindings") {
     description = "Generates the UniFFI Kotlin bindings"
     dependsOn(cargoNdkBuild)
     workingDir = workspaceDir
-    val lib = rustJniDir.get().asFile.resolve("${abis.first()}/liblull_ffi.so")
+    val lib = rustJniDir.get().asFile.resolve("${abis.first()}/libnestwatch_ffi.so")
     inputs.dir(rustJniDir)
     outputs.dir(bindingsDir)
     commandLine(
-        cargo, "run", "--quiet", "-p", "lull-ffi", "--features", "bindgen", "--bin", "uniffi-bindgen", "--",
+        cargo, "run", "--quiet", "-p", "nestwatch-ffi", "--features", "bindgen", "--bin", "uniffi-bindgen", "--",
         "generate", "--library", lib.path, "--language", "kotlin", "--no-format",
         "--out-dir", bindingsDir.get().asFile.path,
     )

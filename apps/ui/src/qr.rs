@@ -62,7 +62,7 @@ mod tests {
 
     #[test]
     fn encodes_an_invitation_into_runs() {
-        let inv = "lull://invite?v=1&s=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&t=AAAAAAAAAAAAAAAAAAAAAA&n=Nursery&a=192.168.1.20%3A47100";
+        let inv = "nestwatch://invite?v=1&s=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&t=AAAAAAAAAAAAAAAAAAAAAA&n=Nursery&a=192.168.1.20%3A47100";
         let q = qr_svg(inv).unwrap();
         // Version ≥ 5 for this length; finder pattern at the top left.
         assert!(q.size >= 37 + 2 * QUIET);

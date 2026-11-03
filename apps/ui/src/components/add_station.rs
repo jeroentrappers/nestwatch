@@ -151,7 +151,7 @@ pub fn AddStation() -> Element {
                         class: "input",
                         autocomplete: "off",
                         spellcheck: "false",
-                        placeholder: "lull://invite?…",
+                        placeholder: "nestwatch://invite?…",
                         value: "{invite}",
                         oninput: move |e: FormEvent| invite.set(e.value()),
                     }

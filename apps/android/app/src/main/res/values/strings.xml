@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- English reference text (NFR-I18N-1). -->
 <resources>
-    <string name="app_name">Lull</string>
+    <string name="app_name">Nestwatch</string>
     <string name="promise">A private baby monitor for the devices you already own. Everything stays on your network.</string>
-    <string name="disclaimer">Lull is not a medical device and does not replace supervision. Always check on your child in person.</string>
+    <string name="disclaimer">Nestwatch is not a medical device and does not replace supervision. Always check on your child in person.</string>
     <string name="role_station">This device watches</string>
     <string name="role_station_hint">Put it in the child\'s room. It listens and, when asked, shows the camera.</string>
     <string name="role_listener">This device listens</string>
@@ -15,13 +15,13 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="settings">Settings</string>
-    <string name="about">About Lull</string>
+    <string name="about">About Nestwatch</string>
     <string name="theme">Theme</string>
     <string name="theme_system">System</string>
     <string name="theme_night">Night</string>
     <string name="theme_day">Day</string>
     <string name="unnamed">Unnamed device</string>
-    <string name="about_body">Lull connects your own devices directly, on your home network or your own VPN. There is no account, no cloud and no tracking. Audio and video are end-to-end encrypted.</string>
+    <string name="about_body">Nestwatch connects your own devices directly, on your home network or your own VPN. There is no account, no cloud and no tracking. Audio and video are end-to-end encrypted.</string>
     <string name="version">Version</string>
     <string name="device_id">Device ID</string>
     <string name="license">Free software under the GNU AGPL 3.0 or later.</string>
@@ -36,15 +36,15 @@
     <string name="perm_camera_station">Allow the camera so a paired listener can open a live view on request. The camera is off otherwise, and this screen shows when it is on.</string>
     <string name="perm_camera_scan">The camera is used to scan the station\'s pairing QR code. Nothing is recorded.</string>
     <string name="perm_notifications_title">Notifications</string>
-    <string name="perm_notifications">Lull alerts you when a room gets loud, a station becomes unreachable or its battery runs low.</string>
+    <string name="perm_notifications">Nestwatch alerts you when a room gets loud, a station becomes unreachable or its battery runs low.</string>
     <string name="perm_continue">Continue</string>
     <string name="perm_not_now">Not now</string>
     <string name="perm_denied_mic">Without the microphone the station cannot listen. You can allow it in the system settings.</string>
     <string name="open_settings">Open settings</string>
 
     <!-- Battery optimisation (platforms.md §2.2) -->
-    <string name="battery_title">Keep Lull running</string>
-    <string name="battery_body">Android may pause apps to save battery, which would stop monitoring with the screen off. Allow Lull to ignore battery optimisation so it keeps running.</string>
+    <string name="battery_title">Keep Nestwatch running</string>
+    <string name="battery_body">Android may pause apps to save battery, which would stop monitoring with the screen off. Allow Nestwatch to ignore battery optimisation so it keeps running.</string>
     <string name="battery_allow">Allow</string>
     <string name="battery_dismiss">Not now</string>
 
@@ -98,7 +98,7 @@
     <string name="addresses">Addresses</string>
 
     <!-- Pairing sheet -->
-    <string name="pair_intro">Scan with the Lull app on the listening device.</string>
+    <string name="pair_intro">Scan with the Nestwatch app on the listening device.</string>
     <string name="pair_code_intro">No camera? Enter this code</string>
     <string name="pair_station_id">Station ID</string>
     <string name="qr_label">Pairing QR code</string>
@@ -116,14 +116,14 @@
     <string name="add_station">Add a station</string>
     <string name="scan_qr">Scan the QR code</string>
     <string name="scan_hint">Point the camera at the QR code on the station.</string>
-    <string name="scan_not_lull">That QR code is not a Lull invitation.</string>
+    <string name="scan_not_nestwatch">That QR code is not a Nestwatch invitation.</string>
     <string name="nearby">Nearby</string>
     <string name="nearby_searching">Looking for stations on this network…</string>
     <string name="pairing_open">pairing open</string>
     <string name="already_paired">already paired</string>
     <string name="not_pairing">pairing closed</string>
     <string name="invite_field">Invitation link</string>
-    <string name="invite_hint">Paste the lull:// link shown on the station.</string>
+    <string name="invite_hint">Paste the nestwatch:// link shown on the station.</string>
     <string name="invite_submit">Pair with link</string>
     <string name="code_field">Pairing code</string>
     <string name="code_field_for">Pairing code shown on %s</string>
@@ -138,7 +138,7 @@
     <string name="verify_removed">The station was removed again. Pair once more, close to the station.</string>
     <string name="by_code">Use a code</string>
     <string name="by_link">Use a link</string>
-    <string name="err_invalid_invite">That link is not a Lull invitation.</string>
+    <string name="err_invalid_invite">That link is not a Nestwatch invitation.</string>
     <string name="err_invalid_code">That code is not valid. It has 10 letters and digits.</string>
     <string name="err_invalid_id">That station ID is not valid.</string>
     <string name="err_invalid_address">That address is not valid. Use host:port.</string>
@@ -151,7 +151,7 @@
 
     <!-- Listener home -->
     <string name="no_stations">No stations yet. Add the station in your child\'s room to start listening.</string>
-    <string name="keeps_listening">Lull keeps listening with the screen off.</string>
+    <string name="keeps_listening">Nestwatch keeps listening with the screen off.</string>
     <string name="status_quiet">Quiet</string>
     <string name="status_sound">Sound</string>
     <string name="status_live">Listening</string>
@@ -237,7 +237,7 @@
     <string name="alert_unreachable">%s is unreachable</string>
     <string name="alert_reachable">%s is back</string>
     <string name="alert_battery">%1$s: battery low (%2$d%%)</string>
-    <string name="alert_body">Open Lull to listen.</string>
+    <string name="alert_body">Open Nestwatch to listen.</string>
 
     <!-- Time -->
     <string name="ago_now">just now</string>
@@ -259,9 +259,9 @@
     <string name="channel_connection_desc">A station is unreachable or back.</string>
     <string name="channel_battery">Battery alerts</string>
     <string name="channel_battery_desc">A station\'s battery runs low.</string>
-    <string name="notif_station_title">Lull station is listening</string>
+    <string name="notif_station_title">Nestwatch station is listening</string>
     <string name="notif_station_starting">Starting…</string>
-    <string name="notif_listener_title">Lull is listening</string>
+    <string name="notif_listener_title">Nestwatch is listening</string>
     <string name="notif_listener_idle">No station followed</string>
     <plurals name="notif_listener_text">
         <item quantity="one">%1$d station · %2$d live</item>

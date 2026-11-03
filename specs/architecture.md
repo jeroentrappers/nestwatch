@@ -15,21 +15,21 @@
 
 ```
 crates/
-  lull-proto      wire format: preface, frames, records, CBOR control messages, invitations, endpoints
-  lull-crypto     device keys, device IDs, Noise handshakes (all modes), code PSK, verification number
-  lull-media      capture chain (resample, AGC, level), codecs (ADPCM, Opus), VOX gate, jitter buffer, mixer, JPEG helpers
-  lull-session    sans-I/O session state machines for station and listener: feed bytes in, get bytes and events out
-  lull-core       station and listener engines: trust stores, pairing mode, multi-session scheduling, reconnect, alerts, settings
-  lull-net        async transports: TCP, WebSocket client and server, HTTP(S) server for the web app, mDNS
-  lull-platform   traits for audio I/O, camera, key storage, power, notifications, plus desktop implementations
-  lull-ffi        UniFFI bindings exposing lull-core to Kotlin and Swift
+  nestwatch-proto      wire format: preface, frames, records, CBOR control messages, invitations, endpoints
+  nestwatch-crypto     device keys, device IDs, Noise handshakes (all modes), code PSK, verification number
+  nestwatch-media      capture chain (resample, AGC, level), codecs (ADPCM, Opus), VOX gate, jitter buffer, mixer, JPEG helpers
+  nestwatch-session    sans-I/O session state machines for station and listener: feed bytes in, get bytes and events out
+  nestwatch-core       station and listener engines: trust stores, pairing mode, multi-session scheduling, reconnect, alerts, settings
+  nestwatch-net        async transports: TCP, WebSocket client and server, HTTP(S) server for the web app, mDNS
+  nestwatch-platform   traits for audio I/O, camera, key storage, power, notifications, plus desktop implementations
+  nestwatch-ffi        UniFFI bindings exposing nestwatch-core to Kotlin and Swift
 apps/
   desktop         Dioxus desktop app (Linux, macOS, Windows)
   web             Dioxus web listener (wasm32), served by stations
-  android         Kotlin + Jetpack Compose app on lull-ffi
-  ios             SwiftUI app on lull-ffi
+  android         Kotlin + Jetpack Compose app on nestwatch-ffi
+  ios             SwiftUI app on nestwatch-ffi
 tools/
-  lull-cli        headless station / listener / probe for testing and servers
+  nestwatch-cli        headless station / listener / probe for testing and servers
   conformance     independent checks of test vectors (see test-vectors.md)
 ```
 
@@ -38,14 +38,14 @@ tools/
 ```
 UI (Dioxus / Compose / SwiftUI)
    │  state snapshots + intents
-lull-core (engines)  ── lull-platform traits ── OS adapters
+nestwatch-core (engines)  ── nestwatch-platform traits ── OS adapters
    │
-lull-session (sans-I/O) ── lull-proto, lull-crypto, lull-media
+nestwatch-session (sans-I/O) ── nestwatch-proto, nestwatch-crypto, nestwatch-media
    │
-lull-net (tokio on native, browser APIs on wasm)
+nestwatch-net (tokio on native, browser APIs on wasm)
 ```
 
-`lull-session` consumes and produces bytes and typed events; it owns no
+`nestwatch-session` consumes and produces bytes and typed events; it owns no
 sockets, timers or threads (time is passed in). This makes every protocol
 path testable deterministically, including loss, reordering and timeouts.
 

@@ -6,7 +6,7 @@
    Noise (the `cacophony`/`snow` vector set for the three patterns used),
    Argon2id (RFC 9106 §5.3), HKDF-SHA256 (RFC 5869 appendix A),
    ChaCha20-Poly1305 (RFC 8439 §2.8.2), CBOR (RFC 8949 appendix A).
-2. **Lull vectors** in `vectors/*.json`, produced by the reference
+2. **Nestwatch vectors** in `vectors/*.json`, produced by the reference
    implementation from fixed seeds:
    - device IDs from fixed public keys;
    - invite PSK and code PSK derivations;
@@ -18,7 +18,7 @@
 
 ## 2. Independent check
 
-`tools/conformance` re-derives every Lull vector with a separate
+`tools/conformance` re-derives every Nestwatch vector with a separate
 implementation that does not share code with the Rust core (Python, using
 the `noiseprotocol`, `argon2-cffi` and `cbor2` packages). A vector is
 accepted only if both implementations agree. Changes to the protocol must

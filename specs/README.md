@@ -1,13 +1,13 @@
-# Lull specifications
+# Nestwatch specifications
 
-Lull is a private, local-first baby monitor. These documents are the single
-source of truth for every Lull implementation. Code is written from these
+Nestwatch is a private, local-first baby monitor. These documents are the single
+source of truth for every Nestwatch implementation. Code is written from these
 specs; where code and spec disagree, the spec wins until it is changed.
 
 | Document | Contents |
 |----------|----------|
 | [product.md](product.md) | Roles, user-facing behaviour, numbered requirements |
-| [protocol.md](protocol.md) | Lull Wire Protocol 1 (LWP/1): discovery, pairing, handshake, records, control messages |
+| [protocol.md](protocol.md) | Nestwatch Wire Protocol 1 (NWP/1): discovery, pairing, handshake, records, control messages |
 | [media.md](media.md) | Audio and video pipelines, codecs, sound activation, jitter handling |
 | [security.md](security.md) | Threat model, key management, privacy rules |
 | [platforms.md](platforms.md) | Supported platforms, minimum versions, platform obligations |
@@ -27,7 +27,7 @@ specs; where code and spec disagree, the spec wins until it is changed.
 
 ## Clean-room process
 
-Lull is an independent implementation of a familiar product category. Its
+Nestwatch is an independent implementation of a familiar product category. Its
 specifications are written from desired behaviour and public standards
 (Noise, CBOR, Opus, mDNS, SPAKE2, JPEG, WebSocket). Implementers work from
 these documents only and do not consult the source code of other baby
