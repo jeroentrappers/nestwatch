@@ -23,6 +23,12 @@
 //! - Secrets and settings go through the foreign [`Storage`] (Android
 //!   Keystore or iOS Keychain backed; security.md §5).
 //!
+//! Bindings are generated in library mode by the `uniffi-bindgen` binary
+//! (feature `bindgen`): `crates/lull-ffi/generate-bindings.sh` writes Kotlin
+//! and Swift into `target/uniffi/`, and the Android Gradle build generates
+//! its Kotlin copy itself. `uniffi.toml` sets the Kotlin package
+//! `org.lull.ffi` and the Swift module `LullFFI`.
+//!
 //! The crate runs its own multi-threaded tokio runtime. Observer methods
 //! are called on its threads and must return quickly (post to the UI
 //! thread); they may call engine methods.
