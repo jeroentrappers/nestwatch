@@ -22,8 +22,8 @@ Specification phase. Start with [specs/](specs/README.md).
 
 | Step | State |
 |------|-------|
-| Specifications | in progress |
-| Design system | planned |
+| Specifications | first version |
+| Design system | done (`design/`) |
 | Rust core | planned |
 | Desktop apps (Dioxus) and browser listener (wasm) | planned |
 | Android (Compose) and iOS (SwiftUI) apps on the Rust core | planned |

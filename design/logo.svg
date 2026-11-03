@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Lull">
+  <!-- A crescent moon cradling two soft sound waves. -->
+  <defs>
+    <mask id="crescent">
+      <rect width="64" height="64" fill="#fff"/>
+      <circle cx="40" cy="24" r="20" fill="#000"/>
+    </mask>
+  </defs>
+  <circle cx="30" cy="32" r="24" fill="#f4bd7e" mask="url(#crescent)"/>
+  <path d="M40 38c3.5-2.6 3.5-8.4 0-11" fill="none" stroke="#b3a6ff" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M46 43c7-5.2 7-16.8 0-22" fill="none" stroke="#b3a6ff" stroke-width="3.2" stroke-linecap="round" opacity=".6"/>
+</svg>

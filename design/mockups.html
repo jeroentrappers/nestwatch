@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lull mockups</title>
+<link rel="stylesheet" href="lull.css">
+<style>
+  /* Mockup board only: frames around screens. Not part of the app stylesheet. */
+  body { padding: 32px; }
+  .board { display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start; }
+  .frame-label { font-size: 13px; color: var(--text-3); margin: 0 0 10px 6px; letter-spacing: .04em; text-transform: uppercase; }
+  .desktop { width: 1180px; border-radius: 18px; overflow: hidden; border: 1px solid var(--ink-3); background: var(--ink-0); box-shadow: 0 30px 80px rgba(0,0,0,.4); }
+  .titlebar { height: 36px; background: var(--ink-1); border-bottom: 1px solid var(--ink-3); display: flex; align-items: center; gap: 8px; padding: 0 14px; }
+  .titlebar i { width: 12px; height: 12px; border-radius: 50%; background: var(--ink-3); display: block; }
+  .phone { width: 390px; height: 820px; border-radius: 46px; border: 10px solid #050507; overflow: hidden; background: var(--ink-0); position: relative; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+  .phone .status { height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 28px; font-size: 13px; font-weight: 650; }
+  .phone .screen { padding: 8px 20px 20px; display: flex; flex-direction: column; gap: 16px; height: calc(100% - 44px); }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; }
+  .side { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 20px; padding: 0 24px 24px; }
+  .placeholder { background: radial-gradient(circle at 60% 40%, #3b3446, #121019 70%); }
+  .placeholder.night { background: radial-gradient(circle at 55% 45%, #4a4a4a, #0c0c0c 72%); filter: grayscale(1); }
+  .crib { position: absolute; inset: 22% 18% 18% 18%; border: 3px solid rgba(255,255,255,.18); border-radius: 18px; }
+  .crib::after { content: ""; position: absolute; left: 30%; top: 40%; width: 36%; height: 30%; border-radius: 50%; background: rgba(255,255,255,.12); }
+</style>
+</head>
+<body>
+<h1 class="row" style="margin-bottom:8px"><img src="logo.svg" width="36" height="36" alt=""> Lull design</h1>
+<p class="muted" style="margin-bottom:32px">Follows the system theme. Append <span class="mono">?night</span> or <span class="mono">?day</span> to force one.</p>
+<script>if (location.search.includes('day')) document.documentElement.dataset.theme = 'day'; else if (location.search.includes('night')) document.documentElement.dataset.theme = 'night';</script>
+
+<div class="board">
+
+  <!-- 1. Desktop listener dashboard -->
+  <section>
+    <p class="frame-label">Listener · desktop dashboard</p>
+    <div class="desktop">
+      <div class="titlebar"><i></i><i></i><i></i></div>
+      <div class="topbar">
+        <span class="brand"><img src="logo.svg" alt=""> Lull</span>
+        <div class="row">
+          <div class="segmented" role="group" aria-label="Role">
+            <button aria-pressed="true">Listening</button>
+            <button>Station</button>
+          </div>
+          <button class="btn ghost">+ Add station</button>
+        </div>
+      </div>
+      <div class="side">
+        <div class="grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start">
+          <article class="card tile alert">
+            <div class="row-between">
+              <div class="title"><h2>Nursery</h2><span class="caption">via Tailscale</span></div>
+              <span class="pill sound">Sound</span>
+            </div>
+            <div class="meter" style="--level:.78; --threshold:.5"><div class="fill"></div><div class="mark"></div></div>
+            <div class="row-between caption"><span>−18 dB now · opens above −50 dB</span><span>🔋 82%</span></div>
+            <div class="video"><div class="placeholder" style="position:absolute; inset:0"></div><div class="crib"></div><span class="pill cam badge">Camera live</span></div>
+            <div class="actions">
+              <button class="btn">Mute</button>
+              <button class="btn" aria-pressed="true">Camera</button>
+              <button class="btn">Solo</button>
+            </div>
+            <button class="btn talk">Hold to talk</button>
+          </article>
+          <article class="card tile">
+            <div class="row-between">
+              <div class="title"><h2>Leo's room</h2><span class="caption">home Wi-Fi</span></div>
+              <span class="pill calm">Quiet</span>
+            </div>
+            <div class="meter" style="--level:.18; --threshold:.5"><div class="fill"></div><div class="mark"></div></div>
+            <div class="row-between caption"><span>−58 dB room · opens above −50 dB</span><span>⚡ charging</span></div>
+            <div class="actions">
+              <button class="btn">Mute</button>
+              <button class="btn">Camera</button>
+              <button class="btn">Solo</button>
+            </div>
+            <button class="btn talk">Hold to talk</button>
+          </article>
+          <article class="card tile">
+            <div class="row-between">
+              <div class="title"><h2>Grandma's</h2><span class="caption">trying 3 addresses…</span></div>
+              <span class="pill warn">Reconnecting</span>
+            </div>
+            <div class="meter" style="--level:0; --threshold:.5"><div class="fill"></div><div class="mark"></div></div>
+            <p class="caption">Unreachable for 0:42. You'll be alerted when it's back.</p>
+          </article>
+        </div>
+        <aside class="card stack">
+          <div class="row-between"><h3>Nursery</h3><span class="caption">listening settings</span></div>
+          <div class="segmented" role="group" aria-label="Listening mode">
+            <button>Always on</button>
+            <button aria-pressed="true">When there's sound</button>
+          </div>
+          <div class="calibrate">
+            <svg viewBox="0 0 300 120" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 96 L20 94 L40 97 L60 93 L80 95 L100 90 L120 96 L140 88 L160 60 L170 30 L180 22 L190 40 L200 70 L220 92 L240 95 L260 93 L280 96 L300 94" fill="none" stroke="var(--sage)" stroke-width="2.5" stroke-linejoin="round"/>
+            </svg>
+            <div class="threshold" style="top:60%"><span>−50 dB</span></div>
+          </div>
+          <p class="caption">The line is the room's level over the last minute. Drag the threshold just above the quiet part.</p>
+          <div class="field"><label>Keep listening after sound</label><input class="range" type="range" min="1" max="15" value="4"><span class="caption">4 seconds</span></div>
+          <div class="field"><label>Volume</label><input class="range" type="range" value="70"></div>
+          <hr class="divider">
+          <div class="row-between"><span>Alert sound</span><input class="switch" type="checkbox" checked></div>
+          <div class="row-between"><span>Alert if unreachable</span><input class="switch" type="checkbox" checked></div>
+          <button class="btn ghost">Forget this station</button>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Phone station (normal) -->
+  <section>
+    <p class="frame-label">Station · phone</p>
+    <div class="phone">
+      <div class="status"><span>21:47</span><span>●●● 82%</span></div>
+      <div class="screen">
+        <div class="row-between"><span class="brand"><img src="logo.svg" alt=""> Nursery</span><button class="btn icon ghost" aria-label="Settings">⚙︎</button></div>
+        <div class="row wrap"><span class="pill calm">2 listening</span><span class="pill cam">Camera on · Mum</span></div>
+        <div style="display:grid; place-items:center; padding:12px 0">
+          <div class="ring" style="--level:.24; --threshold:.44">
+            <div class="value"><strong>−56</strong><span class="caption">dB · quiet</span></div>
+          </div>
+        </div>
+        <div class="card stack-s" style="padding:16px">
+          <div class="row-between"><span>Mum's phone</span><span class="caption">sound-activated</span></div>
+          <div class="row-between"><span>Living room laptop</span><span class="caption">always on</span></div>
+        </div>
+        <div class="stack-s" style="margin-top:auto">
+          <button class="btn primary block">Pair a listener</button>
+          <button class="btn ghost block">Dim screen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Phone station dimmed -->
+  <section>
+    <p class="frame-label">Station · dimmed for the night</p>
+    <div class="phone dimmed">
+      <div class="status"><span>02:13</span><span></span></div>
+      <div class="screen" style="justify-content:center; align-items:center; gap:28px">
+        <div class="ring" style="--level:.12; --threshold:.44; width:180px; height:180px">
+          <div class="value"><strong style="font-size:34px">−61</strong><span class="caption">quiet</span></div>
+        </div>
+        <span class="pill calm">2 listening</span>
+        <p class="caption">Tap anywhere to brighten</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Pairing sheet on the station -->
+  <section>
+    <p class="frame-label">Station · pairing sheet</p>
+    <div class="phone">
+      <div class="status"><span>21:48</span><span>●●● 82%</span></div>
+      <div class="screen" style="padding:0; justify-content:flex-end; background: rgba(0,0,0,.35)">
+        <div class="sheet stack" style="align-items:center; text-align:center">
+          <h2>Pair a listener</h2>
+          <p class="muted">Scan with the Lull app, or open the link on a computer.</p>
+          <div class="qr">
+            <svg viewBox="0 0 29 29" width="190" height="190" shape-rendering="crispEdges" aria-label="Pairing QR code">
+              <rect width="29" height="29" fill="#fff"/>
+              <path fill="#17161d" d="M1 1h7v7H1zM2 2v5h5V2zM3 3h3v3H3zM21 1h7v7h-7zM22 2v5h5V2zM23 3h3v3h-3zM1 21h7v7H1zM2 22v5h5v-5zM3 23h3v3H3zM10 1h1v2h-1zM12 2h2v1h-2zM15 1h3v1h-3zM10 5h3v1h-3zM14 4h1v4h-1zM17 3h2v3h-2zM9 9h2v2H9zM12 9h1v3h-1zM15 9h3v1h-3zM19 10h2v2h-2zM23 9h1v2h-1zM25 10h3v1h-3zM1 10h3v1H1zM5 11h2v2H5zM2 13h2v1H2zM10 13h4v1h-4zM16 12h1v3h-1zM18 14h3v1h-3zM22 13h2v2h-2zM26 12h2v3h-2zM9 16h1v3H9zM11 17h3v1h-3zM15 16h2v2h-2zM19 17h1v3h-1zM21 16h3v1h-3zM25 17h2v2h-2zM10 20h2v2h-2zM13 21h3v1h-3zM17 20h1v4h-1zM20 22h3v1h-3zM24 21h1v3h-1zM26 23h2v1h-2zM10 24h1v3h-1zM12 25h3v2h-3zM16 26h2v1h-2zM19 24h2v3h-2zM22 26h3v1h-3zM26 25h2v3h-2z"/>
+            </svg>
+          </div>
+          <div class="stack-s" style="align-items:center">
+            <span class="caption">No camera? Enter this code</span>
+            <span class="code-display">7KQ2M-X9RTA</span>
+          </div>
+          <p class="caption">Open for 9:12 · up to 8 devices</p>
+          <button class="btn ghost block">Done</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Listener: code entry + verification -->
+  <section>
+    <p class="frame-label">Listener · pairing by code</p>
+    <div class="phone">
+      <div class="status"><span>21:49</span><span>●●● 64%</span></div>
+      <div class="screen">
+        <div class="row"><button class="btn icon ghost" aria-label="Back">‹</button><h2>Add a station</h2></div>
+        <div class="card stack">
+          <h3>Nearby</h3>
+          <div class="list">
+            <div class="item"><span class="grow">Nursery</span><span class="pill calm plain">pairing open</span></div>
+            <div class="item"><span class="grow">Leo's room</span><span class="caption">already paired</span></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="code">Pairing code shown on Nursery</label>
+          <input id="code" class="input code-input" value="7KQ2M-X9RTA">
+        </div>
+        <div class="card stack" style="align-items:center; text-align:center">
+          <span class="caption">Check that the station shows the same number</span>
+          <span class="verify">042 917</span>
+          <div class="row" style="width:100%">
+            <button class="btn ghost grow">Different</button>
+            <button class="btn primary grow">Same, continue</button>
+          </div>
+        </div>
+        <button class="btn ghost block" style="margin-top:auto">Scan a QR code instead</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Phone listener home -->
+  <section>
+    <p class="frame-label">Listener · phone home</p>
+    <div class="phone">
+      <div class="status"><span>21:52</span><span>●●● 64%</span></div>
+      <div class="screen">
+        <div class="row-between"><span class="brand"><img src="logo.svg" alt=""> Lull</span><button class="btn icon ghost" aria-label="Add station">＋</button></div>
+        <article class="card tile" style="padding:18px">
+          <div class="row-between"><h2>Nursery</h2><span class="pill calm">Quiet</span></div>
+          <div class="meter" style="--level:.2; --threshold:.5"><div class="fill"></div><div class="mark"></div></div>
+          <div class="row-between caption"><span>−57 dB room</span><span>🔋 81%</span></div>
+          <div class="actions"><button class="btn">Mute</button><button class="btn">Camera</button></div>
+          <button class="btn talk">Hold to talk</button>
+        </article>
+        <article class="card tile" style="padding:18px">
+          <div class="row-between"><h2>Leo's room</h2><span class="pill voice">Dad talking</span></div>
+          <div class="meter" style="--level:.42; --threshold:.5"><div class="fill"></div><div class="mark"></div></div>
+          <div class="actions"><button class="btn">Mute</button><button class="btn">Camera</button></div>
+        </article>
+        <p class="caption" style="text-align:center; margin-top:auto">Lull keeps listening with the screen off.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
