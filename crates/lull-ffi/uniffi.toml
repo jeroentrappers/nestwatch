@@ -3,6 +3,8 @@
 package_name = "org.lull.ffi"
 # Android cleaner on API 34+, JNA cleaner below; androidx annotations.
 android = true
+# Records as `val` data classes (stable for Compose).
+generate_immutable_records = true
 
 [bindings.swift]
 module_name = "LullFFI"
