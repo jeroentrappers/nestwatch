@@ -24,6 +24,8 @@ mod error;
 mod listener;
 mod station;
 
+#[cfg(test)]
+mod tests;
 
 pub use crate::common::{Flavor, Stats};
 pub use error::{ConfigError, ProtocolError, SendError, SessionError, TimeoutKind};
