@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Nestwatch
+GenericName=Baby monitor
+GenericName[nl]=Babyfoon
+Comment=Private, local-first baby monitor: station and listener
+Comment[nl]=Privé babyfoon die lokaal werkt: zender en luisteraar
+Exec=nestwatch-desktop
+Icon=org.nestwatch.Nestwatch
+Terminal=false
+Categories=AudioVideo;Audio;Network;
+Keywords=baby;monitor;babyphone;babyfoon;
+StartupWMClass=nestwatch-desktop
