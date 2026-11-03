@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- design/logo.svg: a honey crescent cradling two lavender sound waves. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path
+        android:fillColor="#f4bd7e"
+        android:pathData="M27.876,8.094 A24,24 0 1,0 52.856,39.320 A20,20 0 1,1 27.876,8.094 Z" />
+    <path
+        android:pathData="M40,38c3.5,-2.6 3.5,-8.4 0,-11"
+        android:strokeColor="#b3a6ff"
+        android:strokeLineCap="round"
+        android:strokeWidth="3.2" />
+    <path
+        android:pathData="M46,43c7,-5.2 7,-16.8 0,-22"
+        android:strokeAlpha="0.6"
+        android:strokeColor="#b3a6ff"
+        android:strokeLineCap="round"
+        android:strokeWidth="3.2" />
+</vector>

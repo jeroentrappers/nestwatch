@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Monochrome status bar icon: the crescent and one wave. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M27.876,8.094 A24,24 0 1,0 52.856,39.320 A20,20 0 1,1 27.876,8.094 Z" />
+    <path
+        android:pathData="M40,38c3.5,-2.6 3.5,-8.4 0,-11"
+        android:strokeColor="#ffffff"
+        android:strokeLineCap="round"
+        android:strokeWidth="4" />
+</vector>
