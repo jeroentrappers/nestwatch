@@ -123,15 +123,15 @@ mod tests {
         let cases = [
             (
                 "0000000000000000000000000000000000000000000000000000000000000000",
-                "bh6u44sz3tdfitae",
+                "jxgvemvdl4fipfni",
             ),
             (
                 "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
-                "fv5cur5w6xdc2w7g",
+                "5oohnb4erchflnxs",
             ),
             (
                 "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a",
-                "2r5u2qrs5oqjtnbq",
+                "fe7cgpjgrn5h665a",
             ),
         ];
         for (key, id) in cases {
@@ -152,9 +152,9 @@ mod tests {
     #[test]
     fn grouped_form_and_parsing() {
         let id = pk("8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a").device_id();
-        assert_eq!(id.grouped(), "2r5u-2qrs-5oqj-tnbq");
-        assert_eq!(DeviceId::parse("2r5u-2qrs-5oqj-tnbq"), Ok(id));
-        assert_eq!("2R5U2QRS5OQJTNBQ".parse::<DeviceId>(), Ok(id));
+        assert_eq!(id.grouped(), "fe7c-gpjg-rn5h-665a");
+        assert_eq!(DeviceId::parse("fe7c-gpjg-rn5h-665a"), Ok(id));
+        assert_eq!("FE7CGPJGRN5H665A".parse::<DeviceId>(), Ok(id));
         assert_eq!(DeviceId::parse(id.as_str()), Ok(id));
     }
 

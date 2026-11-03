@@ -65,7 +65,7 @@
         "token": "a5c4e30221405f7e9dbcdbfa19385776"
       },
       "name": "reordered-and-uppercase-scheme",
-      "uri": "NEST://INVITE?a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&n=Baby%27s%20room&t=pcTjAiFAX36dvNv6GThXdg&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&v=1"
+      "uri": "NESTWATCH://INVITE?a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&n=Baby%27s%20room&t=pcTjAiFAX36dvNv6GThXdg&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&v=1"
     },
     {
       "invitation": {

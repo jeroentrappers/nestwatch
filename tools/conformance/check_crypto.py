@@ -159,8 +159,8 @@ def check_handshake(v):
             x25519_public(unhex(party["static_secret"])).hex(),
             party["static_public"],
         )
-    check(f"{label} listener preface", f"4c554c4c01{MODE_BYTE[mode]:02x}", v["listener"]["preface"])
-    check(f"{label} station preface", "4c554c4c0100", v["station"]["preface"])
+    check(f"{label} listener preface", f"4e45535401{MODE_BYTE[mode]:02x}", v["listener"]["preface"])
+    check(f"{label} station preface", "4e4553540100", v["station"]["preface"])
     prologue = b"nestwatch/1" + unhex(v["listener"]["preface"]) + unhex(v["station"]["preface"])
     check(f"{label} prologue", prologue.hex(), v["prologue"])
 

@@ -455,8 +455,11 @@ impl Shared {
             .values()
             .filter_map(|s| s.video.as_ref())
             .collect();
+        // State is published before the event, so anyone reacting to the
+        // event reads a snapshot that already agrees with it.
         if watches.is_empty() {
             if g.camera.wanted.take().is_some() {
+                self.publish(g);
                 self.emit(StationEvent::CameraNotWanted);
             }
             return;
@@ -470,6 +473,7 @@ impl Shared {
         };
         if g.camera.wanted.as_ref() != Some(&req) {
             g.camera.wanted = Some(req.clone());
+            self.publish(g);
             self.emit(StationEvent::CameraWanted(req));
         }
     }

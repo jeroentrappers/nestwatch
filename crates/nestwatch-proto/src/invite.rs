@@ -188,9 +188,10 @@ impl Invitation {
     /// fragment.
     pub fn parse_any(input: &str) -> Result<Self, InviteError> {
         let input = input.trim();
+        const SCHEME: &str = "nestwatch://";
         if input
-            .get(..7)
-            .is_some_and(|p| p.eq_ignore_ascii_case("nestwatch://"))
+            .get(..SCHEME.len())
+            .is_some_and(|p| p.eq_ignore_ascii_case(SCHEME))
         {
             Self::parse(input)
         } else {
@@ -233,7 +234,7 @@ mod tests {
     fn unknown_and_reordered_parameters() {
         let s = sample();
         let uri = format!(
-            "NEST://INVITE?x=9&a=10.0.0.1%3A1&t={}&future=%FF&n=Caf%C3%A9&s={}&v=1",
+            "NESTWATCH://INVITE?x=9&a=10.0.0.1%3A1&t={}&future=%FF&n=Caf%C3%A9&s={}&v=1",
             URL_SAFE_NO_PAD.encode(s.token),
             URL_SAFE_NO_PAD.encode(s.station_key)
         );
@@ -333,7 +334,9 @@ mod tests {
     fn web_url_variant() {
         let s = sample();
         let url = s.to_web_url("http://192.168.1.20:47180/").unwrap();
-        assert!(url.starts_with("http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1%26s%3D"));
+        assert!(
+            url.starts_with("http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1%26s%3D")
+        );
         assert!(!url[url.find('#').unwrap() + 1..].contains(['&', '=', '#', '?']));
         assert_eq!(Invitation::parse_web_url(&url).unwrap(), s);
         assert_eq!(Invitation::parse_any(&url).unwrap(), s);

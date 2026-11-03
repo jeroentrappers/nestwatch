@@ -12,9 +12,9 @@ use snow::{Builder, HandshakeState};
 use crate::{DeviceId, DeviceKey, HandshakeError, Psk, PublicKey, Transport};
 
 /// Length of the prologue: `"nestwatch/1"` plus two 6-byte prefaces.
-pub const PROLOGUE_LEN: usize = 18;
+pub const PROLOGUE_LEN: usize = 23;
 
-const PROLOGUE_TAG: &[u8; 6] = b"nestwatch/1";
+const PROLOGUE_TAG: &[u8; 11] = b"nestwatch/1";
 /// Largest Noise message (Noise spec §3).
 const MAX_NOISE_MESSAGE: usize = 65535;
 
@@ -61,13 +61,14 @@ impl Prologue {
     /// Builds the prologue from the two prefaces exactly as sent on the wire.
     pub fn new(listener_preface: [u8; 6], station_preface: [u8; 6]) -> Self {
         let mut p = [0u8; PROLOGUE_LEN];
-        p[..6].copy_from_slice(PROLOGUE_TAG);
-        p[6..12].copy_from_slice(&listener_preface);
-        p[12..].copy_from_slice(&station_preface);
+        let tag = PROLOGUE_TAG.len();
+        p[..tag].copy_from_slice(PROLOGUE_TAG);
+        p[tag..tag + 6].copy_from_slice(&listener_preface);
+        p[tag + 6..].copy_from_slice(&station_preface);
         Self(p)
     }
 
-    /// The 18 prologue bytes.
+    /// The 23 prologue bytes.
     pub const fn as_bytes(&self) -> &[u8; PROLOGUE_LEN] {
         &self.0
     }

@@ -20,44 +20,44 @@
   ],
   "listener": [
     {
-      "hex": "4c554c4c0101",
+      "hex": "4e4553540101",
       "mode": "trusted"
     },
     {
-      "hex": "4c554c4c0102",
+      "hex": "4e4553540102",
       "mode": "invite"
     },
     {
-      "hex": "4c554c4c0103",
+      "hex": "4e4553540103",
       "mode": "code"
     }
   ],
   "prologue": [
     {
-      "hex": "6c756c6c2f314c554c4c01024c554c4c0100",
-      "listener_hex": "4c554c4c0102",
-      "station_hex": "4c554c4c0100"
+      "hex": "6e65737477617463682f314e45535401024e4553540100",
+      "listener_hex": "4e4553540102",
+      "station_hex": "4e4553540100"
     }
   ],
   "station": [
     {
-      "hex": "4c554c4c0100",
+      "hex": "4e4553540100",
       "status": "ok"
     },
     {
-      "hex": "4c554c4c0101",
+      "hex": "4e4553540101",
       "status": "unsupported-version"
     },
     {
-      "hex": "4c554c4c0102",
+      "hex": "4e4553540102",
       "status": "pairing-closed"
     },
     {
-      "hex": "4c554c4c0103",
+      "hex": "4e4553540103",
       "status": "busy"
     },
     {
-      "hex": "4c554c4c0104",
+      "hex": "4e4553540104",
       "status": "rate-limited"
     }
   ]

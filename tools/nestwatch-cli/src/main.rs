@@ -23,7 +23,11 @@ use nestwatch_core::station::{
 use nestwatch_core::{DirStorage, Endpoint, Storage, SystemClock, grouped_id};
 
 #[derive(Parser, Debug)]
-#[command(name = "nestwatch", version, about = "Headless Nestwatch station and listener")]
+#[command(
+    name = "nestwatch",
+    version,
+    about = "Headless Nestwatch station and listener"
+)]
 struct Cli {
     /// Directory for the device key, trust store and settings
     /// (default: the per-user data directory).

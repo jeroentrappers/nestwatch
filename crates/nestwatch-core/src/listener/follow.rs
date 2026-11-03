@@ -207,11 +207,14 @@ impl Ctx<'_> {
                 self.out.pairing_gen = shared.start_follow(&mut g, &id).ok();
                 shared.save(&g);
                 self.out.station_id = Some(id.clone());
-                shared.emit(ListenerEvent::Paired {
-                    station_id: id,
-                    name,
-                    verification: self.verification.clone(),
-                });
+                shared.emit_after_publish(
+                    &mut g,
+                    ListenerEvent::Paired {
+                        station_id: id,
+                        name,
+                        verification: self.verification.clone(),
+                    },
+                );
                 shared.publish(&mut g);
             }
             SessEvent::Connected {
@@ -255,12 +258,18 @@ impl Ctx<'_> {
                 apply_status(shared, &mut g, &id, &status);
                 shared.apply_mixer(&mut g, &id);
                 shared.save(&g);
-                shared.emit(ListenerEvent::Connected {
-                    station_id: id.clone(),
-                });
+                shared.emit_after_publish(
+                    &mut g,
+                    ListenerEvent::Connected {
+                        station_id: id.clone(),
+                    },
+                );
                 if reachable {
                     shared.alert(&g, &id, Alert::Reachable);
                 }
+                // The caller learns of the pairing only once the published
+                // state already shows the live station.
+                shared.publish(&mut g);
                 if let Some(r) = self.reply.take() {
                     let _ = r.send(Ok(PairResult {
                         station_id: id,
@@ -268,7 +277,6 @@ impl Ctx<'_> {
                         verification: self.verification.clone(),
                     }));
                 }
-                shared.publish(&mut g);
             }
             SessEvent::Control(c) => self.on_control(c),
             SessEvent::Audio { header, payload } => {
@@ -383,10 +391,13 @@ impl Ctx<'_> {
                 rt.talk = view.clone();
                 // FR-TB-2: own playback of this station is muted while talking.
                 shared.apply_mixer(&mut g, &id);
-                shared.emit(ListenerEvent::Talk {
-                    station_id: id.clone(),
-                    state: view.clone(),
-                });
+                shared.emit_after_publish(
+                    &mut g,
+                    ListenerEvent::Talk {
+                        station_id: id.clone(),
+                        state: view.clone(),
+                    },
+                );
                 if view == TalkView::Granted {
                     shared.start_talk_capture(&mut g, &id);
                 } else {
@@ -436,10 +447,13 @@ impl Ctx<'_> {
                 }
                 shared.stop_talk_capture(&mut g, &id);
                 shared.apply_mixer(&mut g, &id);
-                shared.emit(ListenerEvent::Disconnected {
-                    station_id: id,
-                    reason: reason.clone(),
-                });
+                shared.emit_after_publish(
+                    &mut g,
+                    ListenerEvent::Disconnected {
+                        station_id: id,
+                        reason: reason.clone(),
+                    },
+                );
                 shared.publish(&mut g);
             }
         }
@@ -659,9 +673,12 @@ fn needs_pairing(shared: &Shared, id: &str, gen_: u64) {
     rt.known.needs_pairing = true;
     rt.status = ConnStatus::NeedsPairing;
     shared.save(&g);
-    shared.emit(ListenerEvent::NeedsPairing {
-        station_id: id.to_owned(),
-    });
+    shared.emit_after_publish(
+        &mut g,
+        ListenerEvent::NeedsPairing {
+            station_id: id.to_owned(),
+        },
+    );
     shared.publish(&mut g);
 }
 

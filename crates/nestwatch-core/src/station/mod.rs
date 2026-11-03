@@ -26,6 +26,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Duration;
 
+use minicbor::{Decode, Encode};
 use nestwatch_crypto::{DeviceKey, InviteToken, PairingCode};
 use nestwatch_media::capture::{GainSetting, GainStep};
 use nestwatch_net::StationListener;
@@ -33,7 +34,6 @@ use nestwatch_net::mdns::{Advertisement, Advertiser};
 use nestwatch_net::web::{StationCert, WebServer};
 use nestwatch_proto::control::{CloseReason, Control, Hello, Role, StationStatus, caps};
 use nestwatch_proto::{Endpoint, Host, Invitation, StationTxt};
-use minicbor::{Decode, Encode};
 use thiserror::Error;
 use tokio::sync::{broadcast, watch};
 
@@ -42,9 +42,9 @@ use crate::persist;
 use crate::storage::{Storage, StorageError};
 use crate::types::{ListenMode, Transport, clamp_name};
 
+pub use media::{CameraAvailability, CameraFrame, CameraRequest, PixelFormat};
 pub use nestwatch_net::web::{AssetSource, WebConfig};
 pub use nestwatch_net::{BindScope, ListenConfig};
-pub use media::{CameraAvailability, CameraFrame, CameraRequest, PixelFormat};
 pub use pairing::PairingEnd;
 pub use trust::{KEY_TRUST, TrustedListener};
 
@@ -988,9 +988,10 @@ impl StationEngine {
         g.camera.availability = availability;
         match availability {
             CameraAvailability::Available => {}
-            CameraAvailability::Unavailable => {
-                shared.stop_all_video(&mut g, nestwatch_proto::control::VideoStateKind::Unavailable)
-            }
+            CameraAvailability::Unavailable => shared.stop_all_video(
+                &mut g,
+                nestwatch_proto::control::VideoStateKind::Unavailable,
+            ),
             CameraAvailability::Denied => {
                 shared.stop_all_video(&mut g, nestwatch_proto::control::VideoStateKind::Denied)
             }

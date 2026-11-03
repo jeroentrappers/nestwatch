@@ -11,7 +11,8 @@ use std::sync::Arc;
 use dioxus::desktop::trayicon::menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem};
 use dioxus::desktop::trayicon::{Icon as TrayIcon, init_tray_icon};
 use dioxus::desktop::{
-    Config, LogicalSize, WindowBuilder, WindowCloseBehaviour, use_tray_menu_event_handler, window,
+    Config, LogicalSize, WindowBuilder, WindowCloseBehaviour, use_muda_event_handler,
+    use_tray_menu_event_handler, window,
 };
 use dioxus::prelude::*;
 use nestwatch_core::listener::{ListenerConfig, ListenerEngine};
@@ -21,6 +22,7 @@ use nestwatch_desktop::{DesktopHost, listener_host};
 use nestwatch_platform::{DesktopOptions, DesktopPlatform};
 use nestwatch_ui::model::{StationRun, Theme};
 use nestwatch_ui::{APP_CSS, BackendHandle, NESTWATCH_CSS, NestwatchApp, Ui, logic};
+use std::rc::Rc;
 
 struct Boot {
     platform: DesktopPlatform,
@@ -92,9 +94,11 @@ fn App() -> Element {
         };
         nestwatch_desktop::backend(host, b.listener)
     });
+    // The tray reads the app's `Ui` context, so it renders inside the app.
     rsx! {
-        NestwatchApp { backend: backend.clone() }
-        Tray { backend }
+        NestwatchApp { backend: backend.clone(),
+            Tray { backend }
+        }
     }
 }
 
@@ -116,7 +120,10 @@ fn Tray(backend: BackendHandle) -> Element {
             let _ = tray.set_tooltip(Some(tray_state(&ui)));
         });
     }
-    use_tray_menu_event_handler(move |e: &MenuEvent| match e.id().as_ref() {
+    // Tray menus and window menus share one global `muda` handler and the
+    // first registration wins, so on some platforms tray clicks arrive as
+    // window-menu events. Listen on both; only one fires per click.
+    let on_menu = Rc::new(move |id: &str| match id {
         "show" => {
             let w = window();
             w.set_visible(true);
@@ -131,6 +138,11 @@ fn Tray(backend: BackendHandle) -> Element {
         }
         _ => {}
     });
+    {
+        let on_menu = on_menu.clone();
+        use_tray_menu_event_handler(move |e: &MenuEvent| on_menu(e.id().as_ref()));
+    }
+    use_muda_event_handler(move |e: &dioxus::desktop::muda::MenuEvent| on_menu(e.id().as_ref()));
     rsx! {}
 }
 
@@ -164,7 +176,8 @@ fn main() {
         })
     });
     let icon =
-        dioxus::desktop::tao::window::Icon::from_rgba(nestwatch_desktop::logo_rgba(64), 64, 64).ok();
+        dioxus::desktop::tao::window::Icon::from_rgba(nestwatch_desktop::logo_rgba(64), 64, 64)
+            .ok();
     let head = format!("<style>{NESTWATCH_CSS}</style><style>{APP_CSS}</style>");
     let config = Config::new()
         .with_window(

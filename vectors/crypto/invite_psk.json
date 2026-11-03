@@ -5,18 +5,18 @@
   "cases": [
     {
       "invite_token": "00000000000000000000000000000000",
-      "station_public_key": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
-      "psk": "5a18f295275d07336f1e3bf64feded60444be4d84183b0f2be2c1f4b70e397bf"
+      "station_public_key": "63de8f31a8228b04556f6449c92dc64c55fd546b6f76574323c7a37d2a2af602",
+      "psk": "5e6ef55efd9155ac9875c5935d0e089317a8e5e6d3904e5042bd4365fac4be0e"
     },
     {
       "invite_token": "ffffffffffffffffffffffffffffffff",
-      "station_public_key": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
-      "psk": "4034f39c158575f78b53f2170bfd26673393e736e3d562157cd4b7a70198a128"
+      "station_public_key": "63de8f31a8228b04556f6449c92dc64c55fd546b6f76574323c7a37d2a2af602",
+      "psk": "7795e443bfd87a0e2a283bdffad2ed2499ee059248faa95d366e2accdd2baabc"
     },
     {
-      "invite_token": "1e360cb87ac26ca2cfb02368b5454456",
-      "station_public_key": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
-      "psk": "c0b47c5cdeb5c50e5fed6dad3f2d2f8b18d2d1e9cde1c71f241f48ce2757ec17"
+      "invite_token": "d838e29709f4233e5b9b16b0d0cd4c54",
+      "station_public_key": "63de8f31a8228b04556f6449c92dc64c55fd546b6f76574323c7a37d2a2af602",
+      "psk": "ad9eef695aa3ad21226004be0092a9fa6eadbbf78f668a45c7020be346fe8c8e"
     }
   ]
 }

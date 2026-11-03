@@ -18,7 +18,10 @@ async fn fr_al_2_unreachable_and_reachable_again() {
     let station = station_with(cfg.clone(), &storage).await;
     let mut lcfg = listener_config("Parents");
     lcfg.unreachable_alert_after = Duration::from_millis(1_000);
-    let (l, _) = (listener_with(lcfg, &nestwatch_core::MemoryStorage::new()), ());
+    let (l, _) = (
+        listener_with(lcfg, &nestwatch_core::MemoryStorage::new()),
+        (),
+    );
     let id = pair(&station, &l).await;
     let mut lev = l.events();
 
@@ -129,7 +132,10 @@ async fn fr_net_3_remembers_working_addresses_in_order_of_success() {
     let mut ls = l.state();
     let s = wait_state(&mut ls, "live", |s| is_live(s, &id)).await;
     assert_eq!(s.stations[0].route.as_deref(), Some(good.as_str()));
-    assert_eq!(s.stations[0].path, Some(nestwatch_core::listener::NetPath::Lan));
+    assert_eq!(
+        s.stations[0].path,
+        Some(nestwatch_core::listener::NetPath::Lan)
+    );
     station.shutdown().await;
     l.shutdown().await;
 }

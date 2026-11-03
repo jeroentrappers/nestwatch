@@ -22,6 +22,7 @@ fn render(platform: Platform, prefs: Prefs, invitation: Option<String>) -> Strin
         NestwatchAppProps {
             backend,
             invitation,
+            children: VNode::empty(),
         },
     );
     dom.rebuild_in_place();

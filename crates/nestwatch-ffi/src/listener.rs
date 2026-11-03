@@ -612,7 +612,11 @@ impl Listener {
     }
 
     /// Alert toggles.
-    pub fn set_alerts(&self, station_id: String, alerts: AlertSettings) -> Result<(), NestwatchError> {
+    pub fn set_alerts(
+        &self,
+        station_id: String,
+        alerts: AlertSettings,
+    ) -> Result<(), NestwatchError> {
         Ok(self.engine.set_alerts(
             &station_id,
             AlertToggles {

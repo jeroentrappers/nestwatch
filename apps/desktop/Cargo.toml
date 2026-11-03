@@ -13,6 +13,10 @@ name = "nestwatch-desktop"
 path = "src/main.rs"
 required-features = ["window"]
 
+[[bin]]
+name = "nestwatch-station"
+path = "src/bin/nestwatch-station.rs"
+
 [features]
 default = ["window"]
 ## The Dioxus desktop window (WebKitGTK on Linux, WKWebView, WebView2).
@@ -26,7 +30,7 @@ log = "0.4"
 nestwatch-core = { path = "../../crates/nestwatch-core" }
 nestwatch-platform = { path = "../../crates/nestwatch-platform" }
 nestwatch-ui = { path = "../ui", features = ["native"] }
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "net", "io-util"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "net", "io-util", "signal"] }
 
 [dev-dependencies]
 

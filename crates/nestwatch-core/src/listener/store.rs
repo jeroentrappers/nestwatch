@@ -3,9 +3,9 @@
 
 use std::fmt;
 
+use minicbor::{Decode, Encode};
 use nestwatch_crypto::PublicKey;
 use nestwatch_proto::Endpoint;
-use minicbor::{Decode, Encode};
 
 use crate::persist;
 use crate::storage::{Storage, StorageError};
@@ -126,7 +126,9 @@ impl ListenSettings {
                 self.threshold_dbfs.clamp(-90.0, 0.0)
             },
             hold_ms: self.hold_ms.min(nestwatch_proto::control::MAX_HOLD_MS),
-            preroll_ms: self.preroll_ms.min(nestwatch_proto::control::MAX_PREROLL_MS),
+            preroll_ms: self
+                .preroll_ms
+                .min(nestwatch_proto::control::MAX_PREROLL_MS),
         }
     }
 }
@@ -407,7 +409,9 @@ mod tests {
     fn websocket_route_from_web_address() {
         assert_eq!(
             Route::websocket_for_origin("http://192.168.1.20:47180/#nestwatch%3A%2F%2F"),
-            Some(Route::WebSocket("ws://192.168.1.20:47180/nestwatch/1".into()))
+            Some(Route::WebSocket(
+                "ws://192.168.1.20:47180/nestwatch/1".into()
+            ))
         );
         assert_eq!(
             Route::websocket_for_origin("https://[fd7a::1]:47181/"),

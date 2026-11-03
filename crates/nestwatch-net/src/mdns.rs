@@ -18,12 +18,12 @@ use std::net::IpAddr;
 use std::time::Duration;
 
 #[cfg(not(target_os = "android"))]
+use mdns_sd::{Receiver, ResolvedService, ServiceDaemon, ServiceEvent, ServiceInfo};
+#[cfg(not(target_os = "android"))]
 use nestwatch_proto::DeviceId;
 use nestwatch_proto::StationTxt;
 #[cfg(not(target_os = "android"))]
 use nestwatch_proto::discovery::SERVICE_TYPE;
-#[cfg(not(target_os = "android"))]
-use mdns_sd::{Receiver, ResolvedService, ServiceDaemon, ServiceEvent, ServiceInfo};
 
 use crate::NetError;
 

@@ -140,7 +140,7 @@ After a non-`ok` status both sides close. A station MUST answer within
 within 15 seconds or the station closes the connection.
 
 The **prologue** for the Noise handshake is
-`"nestwatch/1" || listener_preface || station_preface` (18 bytes).
+`"nestwatch/1" || listener_preface || station_preface` (23 bytes).
 
 ## 5. Handshake
 

@@ -10,7 +10,7 @@ pub const VERSION: u8 = 1;
 /// Length of either preface in bytes (protocol.md §4).
 pub const PREFACE_LEN: usize = 6;
 /// Fixed prefix of the Noise prologue (protocol.md §4).
-pub const PROLOGUE_PREFIX: &[u8; 6] = b"nestwatch/1";
+pub const PROLOGUE_PREFIX: &[u8; 11] = b"nestwatch/1";
 /// Length of the Noise prologue: `"nestwatch/1" || listener || station` (protocol.md §4).
 pub const PROLOGUE_LEN: usize = PROLOGUE_PREFIX.len() + 2 * PREFACE_LEN;
 
@@ -196,9 +196,10 @@ pub fn prologue(
     station_preface: &[u8; PREFACE_LEN],
 ) -> [u8; PROLOGUE_LEN] {
     let mut out = [0u8; PROLOGUE_LEN];
-    out[..6].copy_from_slice(PROLOGUE_PREFIX);
-    out[6..12].copy_from_slice(listener_preface);
-    out[12..].copy_from_slice(station_preface);
+    let tag = PROLOGUE_PREFIX.len();
+    out[..tag].copy_from_slice(PROLOGUE_PREFIX);
+    out[tag..tag + PREFACE_LEN].copy_from_slice(listener_preface);
+    out[tag + PREFACE_LEN..].copy_from_slice(station_preface);
     out
 }
 
@@ -221,7 +222,7 @@ mod tests {
         for v in 0..=4u8 {
             let status = Status::from_u8(v).unwrap();
             let bytes = StationPreface::new(status).encode();
-            assert_eq!(bytes, [b'L', b'U', b'L', b'L', 1, v]);
+            assert_eq!(bytes, [b'N', b'E', b'S', b'T', 1, v]);
             assert_eq!(StationPreface::decode(&bytes).unwrap().status, status);
         }
         assert_eq!(Status::from_u8(5), None);
@@ -263,12 +264,12 @@ mod tests {
     }
 
     #[test]
-    fn prologue_is_18_bytes() {
+    fn prologue_is_23_bytes() {
         let l = ListenerPreface::new(Mode::Invite).encode();
         let s = StationPreface::new(Status::Ok).encode();
         let p = prologue(&l, &s);
-        assert_eq!(p.len(), 18);
-        assert_eq!(&p, b"nestwatch/1NESTWATCH\x01\x02NESTWATCH\x01\x00");
+        assert_eq!(p.len(), 23);
+        assert_eq!(&p, b"nestwatch/1NEST\x01\x02NEST\x01\x00");
     }
 
     #[test]

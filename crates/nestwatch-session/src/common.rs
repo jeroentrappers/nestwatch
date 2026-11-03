@@ -748,7 +748,10 @@ pub(crate) fn check_local_hello(
     if hello.role != role {
         return Err(crate::ConfigError::WrongRole);
     }
-    if !hello.audio.contains(&nestwatch_proto::record::AUDIO_CODEC_ADPCM) {
+    if !hello
+        .audio
+        .contains(&nestwatch_proto::record::AUDIO_CODEC_ADPCM)
+    {
         return Err(crate::ConfigError::MissingMandatoryCodec);
     }
     Control::Hello(hello.clone()).validate()?;

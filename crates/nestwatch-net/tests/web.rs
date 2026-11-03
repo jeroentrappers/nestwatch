@@ -26,7 +26,10 @@ fn loopback_any() -> Option<ListenConfig> {
 
 fn assets() -> AssetSource {
     AssetSource::memory([
-        ("/index.html", &b"<!doctype html><title>Nestwatch</title>"[..]),
+        (
+            "/index.html",
+            &b"<!doctype html><title>Nestwatch</title>"[..],
+        ),
         ("app.js", &b"console.log(1)"[..]),
         ("pkg/app_bg.wasm", &b"\0asm\x01\0\0\0"[..]),
         ("style.css", &b"body{}"[..]),
@@ -88,7 +91,7 @@ async fn static_files_and_security_headers() {
 
     // App routes fall back to index.html; missing files with an extension do not.
     let r = get(port, "GET", "/listen/station").await;
-    assert_eq!((r.status, r.body.len()), (200, 34));
+    assert_eq!((r.status, r.body.len()), (200, 39));
     let r = get(port, "GET", "/missing.js").await;
     assert_eq!(r.status, 404);
     assert_eq!(r.header("x-content-type-options"), Some("nosniff"));

@@ -203,7 +203,8 @@ pub const NOT_PAIRING: &str = "pairing closed";
 /// Invitation field.
 pub const INVITE_FIELD: &str = "Invitation link";
 /// Invitation hint.
-pub const INVITE_HINT: &str = "Paste the nestwatch:// link or the web address shown on the station.";
+pub const INVITE_HINT: &str =
+    "Paste the nestwatch:// link or the web address shown on the station.";
 /// Invitation submit.
 pub const INVITE_SUBMIT: &str = "Pair with link";
 /// Code field.

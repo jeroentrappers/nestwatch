@@ -184,7 +184,10 @@ fn start_devices(platform: &DesktopPlatform, engine: &StationEngine) -> Devices 
         }
     };
     // platforms.md §2.4, PLATFORM-4.
-    let sleep = match platform.power.inhibit_sleep("Nestwatch station is monitoring") {
+    let sleep = match platform
+        .power
+        .inhibit_sleep("Nestwatch station is monitoring")
+    {
         Ok(s) => Some(s),
         Err(e) => {
             log::warn!("cannot prevent system sleep ({e})");

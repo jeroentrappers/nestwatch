@@ -80,7 +80,13 @@ pub fn start_invitation_pairing(backend: BackendHandle, mut nav: Nav, input: Str
 /// The Nestwatch app. `invitation` is a pairing invitation to open at start
 /// (the browser app's URL fragment, protocol.md §3.5).
 #[component]
-pub fn NestwatchApp(backend: BackendHandle, #[props(default)] invitation: Option<String>) -> Element {
+pub fn NestwatchApp(
+    backend: BackendHandle,
+    #[props(default)] invitation: Option<String>,
+    /// Extra platform components that need the app's context (the desktop tray).
+    #[props(default)]
+    children: Element,
+) -> Element {
     let ui = use_hook(|| {
         let ui = Ui::new();
         backend.attach(ui);
@@ -156,5 +162,6 @@ pub fn NestwatchApp(backend: BackendHandle, #[props(default)] invitation: Option
             Notices {}
             {body}
         }
+        {children}
     }
 }

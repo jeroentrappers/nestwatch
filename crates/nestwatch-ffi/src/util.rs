@@ -69,9 +69,10 @@ pub struct InvitationInfo {
 /// code before pairing.
 #[uniffi::export]
 pub fn parse_invitation(input: String) -> Result<InvitationInfo, NestwatchError> {
-    let inv = nestwatch_proto::Invitation::parse_any(&input).map_err(|e| NestwatchError::Invalid {
-        reason: e.to_string(),
-    })?;
+    let inv =
+        nestwatch_proto::Invitation::parse_any(&input).map_err(|e| NestwatchError::Invalid {
+            reason: e.to_string(),
+        })?;
     let key = nestwatch_crypto::PublicKey::from_bytes(inv.station_key);
     Ok(InvitationInfo {
         name: inv.name,

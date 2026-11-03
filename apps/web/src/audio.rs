@@ -133,7 +133,10 @@ impl Audio {
         let ctx = match AudioContext::new_with_context_options(&opts) {
             Ok(c) => c,
             Err(e) => {
-                web_sys::console::error_2(&JsValue::from_str("Nestwatch: no 16 kHz AudioContext"), &e);
+                web_sys::console::error_2(
+                    &JsValue::from_str("Nestwatch: no 16 kHz AudioContext"),
+                    &e,
+                );
                 return;
             }
         };

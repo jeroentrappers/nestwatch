@@ -500,6 +500,9 @@ pub(crate) struct Inner {
     #[cfg(feature = "native")]
     pub discovered: BTreeMap<String, nestwatch_net::mdns::DiscoveredStation>,
     dirty: bool,
+    /// Events raised under the lock, sent right after the next publish so
+    /// subscribers always read a state that already reflects them.
+    pending_events: Vec<ListenerEvent>,
     last_publish: u64,
 }
 
@@ -532,6 +535,13 @@ impl Shared {
 
     pub fn emit(&self, e: ListenerEvent) {
         let _ = self.events.send(e);
+    }
+
+    /// Queues an event about a state change made under the lock; it goes out
+    /// after the state that contains the change is published.
+    pub fn emit_after_publish(&self, g: &mut Inner, e: ListenerEvent) {
+        g.pending_events.push(e);
+        g.dirty = true;
     }
 
     pub fn limits(&self) -> AlertLimits {
@@ -595,6 +605,9 @@ impl Shared {
                 true
             }
         });
+        for e in g.pending_events.drain(..) {
+            let _ = self.events.send(e);
+        }
     }
 
     /// Publishes unless one went out less than 100 ms ago; the ticker
@@ -661,7 +674,7 @@ impl Shared {
     pub fn stop_talk_capture(&self, g: &mut Inner, id: &str) {
         if g.talk.as_ref().is_some_and(|t| t.station == id) {
             g.talk = None;
-            self.emit(ListenerEvent::MicrophoneNotWanted);
+            self.emit_after_publish(g, ListenerEvent::MicrophoneNotWanted);
         }
     }
 
@@ -671,7 +684,7 @@ impl Shared {
             return;
         }
         if g.talk.is_some() {
-            self.emit(ListenerEvent::MicrophoneNotWanted);
+            self.emit_after_publish(g, ListenerEvent::MicrophoneNotWanted);
         }
         g.talk = Some(TalkCapture {
             station: id.to_owned(),
@@ -679,9 +692,12 @@ impl Shared {
             encoder: None,
             seq: 0,
         });
-        self.emit(ListenerEvent::MicrophoneWanted {
-            station_id: id.to_owned(),
-        });
+        self.emit_after_publish(
+            g,
+            ListenerEvent::MicrophoneWanted {
+                station_id: id.to_owned(),
+            },
+        );
     }
 
     pub fn next_session(&self) -> u64 {
@@ -816,6 +832,7 @@ impl ListenerEngine {
                 #[cfg(feature = "native")]
                 discovered: BTreeMap::new(),
                 dirty: false,
+                pending_events: Vec::new(),
                 last_publish: 0,
             }),
             state_tx,
@@ -919,7 +936,10 @@ impl ListenerEngine {
         let inv = nestwatch_proto::Invitation::parse_any(input)
             .map_err(|e| ListenerError::Invalid(e.to_string()))?;
         let mut all = routes;
-        if !input.trim().to_ascii_lowercase().starts_with("nestwatch://")
+        if !input
+            .trim()
+            .to_ascii_lowercase()
+            .starts_with("nestwatch://")
             && let Some(r) = Route::websocket_for_origin(input.trim())
         {
             all.push(r);
@@ -1015,7 +1035,7 @@ impl ListenerEngine {
         }
         shared.stop_talk_capture(&mut g, &id);
         shared.save(&g);
-        shared.emit(ListenerEvent::Forgotten { station_id: id });
+        shared.emit_after_publish(&mut g, ListenerEvent::Forgotten { station_id: id });
         shared.publish(&mut g);
         Ok(())
     }

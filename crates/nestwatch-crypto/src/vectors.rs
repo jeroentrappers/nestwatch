@@ -220,7 +220,7 @@ fn handshake(mode: Mode) -> Handshake {
         Mode::Invite => ("invite", 2),
         Mode::Code => ("code", 3),
     };
-    let listener_preface = [b'L', b'U', b'L', b'L', 1, mode_byte];
+    let listener_preface = [b'N', b'E', b'S', b'T', 1, mode_byte];
     let station_preface = *b"NEST\x01\x00";
     let prologue = Prologue::new(listener_preface, station_preface);
     let ls = DeviceKey::from_secret_bytes(&fixed("listener static"));
@@ -366,7 +366,10 @@ fn vectors_match_files() {
             std::fs::write(&path, &content).unwrap();
         } else {
             let on_disk = std::fs::read_to_string(&path).unwrap_or_else(|e| {
-                panic!("{}: {e}; run with NESTWATCH_UPDATE_VECTORS=1", path.display())
+                panic!(
+                    "{}: {e}; run with NESTWATCH_UPDATE_VECTORS=1",
+                    path.display()
+                )
             });
             assert!(on_disk == content, "{name} differs from the implementation");
         }

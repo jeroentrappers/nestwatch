@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! The trusted listener list (protocol.md §2.3, product.md FR-ST-7).
 
-use nestwatch_crypto::PublicKey;
 use minicbor::{Decode, Encode};
+use nestwatch_crypto::PublicKey;
 
 use crate::persist;
 use crate::storage::{Storage, StorageError};

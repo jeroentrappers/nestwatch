@@ -108,7 +108,11 @@ fn non_nestwatch_preface_gets_no_answer() {
     );
     // WebSocket: the preface must be one 6-byte message (§3.3).
     let mut s = station(Flavor::WebSocket, TestPolicy::pairing(), 0);
-    s.handle_ws_message(0, nestwatch_proto::frame::WsKind::Binary, b"NEST\x01\x01\x00");
+    s.handle_ws_message(
+        0,
+        nestwatch_proto::frame::WsKind::Binary,
+        b"NEST\x01\x01\x00",
+    );
     assert!(drain_s(&mut s, 0).is_empty());
     assert!(matches!(
         events_s(&mut s).as_slice(),

@@ -274,8 +274,11 @@ impl Pcm16kAdapter {
             None
         } else {
             Some(
-                nestwatch_media::resample::Resampler::new(nestwatch_media::SAMPLE_RATE, device_rate)
-                    .map_err(|e| PlatformError::Backend(e.to_string()))?,
+                nestwatch_media::resample::Resampler::new(
+                    nestwatch_media::SAMPLE_RATE,
+                    device_rate,
+                )
+                .map_err(|e| PlatformError::Backend(e.to_string()))?,
             )
         };
         Ok(Self {

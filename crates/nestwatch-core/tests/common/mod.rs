@@ -46,7 +46,10 @@ pub fn with_web(mut cfg: StationConfig) -> StationConfig {
             https: None,
             ..WebConfig::default()
         },
-        assets: AssetSource::memory([("index.html", &b"<!doctype html><title>Nestwatch</title>"[..])]),
+        assets: AssetSource::memory([(
+            "index.html",
+            &b"<!doctype html><title>Nestwatch</title>"[..],
+        )]),
     });
     cfg
 }

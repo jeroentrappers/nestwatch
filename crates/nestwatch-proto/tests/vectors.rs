@@ -9,6 +9,8 @@
 use std::net::IpAddr;
 use std::path::PathBuf;
 
+use minicbor::Decoder;
+use minicbor::data::Type;
 use nestwatch_proto::control::{
     CameraFacing, CloseReason, Hello, Listen, ListenMode, Role, StationStatus, TalkStatus,
     VideoStart, VideoState, VideoStateKind, caps,
@@ -21,8 +23,6 @@ use nestwatch_proto::{
     AudioHeader, Control, DeviceId, Endpoint, Host, Invitation, ListenerPreface, Mode, Record,
     StationPreface, StationTxt, Status, VideoHeader,
 };
-use minicbor::Decoder;
-use minicbor::data::Type;
 use serde_json::{Map, Value, json};
 
 // ---------------------------------------------------------------- helpers
@@ -734,7 +734,7 @@ fn generate_invitations() -> Value {
         .extend((1..=3).map(|i| Endpoint::parse(&format!("10.0.0.{i}:47100")).unwrap()));
     let parse_only = vec![
         json!({"name": "unknown-parameters", "uri": format!("{uri}&x=1&future=%E2%9C%93"), "invitation": invitation_json(&full)}),
-        json!({"name": "reordered-and-uppercase-scheme", "uri": format!("NEST://INVITE?{}", reordered.join("&")), "invitation": invitation_json(&full)}),
+        json!({"name": "reordered-and-uppercase-scheme", "uri": format!("NESTWATCH://INVITE?{}", reordered.join("&")), "invitation": invitation_json(&full)}),
         json!({"name": "no-name-parameter", "uri": minimal.to_uri().unwrap().replace("&n=", ""), "invitation": invitation_json(&minimal)}),
         json!({"name": "more-than-8-endpoints", "uri": nine, "invitation": invitation_json(&nine_expect)}),
     ];

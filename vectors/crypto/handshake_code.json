@@ -3,61 +3,61 @@
   "protocol_name": "Noise_XXpsk3_25519_ChaChaPoly_BLAKE2s",
   "mode": "code",
   "listener": {
-    "static_secret": "642bf8b67bdc144d94dc9bf0d00f108c314c9c95d0d67a49e665e368d447fa06",
-    "static_public": "8b1ae35cbfc73165f62dbb5bcf27ef21e3118a47a6ebb82d0ce5a6b68d9ffc39",
-    "ephemeral_secret": "870476d174ab760bfd0c78c16dec435d562660cbe9a835c8e45101629fc7acae",
-    "preface": "4c554c4c0103"
+    "static_secret": "381a670dbdc75dcbf65c0ec422608d7ada996d15682b59ddaf5d78e03024a51e",
+    "static_public": "d58fd21777d77806a784703de4cdf4cc915ed9c24a0d753d2b07c673f5e59972",
+    "ephemeral_secret": "c71372d4b3898b41b25fcb2442fe1f3f810019cab332c55b8747f72132a04650",
+    "preface": "4e4553540103"
   },
   "station": {
-    "static_secret": "7fa777cda6e17557a381324e27dc002ffb28c7d2bb6ea9f95baa70d9dc8b7ce0",
-    "static_public": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
-    "ephemeral_secret": "9d89064b1ea71e1fed440983bad32ff892dea2cdbbf23dd6ceb6e8307f765da4",
-    "preface": "4c554c4c0100"
+    "static_secret": "95c1083729eec29099203880efc63aead084adbd91f95e3ee483acb2eae6a49c",
+    "static_public": "63de8f31a8228b04556f6449c92dc64c55fd546b6f76574323c7a37d2a2af602",
+    "ephemeral_secret": "029b53bd9c1fc7ef83335052a4b3cd8bddda2c1e6dd36e4423d0e7e9106047fd",
+    "preface": "4e4553540100"
   },
-  "prologue": "6c756c6c2f314c554c4c01034c554c4c0100",
+  "prologue": "6e65737477617463682f314e45535401034e4553540100",
   "pairing_code": "7K3QD-9XW2M",
-  "station_device_id": "edrzcaait57dtrhx",
-  "psk": "53059b17edceeba74562c97be2b990c56b8a232845356e38ea4b74664c965208",
+  "station_device_id": "ksvmaeemolnzzvbm",
+  "psk": "c2f53a17f79699de1bebb5b287c4ac45fd977deca4239e44e4be2def7e34e917",
   "handshake_messages": [
     {
       "sender": "listener",
       "payload": "",
-      "message": "8459362680ccc271d64ddeca039b68df4cc88a3c0350daa762b90caa9d015601c43dbb5d7607a93f2b4595d3211a225d"
+      "message": "9de9834690cb69922c4524623bdda9ee387a44ea26029312933781fa8a8e5c19c2fc6b778542d9812afaa77658ce4a75"
     },
     {
       "sender": "station",
       "payload": "",
-      "message": "e0bade1c842ca6eb899ffdf8b525488cbda9831a30f7e0a6e080762682f83a48b9cfffd2bb7279d2b64f74115bd6a255aed0dcfd16bacf35f55e676e08869a9be08cbbb151fdb052ac1d3e7a55f09d15fd3e1c293eba246a2389f5710e51d141"
+      "message": "db1f93341019f5d8b651a99a9fd803fa9cb95693259524086599840d34c21f1ad6d282515c8df914dee5051019e50a4fc55787675acd11268f2d28a548fc4dfaecd71b78fa9bc02d03e3d7491fd9c5da5d6506f34fc4353ec62eb647b880bd32"
     },
     {
       "sender": "listener",
       "payload": "",
-      "message": "c9d54cb0cf1cc08f7b4b12b94cfdf1282d9d5b25acfdf123331e57347cc7bfcef601a42e13dd0f61cdcbdbe4b11e19e4746be60e1028a3c2f0b8712f07567c62"
+      "message": "0dc5b8bfb746dcf11e2121bf8f588729622b5023f928b504515288c63a051f5494f6c80fc9ca07ad4fd3744136cab7f8d75e0b28d7abfc42e6fbdc6b3914518c"
     }
   ],
-  "handshake_hash": "883526b08c0d38417994d9548357315bc3360db10ec2f3ee029562dc678033bf",
-  "verification_number": 184688,
-  "verification_display": "184 688",
+  "handshake_hash": "00f3d449292b37b03b1dda28541da5030e2f2a2cafff868e32aca454a3f64c23",
+  "verification_number": 979593,
+  "verification_display": "979 593",
   "transport_messages": [
     {
       "sender": "listener",
       "payload": "04000000000000002a",
-      "message": "2925c46c3d12428dac659714a5aedf02f6a0742601d903d4b9"
+      "message": "5f4cea86c18c466e36dd968904707290f10cc96d4cc264dddc"
     },
     {
       "sender": "station",
       "payload": "05000000000000002a",
-      "message": "cc3c15df0859961cb773b8ef28f0bac5dded1de976a96297e6"
+      "message": "076dea4aefd4fb98e67ab6cee97b07e0ad59d865d2379bae9c"
     },
     {
       "sender": "listener",
       "payload": "01a161746568656c6c6f",
-      "message": "832a8b7163f06a8ffec0a501da3b7d2a0468ca9e08f13711f9f0"
+      "message": "b36803eabb5f408c22526f3106ec493591ac0d36853df343e014"
     },
     {
       "sender": "station",
       "payload": "",
-      "message": "8f08455145434ee2f0b87c16c1572e0c"
+      "message": "3a205aa33500dc8737f0f04f62cbd1af"
     }
   ]
 }

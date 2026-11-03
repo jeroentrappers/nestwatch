@@ -4,8 +4,8 @@
 //! Storage keys and record layouts are owned by the engines; see
 //! `OPEN-QUESTIONS.md` CORE-1.
 
-use nestwatch_crypto::DeviceKey;
 use minicbor::{Decode, Encode};
+use nestwatch_crypto::DeviceKey;
 
 use crate::storage::{Storage, StorageError};
 
@@ -75,7 +75,10 @@ pub(crate) fn load_or_create_device_key(storage: &dyn Storage) -> Result<DeviceK
 }
 
 /// A 32-byte public key from stored bytes.
-pub(crate) fn public_key(key: &str, bytes: &[u8]) -> Result<nestwatch_crypto::PublicKey, StorageError> {
+pub(crate) fn public_key(
+    key: &str,
+    bytes: &[u8],
+) -> Result<nestwatch_crypto::PublicKey, StorageError> {
     nestwatch_crypto::PublicKey::from_slice(bytes).map_err(|e| StorageError::Corrupt {
         key: key.to_owned(),
         why: e.to_string(),
