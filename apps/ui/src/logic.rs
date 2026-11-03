@@ -196,6 +196,8 @@ pub fn tile_subtitle(tile: &Tile) -> String {
         Conn::Live => match tile.path {
             Some(NetPath::Vpn) => s::PATH_VPN.into(),
             Some(NetPath::Lan) => s::PATH_LAN.into(),
+            Some(NetPath::Direct) => s::PATH_DIRECT.into(),
+            Some(NetPath::Relayed) => s::PATH_RELAYED.into(),
             None => String::new(),
         },
         Conn::Connecting { tried, .. } | Conn::Reconnecting { tried, .. } => {

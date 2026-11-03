@@ -85,13 +85,17 @@ pub enum Conn {
     NeedsPairing,
 }
 
-/// Network path (FR-LS-3).
+/// Network path (FR-LS-3, rendezvous.md FR-RV-4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetPath {
     /// Local network.
     Lan,
     /// User VPN.
     Vpn,
+    /// Hole-punched path across the internet.
+    Direct,
+    /// Through the relay server.
+    Relayed,
 }
 
 /// Talk-back state of one tile (FR-TB-1).

@@ -106,8 +106,10 @@ fn map_tile(v: &StationView, tracker: &mut Tracker, now_ms: u64, talk_possible: 
         name: v.name.clone(),
         conn,
         path: v.path.map(|p| match p {
-            CoreNetPath::Lan => NetPath::Lan,
+            CoreNetPath::HomeNetwork => NetPath::Lan,
             CoreNetPath::Vpn => NetPath::Vpn,
+            CoreNetPath::Direct => NetPath::Direct,
+            CoreNetPath::Relayed => NetPath::Relayed,
         }),
         route: v.route.clone(),
         level_dbfs: v.level_dbfs,

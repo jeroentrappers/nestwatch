@@ -188,13 +188,17 @@ pub enum Connection {
     NeedsPairing,
 }
 
-/// Network path of a live session (FR-LS-3).
+/// Network path of a live session (FR-LS-3, rendezvous.md FR-RV-4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
 pub enum NetworkPath {
-    /// Local network.
+    /// Local network ("home network").
     Lan,
     /// User-operated VPN.
     Vpn,
+    /// Hole-punched path across the internet ("direct (internet)").
+    Direct,
+    /// Through the relay server ("relayed").
+    Relayed,
 }
 
 /// Talk-back state with one station (FR-TB-1).
@@ -857,8 +861,10 @@ fn tile(v: &StationView) -> StationTile {
         name: v.name.clone(),
         connection: connection(&v.status),
         path: v.path.map(|p| match p {
-            NetPath::Lan => NetworkPath::Lan,
+            NetPath::HomeNetwork => NetworkPath::Lan,
             NetPath::Vpn => NetworkPath::Vpn,
+            NetPath::Direct => NetworkPath::Direct,
+            NetPath::Relayed => NetworkPath::Relayed,
         }),
         route: v.route.clone(),
         level_dbfs: v.level_dbfs,

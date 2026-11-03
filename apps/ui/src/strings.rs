@@ -299,6 +299,10 @@ pub const STATUS_YOU_TALK: &str = "You are talking";
 pub const PATH_LAN: &str = "home network";
 /// Path: VPN.
 pub const PATH_VPN: &str = "via VPN";
+/// Path: hole-punched across the internet (rendezvous.md FR-RV-4).
+pub const PATH_DIRECT: &str = "direct (internet)";
+/// Path: through the relay server (rendezvous.md FR-RV-4).
+pub const PATH_RELAYED: &str = "relayed";
 /// Trying addresses.
 pub fn trying_addresses(n: usize) -> String {
     match n {

@@ -133,9 +133,20 @@ fn apply(s: &mut Session, cmd: Cmd) {
 
 /// Runs one accepted connection to its end.
 pub(crate) async fn run(shared: Arc<Shared>, link: Link) {
-    let id = next_session(&shared);
-    let info = link.info().clone();
     let transport = Transport::from(link.kind());
+    let peer = link.info().peer;
+    run_as(shared, link, transport, peer).await;
+}
+
+/// Runs one connection to its end as `transport`, with `peer` as the
+/// listener's address (for relay pipes, the address the server observed).
+pub(crate) async fn run_as(
+    shared: Arc<Shared>,
+    link: Link,
+    transport: Transport,
+    peer: Option<SocketAddr>,
+) {
+    let id = next_session(&shared);
     let (tx, mut rx) = mpsc::unbounded_channel();
     let (busy, hello) = {
         let mut g = shared.lock();
@@ -152,7 +163,7 @@ pub(crate) async fn run(shared: Arc<Shared>, link: Link) {
             Sess {
                 tx,
                 transport,
-                peer: info.peer,
+                peer,
                 pairing_mode: false,
                 key: None,
                 name: None,
@@ -173,7 +184,7 @@ pub(crate) async fn run(shared: Arc<Shared>, link: Link) {
     let policy = Policy {
         shared: shared.clone(),
         id,
-        ip: info.peer.map(|p| p.ip()),
+        ip: peer.map(|p| p.ip()),
     };
     let mut reason = String::from("ended");
     match StationSession::new(cfg, &shared.key, policy, shared.now()) {

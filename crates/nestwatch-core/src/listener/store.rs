@@ -5,7 +5,7 @@ use std::fmt;
 
 use minicbor::{Decode, Encode};
 use nestwatch_crypto::PublicKey;
-use nestwatch_proto::Endpoint;
+use nestwatch_proto::{Endpoint, RelayRef};
 
 use crate::persist;
 use crate::storage::{Storage, StorageError};
@@ -26,6 +26,10 @@ pub enum Route {
     Tcp(Endpoint),
     /// A `ws://` or `wss://` URL of the station's `/nestwatch/1` (protocol.md §3.3).
     WebSocket(String),
+    /// The station's mailbox at a relay server (rendezvous.md §3.2, §4.2).
+    /// Kept in [`KnownStation::relay`], tried after every other route
+    /// (FR-RV-2).
+    Relay(RelayRef),
 }
 
 impl Route {
@@ -65,6 +69,7 @@ impl fmt::Display for Route {
         match self {
             Self::Tcp(e) => write!(f, "{e}"),
             Self::WebSocket(u) => f.write_str(u),
+            Self::Relay(r) => write!(f, "relay {}", r.server),
         }
     }
 }
@@ -215,11 +220,19 @@ pub struct KnownStation {
     pub needs_pairing: bool,
     /// When it was paired (Unix ms).
     pub paired_unix_ms: u64,
+    /// Relay server and mailbox from the last invitation that had them
+    /// (rendezvous.md FR-RV-2).
+    pub relay: Option<RelayRef>,
 }
 
 impl KnownStation {
-    /// Adds an endpoint (or refreshes it on `success`).
+    /// Adds an endpoint (or refreshes it on `success`). A relay route
+    /// replaces the stored relay reference instead.
     pub fn note_endpoint(&mut self, route: &Route, success: Option<u64>) {
+        if let Route::Relay(r) = route {
+            self.relay = Some(r.clone());
+            return;
+        }
         if let Some(e) = self.endpoints.iter_mut().find(|e| &e.route == route) {
             if success.is_some() {
                 e.last_success_unix_ms = success;
@@ -276,6 +289,16 @@ struct StationRecord {
     needs_pairing: bool,
     #[n(5)]
     paired: u64,
+    #[n(6)]
+    relay: Option<RelayRecord>,
+}
+
+#[derive(Encode, Decode)]
+struct RelayRecord {
+    #[n(0)]
+    server: String,
+    #[b(1)]
+    mailbox: Vec<u8>,
 }
 
 #[derive(Encode, Decode)]
@@ -321,6 +344,12 @@ pub(crate) fn load_stations(storage: &dyn Storage) -> Result<Vec<KnownStation>, 
             settings: s.settings,
             needs_pairing: s.needs_pairing,
             paired_unix_ms: s.paired,
+            relay: s.relay.and_then(|r| {
+                Some(RelayRef {
+                    server: nestwatch_proto::invite::normalize_relay_origin(&r.server)?,
+                    mailbox: r.mailbox.try_into().ok()?,
+                })
+            }),
         });
     }
     Ok(out)
@@ -339,22 +368,27 @@ pub(crate) fn save_stations<'a>(
                 endpoints: s
                     .endpoints
                     .iter()
-                    .map(|e| match &e.route {
-                        Route::Tcp(ep) => EndpointRecord {
+                    .filter_map(|e| match &e.route {
+                        Route::Tcp(ep) => Some(EndpointRecord {
                             websocket: false,
                             addr: ep.to_string(),
                             last_success: e.last_success_unix_ms,
-                        },
-                        Route::WebSocket(u) => EndpointRecord {
+                        }),
+                        Route::WebSocket(u) => Some(EndpointRecord {
                             websocket: true,
                             addr: u.clone(),
                             last_success: e.last_success_unix_ms,
-                        },
+                        }),
+                        Route::Relay(_) => None,
                     })
                     .collect(),
                 settings: s.settings,
                 needs_pairing: s.needs_pairing,
                 paired: s.paired_unix_ms,
+                relay: s.relay.as_ref().map(|r| RelayRecord {
+                    server: r.server.clone(),
+                    mailbox: r.mailbox.to_vec(),
+                }),
             })
             .collect(),
     };
@@ -375,6 +409,7 @@ mod tests {
             settings: StationSettings::default(),
             needs_pairing: false,
             paired_unix_ms: 1,
+            relay: None,
         }
     }
 
@@ -401,6 +436,17 @@ mod tests {
         s.note_endpoint(&Route::parse("wss://h:47181/nestwatch/1").unwrap(), None);
         s.settings.listen = ListenSettings::activated(-35.5, 2000, 300);
         s.settings.muted = true;
+        save_stations(&storage, [&s]).unwrap();
+        assert_eq!(load_stations(&storage).unwrap(), vec![s.clone()]);
+        // FR-RV-2: the relay reference is kept, outside the endpoint list.
+        s.note_endpoint(
+            &Route::Relay(RelayRef {
+                server: "http://127.0.0.1:8740".into(),
+                mailbox: [7; 16],
+            }),
+            Some(9),
+        );
+        assert_eq!(s.endpoints.len(), 2);
         save_stations(&storage, [&s]).unwrap();
         assert_eq!(load_stations(&storage).unwrap(), vec![s]);
     }
