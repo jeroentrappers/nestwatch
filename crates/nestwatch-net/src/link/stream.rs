@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! TCP byte-stream links (protocol.md §3.2).
+//! Byte-stream links: TCP (protocol.md §3.2) and any other ordered,
+//! reliable byte stream framed like TCP (for example a QUIC stream of the
+//! direct path, rendezvous.md §5.2).
 
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use std::fmt;
+
+use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tokio::net::TcpStream;
-use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 
 use super::{LinkInfo, LinkKind};
 use crate::NetError;
@@ -11,7 +14,10 @@ use crate::NetError;
 /// Bytes read per [`StreamReader::recv`] call at most.
 const READ_CHUNK: usize = 16 * 1024;
 
-/// A TCP connection carrying the framed NWP/1 byte stream.
+type BoxRead = Box<dyn AsyncRead + Send + Unpin>;
+type BoxWrite = Box<dyn AsyncWrite + Send + Unpin>;
+
+/// A byte stream (normally TCP) carrying the framed NWP/1 byte stream.
 #[derive(Debug)]
 pub struct StreamLink {
     reader: StreamReader,
@@ -31,9 +37,25 @@ impl StreamLink {
             tls: false,
         };
         let (r, w) = stream.into_split();
+        Self::from_io(r, w, info)
+    }
+
+    /// Wraps the two halves of any ordered, reliable byte stream. `info.kind`
+    /// is forced to [`LinkKind::Stream`]. Shutting down `writer` must signal
+    /// end of stream to the peer (like a TCP FIN).
+    pub fn from_io<R, W>(reader: R, writer: W, mut info: LinkInfo) -> Self
+    where
+        R: AsyncRead + Send + Unpin + 'static,
+        W: AsyncWrite + Send + Unpin + 'static,
+    {
+        info.kind = LinkKind::Stream;
         Self {
-            reader: StreamReader { inner: r },
-            writer: StreamWriter { inner: w },
+            reader: StreamReader {
+                inner: Box::new(reader),
+            },
+            writer: StreamWriter {
+                inner: Box::new(writer),
+            },
             info,
         }
     }
@@ -65,9 +87,14 @@ impl StreamLink {
 }
 
 /// Read half of a [`StreamLink`].
-#[derive(Debug)]
 pub struct StreamReader {
-    inner: OwnedReadHalf,
+    inner: BoxRead,
+}
+
+impl fmt::Debug for StreamReader {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("StreamReader").finish_non_exhaustive()
+    }
 }
 
 impl StreamReader {
@@ -84,19 +111,25 @@ impl StreamReader {
 }
 
 /// Write half of a [`StreamLink`].
-#[derive(Debug)]
 pub struct StreamWriter {
-    inner: OwnedWriteHalf,
+    inner: BoxWrite,
+}
+
+impl fmt::Debug for StreamWriter {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("StreamWriter").finish_non_exhaustive()
+    }
 }
 
 impl StreamWriter {
     /// Writes all bytes, waiting while the socket buffer is full.
     pub async fn send(&mut self, data: &[u8]) -> Result<(), NetError> {
         self.inner.write_all(data).await?;
+        self.inner.flush().await?;
         Ok(())
     }
 
-    /// Shuts down the sending direction (TCP FIN).
+    /// Shuts down the sending direction (TCP FIN, or the stream's equivalent).
     pub async fn close(&mut self) -> Result<(), NetError> {
         self.inner.shutdown().await?;
         Ok(())

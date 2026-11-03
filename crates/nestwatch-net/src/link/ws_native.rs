@@ -156,3 +156,24 @@ impl MessageWriter {
         }
     }
 }
+
+impl crate::Link {
+    /// Wraps a WebSocket that the caller established itself (for example a
+    /// rendezvous connection that turns into a relay pipe after an NWR/1
+    /// exchange, rendezvous.md §4.2) into a
+    /// [`Messages`](crate::LinkKind::Messages) link. Configure it with
+    /// [`websocket_config`] so the 64 KiB limit applies.
+    pub fn from_websocket<S>(ws: WebSocketStream<S>, mut info: LinkInfo) -> Self
+    where
+        S: AsyncRead + AsyncWrite + Unpin + Send + 'static,
+    {
+        info.kind = crate::LinkKind::Messages;
+        ws_link(ws, info)
+    }
+}
+
+/// The WebSocket configuration every Nestwatch WebSocket uses (frames and
+/// messages limited to [`WS_MAX_MESSAGE_SIZE`], small write buffer).
+pub fn websocket_config() -> WebSocketConfig {
+    server_config()
+}

@@ -29,7 +29,7 @@ mod ws_wasm;
 #[cfg(not(target_arch = "wasm32"))]
 pub use stream::{StreamLink, StreamReader, StreamWriter};
 #[cfg(not(target_arch = "wasm32"))]
-pub use ws_native::{MessageLink, MessageReader, MessageWriter};
+pub use ws_native::{MessageLink, MessageReader, MessageWriter, websocket_config};
 #[cfg(not(target_arch = "wasm32"))]
 pub(crate) use ws_native::{server_config, ws_link};
 #[cfg(target_arch = "wasm32")]
