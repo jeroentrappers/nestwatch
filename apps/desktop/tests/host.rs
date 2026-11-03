@@ -54,7 +54,12 @@ async fn station_host_without_devices() {
     let listener = ListenerEngine::start(cfg, Arc::new(MemoryStorage::new()), clock).unwrap();
     let paired = listener.pair_invitation(&info.invite_uri).await.unwrap();
     for _ in 0..100 {
-        if listener.snapshot().stations.first().is_some_and(|s| s.caps.iter().any(|c| c == "video")) {
+        if listener
+            .snapshot()
+            .stations
+            .first()
+            .is_some_and(|s| s.caps.iter().any(|c| c == "video"))
+        {
             break;
         }
         tokio::time::sleep(Duration::from_millis(50)).await;
@@ -64,7 +69,11 @@ async fn station_host_without_devices() {
         .unwrap();
     let mut state = None;
     for _ in 0..100 {
-        state = listener.snapshot().stations.first().map(|s| s.video.clone());
+        state = listener
+            .snapshot()
+            .stations
+            .first()
+            .map(|s| s.video.clone());
         if state == Some(VideoView::State(VideoStateKind::Unavailable)) {
             break;
         }
@@ -82,7 +91,9 @@ async fn station_host_without_devices() {
 
 async fn http_get(port: u16) -> String {
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
-    let mut s = tokio::net::TcpStream::connect(("127.0.0.1", port)).await.unwrap();
+    let mut s = tokio::net::TcpStream::connect(("127.0.0.1", port))
+        .await
+        .unwrap();
     s.write_all(b"GET / HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n")
         .await
         .unwrap();
