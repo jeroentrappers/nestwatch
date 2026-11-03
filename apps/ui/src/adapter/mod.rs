@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! [`EngineBackend`]: the [`Backend`] over the lull-core engines.
+//! [`EngineBackend`]: the [`Backend`] over the nestwatch-core engines.
 //!
 //! The same code serves the native listener (desktop, tokio) and the
 //! browser listener (wasm); the station half exists with the `native`
@@ -21,11 +21,11 @@ use std::sync::Arc;
 use base64::Engine as _;
 use dioxus::core::spawn_forever;
 use dioxus::prelude::*;
-use lull_core::Clock;
-use lull_core::listener::{
+use nestwatch_core::Clock;
+use nestwatch_core::listener::{
     AlertToggles, ListenSettings, ListenerEngine, ListenerError, ListenerEvent, Route, VideoRequest,
 };
-use lull_core::{CameraFacing, ListenMode};
+use nestwatch_core::{CameraFacing, ListenMode};
 
 use crate::backend::{Backend, LocalFuture, Ui, race};
 use crate::model::{
@@ -68,7 +68,7 @@ pub trait Host {
     fn start_station(&self) -> LocalFuture<Result<station::RunningStation, String>>;
 }
 
-/// The [`Backend`] over lull-core engines.
+/// The [`Backend`] over nestwatch-core engines.
 pub struct EngineBackend {
     host: Rc<dyn Host>,
     clock: Arc<dyn Clock>,
@@ -113,11 +113,11 @@ impl EngineBackend {
 
     /// The running station engine, if any.
     #[cfg(feature = "native")]
-    pub fn station(&self) -> Option<lull_core::station::StationEngine> {
+    pub fn station(&self) -> Option<nestwatch_core::station::StationEngine> {
         self.station.borrow().as_ref().map(|s| s.engine.clone())
     }
 
-    fn settings_of(&self, id: &str) -> Result<lull_core::listener::StationSettings, UiError> {
+    fn settings_of(&self, id: &str) -> Result<nestwatch_core::listener::StationSettings, UiError> {
         self.listener
             .known_stations()
             .into_iter()
@@ -153,8 +153,8 @@ pub fn jpeg_data_uri(jpeg: &[u8]) -> String {
     )
 }
 
-fn alert_kind(a: lull_core::listener::Alert) -> AlertKind {
-    use lull_core::listener::Alert;
+fn alert_kind(a: nestwatch_core::listener::Alert) -> AlertKind {
+    use nestwatch_core::listener::Alert;
     match a {
         Alert::SoundStarted => AlertKind::Sound,
         Alert::Unreachable => AlertKind::Unreachable,

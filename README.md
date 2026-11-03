@@ -1,4 +1,4 @@
-# Lull
+# Nestwatch
 
 A private, local-first baby monitor for every device you own.
 
@@ -14,7 +14,7 @@ A private, local-first baby monitor for every device you own.
   over your own VPN (Tailscale, WireGuard). End-to-end encrypted with the
   Noise Protocol Framework.
 
-Lull is not a medical device and does not replace supervision.
+Nestwatch is not a medical device and does not replace supervision.
 
 ## Status
 

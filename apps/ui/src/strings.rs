@@ -6,12 +6,12 @@
 //! Voice (design README §2): short, kind, specific.
 
 /// Product name.
-pub const APP: &str = "Lull";
+pub const APP: &str = "Nestwatch";
 /// Promise on the welcome screen.
 pub const PROMISE: &str =
     "A private baby monitor for the devices you already own. Everything stays on your network.";
 /// Medical disclaimer (product.md §1), first launch and About.
-pub const DISCLAIMER: &str = "Lull is not a medical device and does not replace supervision. Always check on your child in person.";
+pub const DISCLAIMER: &str = "Nestwatch is not a medical device and does not replace supervision. Always check on your child in person.";
 /// Accept the disclaimer.
 pub const DISCLAIMER_ACCEPT: &str = "I understand";
 /// Role choice: station.
@@ -31,7 +31,7 @@ pub const ROLE_TAB_LISTENING: &str = "Listening";
 pub const ROLE_TAB_STATION: &str = "Station";
 /// Browser cannot be a station.
 pub const ROLE_STATION_UNAVAILABLE: &str =
-    "A browser can only listen. Use the Lull app on a phone or computer as the station.";
+    "A browser can only listen. Use the Nestwatch app on a phone or computer as the station.";
 
 // ----- common ---------------------------------------------------------------
 
@@ -48,7 +48,7 @@ pub const SAVE: &str = "Save";
 /// Settings button label.
 pub const SETTINGS: &str = "Settings";
 /// About.
-pub const ABOUT: &str = "About Lull";
+pub const ABOUT: &str = "About Nestwatch";
 /// Copy.
 pub const COPY: &str = "Copy link";
 /// Copied.
@@ -68,7 +68,7 @@ pub const NOTICES: &str = "Alerts";
 /// Unknown name placeholder.
 pub const UNNAMED: &str = "Unnamed device";
 /// About text.
-pub const ABOUT_BODY: &str = "Lull connects your own devices directly, on your home network or your own VPN. There is no account, no cloud and no tracking. Audio and video are end-to-end encrypted.";
+pub const ABOUT_BODY: &str = "Nestwatch connects your own devices directly, on your home network or your own VPN. There is no account, no cloud and no tracking. Audio and video are end-to-end encrypted.";
 /// About: version line prefix.
 pub const VERSION: &str = "Version";
 /// About: device ID label.
@@ -165,7 +165,7 @@ pub const CAMERA_DENIED_HERE: &str = "Camera permission denied";
 // ----- pairing sheet (station) ------------------------------------------------
 
 /// Pairing sheet intro.
-pub const PAIR_INTRO: &str = "Scan with the Lull app, or open the link on a computer.";
+pub const PAIR_INTRO: &str = "Scan with the Nestwatch app, or open the link on a computer.";
 /// Code intro.
 pub const PAIR_CODE_INTRO: &str = "No camera? Enter this code";
 /// Station ID caption on the sheet (for code pairing in a browser).
@@ -203,7 +203,8 @@ pub const NOT_PAIRING: &str = "pairing closed";
 /// Invitation field.
 pub const INVITE_FIELD: &str = "Invitation link";
 /// Invitation hint.
-pub const INVITE_HINT: &str = "Paste the lull:// link or the web address shown on the station.";
+pub const INVITE_HINT: &str =
+    "Paste the nestwatch:// link or the web address shown on the station.";
 /// Invitation submit.
 pub const INVITE_SUBMIT: &str = "Pair with link";
 /// Code field.
@@ -234,7 +235,7 @@ pub const VERIFY_REMOVED: &str =
 /// Or divider.
 pub const OR: &str = "or";
 /// Pairing errors.
-pub const ERR_INVALID_INVITE: &str = "That link is not a Lull invitation.";
+pub const ERR_INVALID_INVITE: &str = "That link is not a Nestwatch invitation.";
 /// Invalid code.
 pub const ERR_INVALID_CODE: &str = "That code is not valid. It has 10 letters and digits.";
 /// Invalid ID.
@@ -261,7 +262,7 @@ pub const ERR_GENERIC: &str = "Something went wrong.";
 pub const NO_STATIONS: &str =
     "No stations yet. Add the station in your child's room to start listening.";
 /// Keeps listening (desktop).
-pub const KEEPS_LISTENING: &str = "Lull keeps listening when the window is closed.";
+pub const KEEPS_LISTENING: &str = "Nestwatch keeps listening when the window is closed.";
 /// Keeps listening only while open (browser).
 pub const BROWSER_KEEP_OPEN: &str =
     "Keep this tab open and the device awake: browsers stop listening in the background.";
@@ -491,7 +492,7 @@ pub fn listener_paired(name: &str) -> String {
     format!("{name} paired")
 }
 /// Alert notification body.
-pub const ALERT_BODY: &str = "Open Lull to listen.";
+pub const ALERT_BODY: &str = "Open Nestwatch to listen.";
 
 // ----- time ------------------------------------------------------------------
 

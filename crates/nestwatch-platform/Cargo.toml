@@ -1,0 +1,64 @@
+[package]
+name = "nestwatch-platform"
+description = "Nestwatch platform glue: audio I/O, camera, key storage, power, notifications and battery, with desktop implementations"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["camera", "keyring", "notify", "power", "battery"]
+## Audio through cpal. Always on for macOS and Windows; on Linux it needs the
+## ALSA development headers (Debian: libasound2-dev, pkg-config).
+cpal = ["dep:cpal"]
+## Cameras through nokhwa (V4L2, AVFoundation, Media Foundation).
+camera = ["dep:nokhwa"]
+## OS credential stores (Secret Service, Keychain, Credential Manager).
+keyring = [
+    "dep:keyring-core",
+    "dep:zbus-secret-service-keyring-store",
+    "dep:apple-native-keyring-store",
+    "dep:windows-native-keyring-store",
+]
+## System notifications through notify-rust.
+notify = ["dep:notify-rust"]
+## Sleep inhibition through keepawake (logind, IOPMAssertion, SetThreadExecutionState).
+power = ["dep:keepawake"]
+## Battery state through starship-battery (macOS, Windows; Linux uses sysfs directly).
+battery = ["dep:starship-battery"]
+
+[dependencies]
+nestwatch-media = { path = "../nestwatch-media" }
+chacha20poly1305 = { version = "0.10.1", default-features = false, features = ["alloc"] }
+directories = "6"
+getrandom = "0.3.4"
+log = "0.4"
+thiserror = "2"
+zeroize = "1.8"
+keepawake = { version = "0.6.1", optional = true }
+keyring-core = { version = "1.0.1", optional = true }
+notify-rust = { version = "4.18", optional = true }
+starship-battery = { version = "0.12", optional = true }
+nokhwa = { version = "0.10.11", default-features = false, features = ["input-native"], optional = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+cpal = { version = "0.16", optional = true }
+rustix = { version = "1", default-features = false, features = ["std", "pipe"] }
+
+[target.'cfg(not(target_os = "linux"))'.dependencies]
+cpal = "0.16"
+
+[target.'cfg(all(unix, not(any(target_os = "macos", target_os = "ios", target_os = "android"))))'.dependencies]
+zbus-secret-service-keyring-store = { version = "1.0.1", features = ["crypto-rust"], optional = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+apple-native-keyring-store = { version = "1.0.2", features = ["keychain"], optional = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-native-keyring-store = { version = "1.1", optional = true }
+
+[dev-dependencies]
+
+[lints]
+workspace = true

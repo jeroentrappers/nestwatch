@@ -412,5 +412,5 @@
       ]
     }
   ],
-  "description": "Lull sound activation gate decisions, media.md §3. One step per captured 20 ms frame (its level in dBFS); `out` lists what is queued for the listener in order: frames by seq (captured frames since session start) with flags (1 = pre-roll, 2 = first of burst), and activity messages. An optional `listen` applies before the step's frame."
+  "description": "Nestwatch sound activation gate decisions, media.md §3. One step per captured 20 ms frame (its level in dBFS); `out` lists what is queued for the listener in order: frames by seq (captured frames since session start) with flags (1 = pre-roll, 2 = first of burst), and activity messages. An optional `listen` applies before the step's frame."
 }

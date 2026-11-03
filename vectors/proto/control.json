@@ -74,7 +74,7 @@
       "name": "close-unknown-reason"
     }
   ],
-  "description": "LWP/1 control messages (protocol.md §7) in RFC 8949 core deterministic encoding: definite lengths, shortest integers and floats, keys sorted by encoded bytes. 'message' is the CBOR map in JSON form; JSON numbers with a fraction or exponent are CBOR floats.",
+  "description": "NWP/1 control messages (protocol.md §7) in RFC 8949 core deterministic encoding: definite lengths, shortest integers and floats, keys sorted by encoded bytes. 'message' is the CBOR map in JSON form; JSON numbers with a fraction or exponent are CBOR floats.",
   "invalid": [
     {
       "hex": "a1646f70656ef5",
@@ -277,9 +277,9 @@
   ],
   "vectors": [
     {
-      "hex": "a761746568656c6c6f636170706a6c756c6c2f302e312e3064636170738565617564696f63766f786474616c6b65766964656f6762617474657279646e616d65674e75727365727964726f6c656773746174696f6e65617564696f82010265766964656f8101",
+      "hex": "a761746568656c6c6f636170706f6e65737477617463682f302e312e3064636170738565617564696f63766f786474616c6b65766964656f6762617474657279646e616d65674e75727365727964726f6c656773746174696f6e65617564696f82010265766964656f8101",
       "message": {
-        "app": "lull/0.1.0",
+        "app": "nestwatch/0.1.0",
         "audio": [
           1,
           2
@@ -301,9 +301,9 @@
       "name": "hello-station"
     },
     {
-      "hex": "a761746568656c6c6f636170706e6c756c6c2d7765622f302e312e3064636170738265617564696f65766964656f646e616d656e4b69746368656e207461626c657464726f6c65686c697374656e657265617564696f810265766964656f80",
+      "hex": "a761746568656c6c6f63617070736e65737477617463682d7765622f302e312e3064636170738265617564696f65766964656f646e616d656e4b69746368656e207461626c657464726f6c65686c697374656e657265617564696f810265766964656f80",
       "message": {
-        "app": "lull-web/0.1.0",
+        "app": "nestwatch-web/0.1.0",
         "audio": [
           2
         ],

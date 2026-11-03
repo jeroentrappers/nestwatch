@@ -1,0 +1,37 @@
+[package]
+name = "nestwatch-core"
+description = "Nestwatch station and listener engines: trust stores, pairing mode, sessions, reconnect, alerts, settings"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["native"]
+## Station and listener engines on tokio (TCP, WebSocket, HTTP(S), mDNS).
+native = ["tokio/rt", "tokio/time"]
+## Listener engine in the browser (wasm32): WebSocket only, browser timers.
+web = ["dep:wasm-bindgen-futures", "dep:gloo-timers", "dep:js-sys"]
+## Opus (audio codec 1) through nestwatch-media's libopus binding. Native only.
+opus = ["nestwatch-media/opus"]
+
+[dependencies]
+nestwatch-crypto = { path = "../nestwatch-crypto" }
+nestwatch-media = { path = "../nestwatch-media" }
+nestwatch-net = { path = "../nestwatch-net" }
+nestwatch-proto = { path = "../nestwatch-proto" }
+nestwatch-session = { path = "../nestwatch-session" }
+minicbor = { version = "2.3.1", features = ["alloc", "derive"] }
+thiserror = "2"
+tokio = { version = "1", default-features = false, features = ["sync", "macros"] }
+
+gloo-timers = { version = "0.3", features = ["futures"], optional = true }
+js-sys = { version = "0.3", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "net", "io-util"] }
+
+[lints]
+workspace = true

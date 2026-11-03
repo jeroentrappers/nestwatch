@@ -6,10 +6,10 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use lull_core::listener::{ListenerConfig, ListenerEngine, VideoRequest, VideoView};
-use lull_core::{Clock, MemoryStorage, SystemClock, VideoStateKind};
-use lull_desktop::station_host::{self, StationOptions};
-use lull_platform::{DesktopOptions, DesktopPlatform};
+use nestwatch_core::listener::{ListenerConfig, ListenerEngine, VideoRequest, VideoView};
+use nestwatch_core::{Clock, MemoryStorage, SystemClock, VideoStateKind};
+use nestwatch_desktop::station_host::{self, StationOptions};
+use nestwatch_platform::{DesktopOptions, DesktopPlatform};
 
 #[tokio::test(flavor = "multi_thread")]
 async fn station_host_without_devices() {
@@ -46,7 +46,7 @@ async fn station_host_without_devices() {
     // The browser app (or the placeholder) is served.
     let body = http_get(http).await;
     assert!(body.starts_with("HTTP/1.1 200"), "{body}");
-    assert!(body.contains("<title>Lull</title>"));
+    assert!(body.contains("<title>Nestwatch</title>"));
 
     let info = station.open_pairing().await.unwrap();
     let mut cfg = ListenerConfig::new("Laptop");
@@ -82,7 +82,7 @@ async fn station_host_without_devices() {
     assert_eq!(state, Some(VideoView::State(VideoStateKind::Unavailable)));
     assert_eq!(
         station.snapshot().camera_availability,
-        lull_core::station::CameraAvailability::Unavailable
+        nestwatch_core::station::CameraAvailability::Unavailable
     );
     listener.shutdown().await;
     station.shutdown().await;

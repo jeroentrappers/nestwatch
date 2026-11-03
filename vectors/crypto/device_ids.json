@@ -3,28 +3,28 @@
   "cases": [
     {
       "public_key": "0000000000000000000000000000000000000000000000000000000000000000",
-      "device_id": "bh6u44sz3tdfitae",
-      "grouped": "bh6u-44sz-3tdf-itae"
+      "device_id": "jxgvemvdl4fipfni",
+      "grouped": "jxgv-emvd-l4fi-pfni"
     },
     {
       "public_key": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
-      "device_id": "fv5cur5w6xdc2w7g",
-      "grouped": "fv5c-ur5w-6xdc-2w7g"
+      "device_id": "5oohnb4erchflnxs",
+      "grouped": "5ooh-nb4e-rchf-lnxs"
     },
     {
       "public_key": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-      "device_id": "3xmmeqarlwefrscr",
-      "grouped": "3xmm-eqar-lwef-rscr"
+      "device_id": "ef4rzmsdmci4jy74",
+      "grouped": "ef4r-zmsd-mci4-jy74"
     },
     {
-      "public_key": "8b1ae35cbfc73165f62dbb5bcf27ef21e3118a47a6ebb82d0ce5a6b68d9ffc39",
-      "device_id": "6sdqdspf5fvx2cti",
-      "grouped": "6sdq-dspf-5fvx-2cti"
+      "public_key": "d58fd21777d77806a784703de4cdf4cc915ed9c24a0d753d2b07c673f5e59972",
+      "device_id": "wdb2i6k7puq3xcmp",
+      "grouped": "wdb2-i6k7-puq3-xcmp"
     },
     {
-      "public_key": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
-      "device_id": "edrzcaait57dtrhx",
-      "grouped": "edrz-caai-t57d-trhx"
+      "public_key": "63de8f31a8228b04556f6449c92dc64c55fd546b6f76574323c7a37d2a2af602",
+      "device_id": "ksvmaeemolnzzvbm",
+      "grouped": "ksvm-aeem-olnz-zvbm"
     }
   ]
 }

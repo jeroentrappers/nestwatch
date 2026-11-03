@@ -3,55 +3,55 @@
   "protocol_name": "Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s",
   "mode": "invite",
   "listener": {
-    "static_secret": "642bf8b67bdc144d94dc9bf0d00f108c314c9c95d0d67a49e665e368d447fa06",
-    "static_public": "8b1ae35cbfc73165f62dbb5bcf27ef21e3118a47a6ebb82d0ce5a6b68d9ffc39",
-    "ephemeral_secret": "830255d68ec9a11f971f715bf3d881353f5adbde605fab29968125d4446227fb",
-    "preface": "4c554c4c0102"
+    "static_secret": "381a670dbdc75dcbf65c0ec422608d7ada996d15682b59ddaf5d78e03024a51e",
+    "static_public": "d58fd21777d77806a784703de4cdf4cc915ed9c24a0d753d2b07c673f5e59972",
+    "ephemeral_secret": "70079ff0284c5e5b9a3e0a0e2a5011d419e47d4248d3b2ad0db5eed302625413",
+    "preface": "4e4553540102"
   },
   "station": {
-    "static_secret": "7fa777cda6e17557a381324e27dc002ffb28c7d2bb6ea9f95baa70d9dc8b7ce0",
-    "static_public": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
-    "ephemeral_secret": "5af4caa4e407f5c9adee7d3c38f8c78f5d2870779aa668cdc3dab21cc54113f0",
-    "preface": "4c554c4c0100"
+    "static_secret": "95c1083729eec29099203880efc63aead084adbd91f95e3ee483acb2eae6a49c",
+    "static_public": "63de8f31a8228b04556f6449c92dc64c55fd546b6f76574323c7a37d2a2af602",
+    "ephemeral_secret": "788aba68da3e4df40a03c350b18fc22ca9f3d94a8d3135063db4f4db722d5e8c",
+    "preface": "4e4553540100"
   },
-  "prologue": "6c756c6c2f314c554c4c01024c554c4c0100",
-  "invite_token": "1e360cb87ac26ca2cfb02368b5454456",
-  "psk": "c0b47c5cdeb5c50e5fed6dad3f2d2f8b18d2d1e9cde1c71f241f48ce2757ec17",
+  "prologue": "6e65737477617463682f314e45535401024e4553540100",
+  "invite_token": "d838e29709f4233e5b9b16b0d0cd4c54",
+  "psk": "ad9eef695aa3ad21226004be0092a9fa6eadbbf78f668a45c7020be346fe8c8e",
   "handshake_messages": [
     {
       "sender": "listener",
       "payload": "",
-      "message": "a3b38d2da3ba97882b6debecc8742d13d5af6f3691a3bbe3c3e2d57182db59160b339cb99207b443296dc3546e4899cd0bb9bce28225b5014acaec3698d59d9f2f914f9cfc2f8d5964e4fc948ae52fb55a28cf3d05f088cc60b93d716d65799b"
+      "message": "02ed07fea4069faa96c0a0e13e4261eeee9a97e1533fce85cbffce308e7a746841ca6f0faa80255b140124da5c3a8d4ba68dfb9dde532c7304f93498396caf0c005bbc199d5cf8c7301f127641e76fe538c7225cf5cd519ca2c19247c746355c"
     },
     {
       "sender": "station",
       "payload": "",
-      "message": "06d0974ffe9796ba46f3edb2b70e13ba9dca2fb285ee615e9b6938c99ffcc373fdd1aa868ba8e28e4bcc7eb2be6a6497"
+      "message": "77bf8c6e730423e9160d9e0986ccbf57bfcaa9e250ac7b51af070c79e585ee18023c2d4736db7c2c5cb163e196a9a03b"
     }
   ],
-  "handshake_hash": "d3918ede0a26107ea8ccfbf9a793f5b7a719e2b1b4b163a0fcdbeadb2dee5a9f",
-  "verification_number": 531870,
-  "verification_display": "531 870",
+  "handshake_hash": "3d91c0576e4b28bdb71e330d281848e7a9cc041a11b61976cb91c164e3a1d027",
+  "verification_number": 962135,
+  "verification_display": "962 135",
   "transport_messages": [
     {
       "sender": "listener",
       "payload": "04000000000000002a",
-      "message": "7eea1aafad0b718eb4142f6602f5ffc2001d2ae2d1e76c1e9c"
+      "message": "2d6a72222b62502878b6682e334242d0bc54334ded5c117164"
     },
     {
       "sender": "station",
       "payload": "05000000000000002a",
-      "message": "e95bbdeb92c882a13ecc5c546a6c32496d0f5a03d395090734"
+      "message": "a40f057b9f148343fa81747b83e43404cebec19a5f0aa93d82"
     },
     {
       "sender": "listener",
       "payload": "01a161746568656c6c6f",
-      "message": "7e8650a8aef7f7de8d15cb3502e2369d0de5316381d89736eb8c"
+      "message": "2e545552b6e64a004cb6406f9a0ad4598e0fde6a4d6e239a31a7"
     },
     {
       "sender": "station",
       "payload": "",
-      "message": "86e48e59c684454f0da02eb149eff41f"
+      "message": "fbad0506e5ed3f38d5756924d0a45811"
     }
   ]
 }

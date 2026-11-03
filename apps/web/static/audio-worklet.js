@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// Audio worklets of the Lull browser listener (platforms.md §2.5).
+// Audio worklets of the Nestwatch browser listener (platforms.md §2.5).
 //
-// lull-playback: plays 16 kHz mono frames that the main thread pulls from
+// nestwatch-playback: plays 16 kHz mono frames that the main thread pulls from
 // the listener engine (pull_playback). The worklet asks for frames whenever
 // less than TARGET samples are buffered or requested, so the engine is
 // pulled at the audio device's pace (CORE-12).
 //
-// lull-capture: posts microphone blocks for talk-back (push_talk_capture).
+// nestwatch-capture: posts microphone blocks for talk-back (push_talk_capture).
 
 const FRAME = 320; // 20 ms at 16 kHz
 const TARGET = 1600; // 100 ms buffered or in flight
 
-class LullPlayback extends AudioWorkletProcessor {
+class NestwatchPlayback extends AudioWorkletProcessor {
   constructor() {
     super();
     this.queue = [];
@@ -65,7 +65,7 @@ class LullPlayback extends AudioWorkletProcessor {
   }
 }
 
-class LullCapture extends AudioWorkletProcessor {
+class NestwatchCapture extends AudioWorkletProcessor {
   constructor() {
     super();
     this.buf = new Float32Array(1024);
@@ -88,5 +88,5 @@ class LullCapture extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor("lull-playback", LullPlayback);
-registerProcessor("lull-capture", LullCapture);
+registerProcessor("nestwatch-playback", NestwatchPlayback);
+registerProcessor("nestwatch-capture", NestwatchCapture);

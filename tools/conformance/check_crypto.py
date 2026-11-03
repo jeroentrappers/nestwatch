@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: AGPL-3.0-or-later
-"""Independent check of the Lull crypto vectors in vectors/crypto/.
+"""Independent check of the Nestwatch crypto vectors in vectors/crypto/.
 
 Re-derives every output from the inputs recorded in the vectors, using
 implementations that share no code with the Rust core (test-vectors.md §2):
@@ -45,7 +45,7 @@ def unhex(s):
 
 
 def device_id(public_key):
-    digest = hashlib.sha256(b"lull/1 device id" + public_key).digest()[:10]
+    digest = hashlib.sha256(b"nestwatch/1 device id" + public_key).digest()[:10]
     return base64.b32encode(digest).decode("ascii").lower()
 
 
@@ -59,7 +59,7 @@ def x25519_public(secret):
 
 def invite_psk(token, station_public_key):
     return HKDF(
-        algorithm=hashes.SHA256(), length=32, salt=station_public_key, info=b"lull/1 invite psk"
+        algorithm=hashes.SHA256(), length=32, salt=station_public_key, info=b"nestwatch/1 invite psk"
     ).derive(token)
 
 
@@ -77,7 +77,7 @@ def normalise_code(text):
 
 
 def code_salt(station_device_id):
-    return hashlib.sha256(b"lull/1 code salt" + station_device_id.encode("ascii")).digest()[:16]
+    return hashlib.sha256(b"nestwatch/1 code salt" + station_device_id.encode("ascii")).digest()[:16]
 
 
 def code_psk(code, station_device_id):
@@ -159,9 +159,9 @@ def check_handshake(v):
             x25519_public(unhex(party["static_secret"])).hex(),
             party["static_public"],
         )
-    check(f"{label} listener preface", f"4c554c4c01{MODE_BYTE[mode]:02x}", v["listener"]["preface"])
-    check(f"{label} station preface", "4c554c4c0100", v["station"]["preface"])
-    prologue = b"lull/1" + unhex(v["listener"]["preface"]) + unhex(v["station"]["preface"])
+    check(f"{label} listener preface", f"4e45535401{MODE_BYTE[mode]:02x}", v["listener"]["preface"])
+    check(f"{label} station preface", "4e4553540100", v["station"]["preface"])
+    prologue = b"nestwatch/1" + unhex(v["listener"]["preface"]) + unhex(v["station"]["preface"])
     check(f"{label} prologue", prologue.hex(), v["prologue"])
 
     station_public = unhex(v["station"]["static_public"])

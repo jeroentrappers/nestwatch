@@ -6,9 +6,9 @@ use std::rc::Rc;
 
 use dioxus::core::spawn_forever;
 use dioxus::prelude::*;
-use lull_ui::adapter::Host;
-use lull_ui::model::{Capabilities, Platform, Prefs, Theme};
-use lull_ui::{LocalFuture, Ui};
+use nestwatch_ui::adapter::Host;
+use nestwatch_ui::model::{Capabilities, Platform, Prefs, Theme};
+use nestwatch_ui::{LocalFuture, Ui};
 use tokio::sync::mpsc;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::{JsFuture, spawn_local};

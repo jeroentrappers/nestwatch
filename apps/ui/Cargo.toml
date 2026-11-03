@@ -1,6 +1,6 @@
 [package]
-name = "lull-ui"
-description = "Shared Dioxus components and screens of the Lull desktop and browser apps"
+name = "nestwatch-ui"
+description = "Shared Dioxus components and screens of the Nestwatch desktop and browser apps"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -9,16 +9,16 @@ rust-version.workspace = true
 
 [features]
 default = []
-## Backend adapters over the native lull-core engines (station and listener).
-native = ["dep:lull-core", "lull-core/native", "dep:lull-media", "dep:tokio"]
-## Backend adapter over the browser lull-core listener engine (wasm32).
-web = ["dep:lull-core", "lull-core/web", "dep:tokio"]
+## Backend adapters over the native nestwatch-core engines (station and listener).
+native = ["dep:nestwatch-core", "nestwatch-core/native", "dep:nestwatch-media", "dep:tokio"]
+## Backend adapter over the browser nestwatch-core listener engine (wasm32).
+web = ["dep:nestwatch-core", "nestwatch-core/web", "dep:tokio"]
 
 [dependencies]
 base64 = "0.22.1"
 dioxus = { version = "0.7.10", default-features = false, features = ["macro", "html", "signals", "hooks"] }
-lull-core = { path = "../../crates/lull-core", default-features = false, optional = true }
-lull-media = { path = "../../crates/lull-media", optional = true }
+nestwatch-core = { path = "../../crates/nestwatch-core", default-features = false, optional = true }
+nestwatch-media = { path = "../../crates/nestwatch-media", optional = true }
 qrcode = { version = "0.14", default-features = false }
 tokio = { version = "1", default-features = false, features = ["sync"], optional = true }
 

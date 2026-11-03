@@ -7,31 +7,31 @@
     },
     {
       "name": "version-2",
-      "uri": "lull://invite?v=2&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
+      "uri": "nestwatch://invite?v=2&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
     },
     {
       "name": "missing-key",
-      "uri": "lull://invite?v=1&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
+      "uri": "nestwatch://invite?v=1&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
     },
     {
       "name": "short-token",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=AAAA"
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=AAAA"
     },
     {
       "name": "padded-key",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I=&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I=&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
     },
     {
       "name": "duplicate-key",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&v=1"
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&v=1"
     },
     {
       "name": "name-too-long",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     },
     {
       "name": "bad-endpoint",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&a=fd7a%3A%3A1%3A47100"
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&a=fd7a%3A%3A1%3A47100"
     }
   ],
   "parse_only": [
@@ -49,7 +49,7 @@
         "token": "a5c4e30221405f7e9dbcdbfa19385776"
       },
       "name": "unknown-parameters",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&x=1&future=%E2%9C%93"
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&x=1&future=%E2%9C%93"
     },
     {
       "invitation": {
@@ -65,7 +65,7 @@
         "token": "a5c4e30221405f7e9dbcdbfa19385776"
       },
       "name": "reordered-and-uppercase-scheme",
-      "uri": "LULL://INVITE?a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&n=Baby%27s%20room&t=pcTjAiFAX36dvNv6GThXdg&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&v=1"
+      "uri": "NESTWATCH://INVITE?a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&n=Baby%27s%20room&t=pcTjAiFAX36dvNv6GThXdg&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&v=1"
     },
     {
       "invitation": {
@@ -75,7 +75,7 @@
         "token": "a5c4e30221405f7e9dbcdbfa19385776"
       },
       "name": "no-name-parameter",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg"
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg"
     },
     {
       "invitation": {
@@ -94,7 +94,7 @@
         "token": "a5c4e30221405f7e9dbcdbfa19385776"
       },
       "name": "more-than-8-endpoints",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&a=10.0.0.1%3A47100&a=10.0.0.2%3A47100&a=10.0.0.3%3A47100&a=10.0.0.4%3A47100"
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&a=10.0.0.1%3A47100&a=10.0.0.2%3A47100&a=10.0.0.3%3A47100&a=10.0.0.4%3A47100"
     }
   ],
   "vectors": [
@@ -112,9 +112,9 @@
         "token": "a5c4e30221405f7e9dbcdbfa19385776"
       },
       "name": "full",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100",
       "web_origin": "http://192.168.1.20:47180",
-      "web_url": "http://192.168.1.20:47180/#lull%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3DBaby%2527s%2520room%26a%3Dnursery.tail1234.ts.net%253A47100%26a%3D100.101.102.103%253A47100%26a%3D%255Bfd7a%253A115c%253Aa1e0%253A%253A7%255D%253A47100%26a%3D192.168.1.20%253A47100%26a%3D%255B2001%253Adb8%253A%253A20%255D%253A47100"
+      "web_url": "http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3DBaby%2527s%2520room%26a%3Dnursery.tail1234.ts.net%253A47100%26a%3D100.101.102.103%253A47100%26a%3D%255Bfd7a%253A115c%253Aa1e0%253A%253A7%255D%253A47100%26a%3D192.168.1.20%253A47100%26a%3D%255B2001%253Adb8%253A%253A20%255D%253A47100"
     },
     {
       "invitation": {
@@ -124,9 +124,9 @@
         "token": "a5c4e30221405f7e9dbcdbfa19385776"
       },
       "name": "minimal",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=",
       "web_origin": "http://192.168.1.20:47180",
-      "web_url": "http://192.168.1.20:47180/#lull%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3D"
+      "web_url": "http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3D"
     },
     {
       "invitation": {
@@ -138,9 +138,9 @@
         "token": "a5c4e30221405f7e9dbcdbfa19385776"
       },
       "name": "unicode-name",
-      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Chambre%20de%20Zo%C3%A9%20%F0%9F%8D%BC&a=10.0.0.5%3A47101",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Chambre%20de%20Zo%C3%A9%20%F0%9F%8D%BC&a=10.0.0.5%3A47101",
       "web_origin": "http://192.168.1.20:47180",
-      "web_url": "http://192.168.1.20:47180/#lull%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3DChambre%2520de%2520Zo%25C3%25A9%2520%25F0%259F%258D%25BC%26a%3D10.0.0.5%253A47101"
+      "web_url": "http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3DChambre%2520de%2520Zo%25C3%25A9%2520%25F0%259F%258D%25BC%26a%3D10.0.0.5%253A47101"
     }
   ]
 }

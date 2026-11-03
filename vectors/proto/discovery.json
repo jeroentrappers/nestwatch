@@ -1,5 +1,5 @@
 {
-  "description": "DNS-SD TXT strings for _lull._tcp.local. (protocol.md §3.4)",
+  "description": "DNS-SD TXT strings for _nestwatch._tcp.local. (protocol.md §3.4)",
   "invalid": [
     {
       "name": "version-2",

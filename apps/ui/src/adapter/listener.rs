@@ -3,9 +3,9 @@
 
 use std::collections::HashMap;
 
-use lull_core::ListenMode;
-use lull_core::VideoStateKind;
-use lull_core::listener::{
+use nestwatch_core::ListenMode;
+use nestwatch_core::VideoStateKind;
+use nestwatch_core::listener::{
     ConnStatus, ListenerState, NetPath as CoreNetPath, StationView, TalkView, VideoView,
 };
 
@@ -159,7 +159,7 @@ fn map_tile(v: &StationView, tracker: &mut Tracker, now_ms: u64, talk_possible: 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use lull_core::listener::StationSettings;
+    use nestwatch_core::listener::StationSettings;
 
     fn view(status: ConnStatus) -> StationView {
         StationView {

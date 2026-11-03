@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! View models: plain data the components render. Backends map engine
-//! snapshots (`lull_core::listener::ListenerState`,
-//! `lull_core::station::StationState`) into these, so the components do not
+//! snapshots (`nestwatch_core::listener::ListenerState`,
+//! `nestwatch_core::station::StationState`) into these, so the components do not
 //! depend on the engines and run against a demo backend too.
 
 use std::collections::VecDeque;
@@ -340,7 +340,7 @@ pub struct TrustedRow {
 /// The open pairing window (FR-PAIR-1..3).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PairingModel {
-    /// `lull://invite?...`.
+    /// `nestwatch://invite?...`.
     pub invite_uri: String,
     /// Browser address with the invitation fragment.
     pub web_url: Option<String>,

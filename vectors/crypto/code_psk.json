@@ -1,6 +1,6 @@
 {
   "spec": "protocol.md 5.3",
-  "argon2": "Argon2id v0x13, password = normalised code (ASCII), salt = SHA-256(\"lull/1 code salt\" || station_device_id)[0..16], m = 19456 KiB, t = 2, p = 1, length = 32, no secret, no associated data",
+  "argon2": "Argon2id v0x13, password = normalised code (ASCII), salt = SHA-256(\"nestwatch/1 code salt\" || station_device_id)[0..16], m = 19456 KiB, t = 2, p = 1, length = 32, no secret, no associated data",
   "normalisation": [
     {
       "input": "7K3QD-9XW2M",
@@ -54,21 +54,21 @@
   "cases": [
     {
       "code": "7K3QD9XW2M",
-      "station_device_id": "edrzcaait57dtrhx",
-      "salt": "9d96f7d6e1274cc2c4c01753c184b22e",
-      "psk": "53059b17edceeba74562c97be2b990c56b8a232845356e38ea4b74664c965208"
+      "station_device_id": "ksvmaeemolnzzvbm",
+      "salt": "16e4b8b2dd1e858d3b9b41587ab71b14",
+      "psk": "c2f53a17f79699de1bebb5b287c4ac45fd977deca4239e44e4be2def7e34e917"
     },
     {
       "code": "0000000000",
-      "station_device_id": "edrzcaait57dtrhx",
-      "salt": "9d96f7d6e1274cc2c4c01753c184b22e",
-      "psk": "26175b0ac19998cce9778faabc4e3e23fc22a7c4eac6c357cbffbedf4d19eea1"
+      "station_device_id": "ksvmaeemolnzzvbm",
+      "salt": "16e4b8b2dd1e858d3b9b41587ab71b14",
+      "psk": "61dc17ac745722686e800935434f845db71fd0e3cc5e0ccab8db037e83dcd69b"
     },
     {
       "code": "ZZZZZZZZZZ",
-      "station_device_id": "bh6u44sz3tdfitae",
-      "salt": "b5ea9fc099735aa0c8927567032741ea",
-      "psk": "ed07cd65cabb064ba12bc475cd79df85c691e8540a788839ab68fd697fc1d4c9"
+      "station_device_id": "jxgvemvdl4fipfni",
+      "salt": "d19a53d29631d92db7555df15a282abb",
+      "psk": "fff7306656e7bea6e185dd5aa6f29aa6f73829337034cf03b6c660e1117f190b"
     }
   ]
 }

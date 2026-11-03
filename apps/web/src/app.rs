@@ -6,9 +6,9 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 use dioxus::prelude::*;
-use lull_core::listener::{Alert, ListenerConfig, ListenerEngine, ListenerEvent};
-use lull_core::{Clock, MemoryStorage, Storage, SystemClock};
-use lull_ui::{BackendHandle, LullApp, strings as s};
+use nestwatch_core::listener::{Alert, ListenerConfig, ListenerEngine, ListenerEvent};
+use nestwatch_core::{Clock, MemoryStorage, Storage, SystemClock};
+use nestwatch_ui::{BackendHandle, NestwatchApp, strings as s};
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::spawn_local;
@@ -25,9 +25,9 @@ thread_local! {
 fn App() -> Element {
     let (backend, invitation) = use_hook(|| {
         BOOT.with(|b| b.borrow().clone())
-            .expect("lull-web booted before launch")
+            .expect("nestwatch-web booted before launch")
     });
-    rsx! { LullApp { backend, invitation } }
+    rsx! { NestwatchApp { backend, invitation } }
 }
 
 fn default_name() -> String {
@@ -77,7 +77,7 @@ fn websocket_url() -> String {
         "ws"
     };
     format!(
-        "{scheme}://{}/lull/1",
+        "{scheme}://{}/nestwatch/1",
         location.host().unwrap_or_else(|_| "localhost".into())
     )
 }
@@ -156,15 +156,15 @@ fn unlock_on_first_gesture(audio: Rc<Audio>) {
 #[allow(clippy::arc_with_non_send_sync)]
 pub fn run() {
     std::panic::set_hook(Box::new(|info| {
-        web_sys::console::error_1(&JsValue::from_str(&format!("Lull panicked: {info}")));
+        web_sys::console::error_1(&JsValue::from_str(&format!("Nestwatch panicked: {info}")));
     }));
     let invitation = take_invitation();
 
     #[cfg(feature = "demo")]
     {
         let prefs = {
-            let mut p = lull_ui::model::Prefs {
-                role: Some(lull_ui::model::Role::Listener),
+            let mut p = nestwatch_ui::model::Prefs {
+                role: Some(nestwatch_ui::model::Role::Listener),
                 disclaimer_ok: true,
                 ..Default::default()
             };
@@ -177,24 +177,24 @@ pub fn run() {
             .and_then(|w| w.location().search().ok())
             .is_some_and(|q| q.contains("desktop"))
         {
-            lull_ui::model::Platform::Desktop
+            nestwatch_ui::model::Platform::Desktop
         } else {
-            lull_ui::model::Platform::Web
+            nestwatch_ui::model::Platform::Web
         };
         let mut prefs = prefs;
         if web_sys::window()
             .and_then(|w| w.location().search().ok())
             .is_some_and(|q| q.contains("station"))
         {
-            prefs.role = Some(lull_ui::model::Role::Station);
+            prefs.role = Some(nestwatch_ui::model::Role::Station);
         }
         if web_sys::window()
             .and_then(|w| w.location().search().ok())
             .is_some_and(|q| q.contains("welcome"))
         {
-            prefs = lull_ui::model::Prefs::default();
+            prefs = nestwatch_ui::model::Prefs::default();
         }
-        let backend = BackendHandle::new(lull_ui::demo::DemoBackend::new(
+        let backend = BackendHandle::new(nestwatch_ui::demo::DemoBackend::new(
             platform,
             prefs,
             Rc::new(crate::host::sleep),
@@ -213,7 +213,7 @@ pub fn run() {
             Ok(l) => Arc::new(l.clone()),
             Err(e) => {
                 web_sys::console::warn_1(&JsValue::from_str(&format!(
-                    "Lull: {e}; pairings are forgotten on reload"
+                    "Nestwatch: {e}; pairings are forgotten on reload"
                 )));
                 Arc::new(MemoryStorage::new())
             }
@@ -225,7 +225,7 @@ pub fn run() {
         let engine = match ListenerEngine::start(cfg, storage, clock.clone()) {
             Ok(e) => e,
             Err(e) => {
-                web_sys::console::error_1(&JsValue::from_str(&format!("Lull: {e}")));
+                web_sys::console::error_1(&JsValue::from_str(&format!("Nestwatch: {e}")));
                 return;
             }
         };
@@ -240,7 +240,7 @@ pub fn run() {
             tx,
             rx: RefCell::new(Some(rx)),
         };
-        let backend = BackendHandle::new(lull_ui::adapter::EngineBackend::new(
+        let backend = BackendHandle::new(nestwatch_ui::adapter::EngineBackend::new(
             Rc::new(host),
             clock,
             engine,

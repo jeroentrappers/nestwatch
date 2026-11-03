@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! The engine's `Storage` port over the origin's `localStorage`
 //! (security.md §5 "Browser"; FR-WEB-3). Values are base64 under
-//! `lull:<key>`. `localStorage` is synchronous, which matches the
+//! `nestwatch:<key>`. `localStorage` is synchronous, which matches the
 //! synchronous port (CORE-13) without a write-through cache; see
 //! OPEN-QUESTIONS UI-4 for why not IndexedDB.
 
 use base64::Engine as _;
-use lull_core::{Storage, StorageError};
+use nestwatch_core::{Storage, StorageError};
 
-const PREFIX: &str = "lull:";
+const PREFIX: &str = "nestwatch:";
 
 /// `localStorage` of the station's origin.
 #[derive(Debug, Clone)]

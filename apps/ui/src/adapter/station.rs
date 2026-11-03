@@ -8,11 +8,11 @@ use std::sync::Arc;
 
 use dioxus::core::spawn_forever;
 use dioxus::prelude::*;
-use lull_core::station::{
+use nestwatch_core::station::{
     CameraAvailability, StationEngine, StationEvent, StationState, TrustedListener,
 };
-use lull_core::{Clock, ListenMode, Transport};
-use lull_media::capture::{GainSetting, GainStep};
+use nestwatch_core::{Clock, ListenMode, Transport};
+use nestwatch_media::capture::{GainSetting, GainStep};
 
 use super::Host;
 use crate::backend::{Ui, race};
@@ -187,8 +187,8 @@ mod tests {
     use super::*;
     use std::sync::Arc;
 
-    use lull_core::station::StationConfig;
-    use lull_core::{ManualClock, MemoryStorage};
+    use nestwatch_core::station::StationConfig;
+    use nestwatch_core::{ManualClock, MemoryStorage};
 
     #[tokio::test]
     async fn maps_a_running_station_with_pairing() {

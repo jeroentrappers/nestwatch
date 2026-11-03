@@ -1,4 +1,4 @@
-# Lull Wire Protocol 1 (LWP/1)
+# Nestwatch Wire Protocol 1 (NWP/1)
 
 ## 1. Overview
 
@@ -26,7 +26,7 @@ the origin's persistent storage.
 
 ### 2.2 Device ID
 
-`device_id = base32(SHA-256("lull/1 device id" || public_key)[0..10])`,
+`device_id = base32(SHA-256("nestwatch/1 device id" || public_key)[0..10])`,
 using the RFC 4648 base32 alphabet in lower case without padding
 (16 characters). The ID is shown to users in grouped form (`abcd-efgh-ijkl-mnop`)
 and is used in discovery records and code pairing.
@@ -58,7 +58,7 @@ Listeners SHOULD enable `TCP_NODELAY`.
 
 A station serves the browser listener app over HTTP on port 47180 and over
 HTTPS on port 47181 (falling back upward like §3.2), and accepts WebSocket
-connections at path `/lull/1` on both. Over WebSocket, the preface (§4) is
+connections at path `/nestwatch/1` on both. Over WebSocket, the preface (§4) is
 sent as one binary message, and each subsequent binary message carries
 exactly one `noise_message` **without** the length prefix. Text messages are
 a protocol error.
@@ -69,7 +69,7 @@ station so users can verify it when accepting it in a browser.
 
 ### 3.4 Discovery
 
-Stations advertise the DNS-SD service `_lull._tcp.local.` while active.
+Stations advertise the DNS-SD service `_nestwatch._tcp.local.` while active.
 
 - Instance name: the station's display name (made unique by the mDNS
   responder as usual).
@@ -93,7 +93,7 @@ IPv6 addresses are never listed.
 An **invitation** is a URI:
 
 ```
-lull://invite?v=1&s=<station public key>&t=<invite token>&n=<name>&a=<endpoint>&a=<endpoint>...
+nestwatch://invite?v=1&s=<station public key>&t=<invite token>&n=<name>&a=<endpoint>&a=<endpoint>...
 ```
 
 - `s`: 32-byte station public key, base64url.
@@ -112,7 +112,7 @@ server.
 The listener sends 6 bytes:
 
 ```
-"LULL" (4 bytes ASCII) || version (u8 = 1) || mode (u8)
+"NEST" (4 bytes ASCII) || version (u8 = 1) || mode (u8)
 ```
 
 | Mode | Value | Use |
@@ -124,7 +124,7 @@ The listener sends 6 bytes:
 The station answers 6 bytes:
 
 ```
-"LULL" || version (u8 = 1) || status (u8)
+"NEST" || version (u8 = 1) || status (u8)
 ```
 
 | Status | Value | Meaning |
@@ -140,7 +140,7 @@ After a non-`ok` status both sides close. A station MUST answer within
 within 15 seconds or the station closes the connection.
 
 The **prologue** for the Noise handshake is
-`"lull/1" || listener_preface || station_preface` (18 bytes).
+`"nestwatch/1" || listener_preface || station_preface` (23 bytes).
 
 ## 5. Handshake
 
@@ -157,7 +157,7 @@ error, to avoid becoming a key-membership oracle).
 
 ### 5.2 Mode `invite`: `IKpsk2`
 
-`psk = HKDF-SHA256(ikm = invite_token, salt = station_public_key, info = "lull/1 invite psk", L = 32)`.
+`psk = HKDF-SHA256(ikm = invite_token, salt = station_public_key, info = "nestwatch/1 invite psk", L = 32)`.
 
 The station accepts if pairing mode is open and the handshake succeeds. In
 `IKpsk2` the station's handshake completes before it has proof that the
@@ -172,7 +172,7 @@ A pairing code is 10 characters from the Crockford base32 alphabet
 normalised by removing spaces and hyphens, upper-casing, and mapping
 `O→0`, `I→1`, `L→1`. A code carries 50 bits of entropy.
 
-`psk = Argon2id(password = normalised_code, salt = SHA-256("lull/1 code salt" || station_device_id_ascii)[0..16], m = 19456 KiB, t = 2, p = 1, length = 32)`
+`psk = Argon2id(password = normalised_code, salt = SHA-256("nestwatch/1 code salt" || station_device_id_ascii)[0..16], m = 19456 KiB, t = 2, p = 1, length = 32)`
 
 The listener learns `station_device_id` from the station's discovery record
 (`id`). After the handshake the listener MUST check that the station's
@@ -200,7 +200,7 @@ they differ (forget and pair again).
 
 Implementations MUST close the session before either direction's Noise
 nonce reaches 2^32. At 50 audio records per second this is more than two
-years; there is no rekeying in LWP/1.
+years; there is no rekeying in NWP/1.
 
 ## 6. Records
 
@@ -412,7 +412,7 @@ precedence over looser wording above.
 - **CRYPTO-6** (protocol.md §2.1, security.md §5). The stored format of the device secret is not specified. **Resolution:** 32 raw X25519 secret bytes as generated (not pre-clamped); the public key is X25519(secret, 9), clamping applied as RFC 7748 specifies.
 - **CRYPTO-7** (protocol.md §5.3). Code normalisation: which whitespace is removed, and how is non-ASCII input upper-cased? **Resolution:** Only ASCII spaces and hyphens are removed; upper-casing is ASCII-only; any other character (tabs, `U`, non-ASCII) rejects the input.
 - **CRYPTO-8** (protocol.md §2.2). Should device ID parsing accept the grouped and upper-case forms? **Resolution:** Parsing ignores hyphens and accepts either case; the canonical (displayed in TXT) form is lower case without hyphens.
-- **PROTO-1** (protocol.md §4). No status is defined for a version-1 listener preface with an unknown mode, and the version byte of a station's `unsupported-version` reply is not stated. **Resolution:** `lull-proto` reports `UnknownMode`; stations should answer `unsupported-version` and close. A station always sends its own version (1) in its preface.
+- **PROTO-1** (protocol.md §4). No status is defined for a version-1 listener preface with an unknown mode, and the version byte of a station's `unsupported-version` reply is not stated. **Resolution:** `nestwatch-proto` reports `UnknownMode`; stations should answer `unsupported-version` and close. A station always sends its own version (1) in its preface.
 - **PROTO-2** (protocol.md §3.1, §6). Maximum record size is not stated. **Resolution:** Derived from Noise: a transport message is at most 65535 bytes including the 16-byte tag, so a record is at most 65519 bytes and a VIDEO fragment payload at most 65501 bytes.
 - **PROTO-3** (protocol.md §7.1, test-vectors.md §1). The CBOR encoding form is not specified, yet vectors compare bytes. **Resolution:** Encoders use RFC 8949 §4.2.1 core deterministic encoding (definite lengths, shortest ints, shortest exact float of f16/f32, keys sorted by encoded bytes). Decoders accept any float width, indefinite-length maps/arrays and keys in any order; duplicate keys and trailing bytes are errors; non-text keys are skipped like unknown keys.
 - **PROTO-4** (protocol.md §7.2–§7.12). Which keys are required is implicit. `listen.threshold` is "used when activated"; `status` keys are "uint or null". **Resolution:** Every key without `?` is required, including `threshold` in continuous mode. Nullable keys (`battery`, `charging`, `talker`) must be present and may be `null`. Optional keys (`?`) treat `null` as absent and are omitted when encoding.
@@ -427,15 +427,15 @@ precedence over looser wording above.
 - **NET-1** (protocol.md §3.2). How to listen on "all interfaces (IPv4 and IPv6)" and what makes a port "unavailable". **Resolution:** One dual-stack `[::]` socket (`IPV6_V6ONLY` off) when possible, else separate `0.0.0.0` and `[::]` sockets on the same port (IPv6 skipped if the host has none). Any bind failure of a required socket moves to the next port. `SO_REUSEADDR` is set except on Windows. IPv4-mapped peer addresses are reported as IPv4.
 - **NET-2** (protocol.md §3.3). The HTTP fallback range 47180..47189 overlaps the HTTPS default 47181. **Resolution:** HTTP is bound first; HTTPS then takes the first free port from 47181 upward, so the two never collide. Both bound ports go into TXT `http`/`https`.
 - **NET-3** (protocol.md §3.3). Maximum WebSocket frame/message size is not stated. **Resolution:** Frames and messages above 64 KiB are rejected by the WebSocket layer (the connection fails); the session layer checks the exact 65535-byte Noise limit. Senders refuse messages above 65535 bytes locally. Ping/pong/close frames are handled by the transport and never reach the session.
-- **NET-4** (protocol.md §3.3, security.md §7). Should the station restrict which web origins may open `/lull/1`? **Resolution:** Yes: if an `Origin` header is present its `host[:port]` must equal the request's `Host` (case-insensitive, scheme ignored), otherwise 403. Requests without `Origin` (native clients) are accepted. Configurable for deployments behind a proxy.
+- **NET-4** (protocol.md §3.3, security.md §7). Should the station restrict which web origins may open `/nestwatch/1`? **Resolution:** Yes: if an `Origin` header is present its `host[:port]` must equal the request's `Host` (case-insensitive, scheme ignored), otherwise 403. Requests without `Origin` (native clients) are accepted. Configurable for deployments behind a proxy.
 - **NET-5** (protocol.md §3.3, security.md PRIV-1). Which HTTP headers and routing rules the app server uses. **Resolution:** CSP `default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' blob:; connect-src 'self' ws://<Host> wss://<Host>; worker-src 'self' blob:; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'` (explicit ws/wss for browsers whose `'self'` misses WebSocket schemes), plus `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, COOP/CORP same-origin, a Permissions-Policy allowing only the microphone for self, and `Cache-Control: no-cache`. No HSTS (HTTP and self-signed HTTPS coexist). Only GET/HEAD; extensionless unknown paths serve `index.html` (app routes), unknown files with an extension are 404.
-- **NET-6** (protocol.md §3.3). Certificate details and fingerprint display form. **Resolution:** Subject CN `Lull station`; SANs exactly the names/addresses the caller passes; `notBefore` back-dated one day for clock skew, `notAfter` 3653 days after generation; key stored as PKCS#8 PEM. Fingerprint = SHA-256 of the DER certificate as upper-case hex pairs joined by `:` (as browsers show it).
-- **NET-7** (protocol.md §3.4). SRV target host name and instance name limits. **Resolution:** SRV host is `lull-<device_id>.local.` (does not reveal the computer's name). The display name is trimmed and truncated to 63 bytes at a character boundary (empty becomes `Lull`); conflicts are resolved by the responder as `Name (2)`. TXT changes are re-announced by re-registering the service.
+- **NET-6** (protocol.md §3.3). Certificate details and fingerprint display form. **Resolution:** Subject CN `Nestwatch station`; SANs exactly the names/addresses the caller passes; `notBefore` back-dated one day for clock skew, `notAfter` 3653 days after generation; key stored as PKCS#8 PEM. Fingerprint = SHA-256 of the DER certificate as upper-case hex pairs joined by `:` (as browsers show it).
+- **NET-7** (protocol.md §3.4). SRV target host name and instance name limits. **Resolution:** SRV host is `nestwatch-<device_id>.local.` (does not reveal the computer's name). The display name is trimmed and truncated to 63 bytes at a character boundary (empty becomes `Nestwatch`); conflicts are resolved by the responder as `Name (2)`. TXT changes are re-announced by re-registering the service.
 - **NET-8** (protocol.md §3.4, §3.5). Which discovered addresses a listener receives. **Resolution:** IPv6 link-local addresses are dropped (endpoints cannot carry a zone, PROTO-11); resolutions without any remaining address are not reported; addresses from successive resolutions of one instance are merged (at most 16), IPv4 first; an instance whose TXT becomes malformed is reported as lost.
 - **NET-9** (protocol.md §3.5). How the VPN DNS name is found. **Resolution:** `tailscale status --json` (on `PATH`, or the macOS app bundle binary) with a 2 s timeout; `Self.DNSName` is used when `BackendState` is `Running` or absent. Any failure means no name.
 - **NET-10** (protocol.md §3.2, §3.5). Dial behaviour for names with several addresses and the timeout scope. **Resolution:** Addresses are tried happy-eyeballs style (families interleaved, next attempt after 250 ms or on failure, first success wins). The timeout covers resolution and connection of one endpoint. Trying several endpoints is sequential in the caller's order.
 - **NET-11** (protocol.md §8). Backpressure for the browser WebSocket, which has no awaitable send. **Resolution:** `send` returns after queuing once the browser's `bufferedAmount` is at most 256 KiB, polling every 5 ms.
-- **SESSION-1** (protocol.md §4, §9). Which status wins when several non-`ok` statuses apply, and whether `busy`/`rate-limited` apply to `trusted` mode. **Resolution:** Checked in this order: `unsupported-version` (also for an unknown mode, PROTO-1), `busy`, `rate-limited`, `pairing-closed`. `busy` applies to every mode; whether to answer `rate-limited` is the station policy's decision per mode. A preface without the `LULL` magic (or, over WebSocket, a first message that is not exactly 6 bytes) gets no answer at all.
+- **SESSION-1** (protocol.md §4, §9). Which status wins when several non-`ok` statuses apply, and whether `busy`/`rate-limited` apply to `trusted` mode. **Resolution:** Checked in this order: `unsupported-version` (also for an unknown mode, PROTO-1), `busy`, `rate-limited`, `pairing-closed`. `busy` applies to every mode; whether to answer `rate-limited` is the station policy's decision per mode. A preface without the `NEST` magic (or, over WebSocket, a first message that is not exactly 6 bytes) gets no answer at all.
 - **SESSION-2** (protocol.md §4). "A station MUST answer within 5 s" and "the whole handshake MUST complete within 15 s": what is measured, and does the listener have a deadline? **Resolution:** The station closes silently if no complete listener preface arrived 5 s after accept. Both roles close silently if setup (Noise handshake plus receipt of the peer's `hello`) is not done 15 s after the session started; including the `hello` matters because in `IKpsk2` the station's handshake completes before the listener proved the PSK.
 - **SESSION-3** (protocol.md §7.2). "Neither side sends any other record before receiving the peer's `hello`" would deadlock if read literally; what may arrive before and during setup? **Resolution:** Each side sends its own `hello` as soon as its handshake completes (station: right after message 2 in `IK`/`IKpsk2`, after message 3 in `XXpsk3`), then nothing else until the peer's `hello`. The first known record must be the peer's `hello` with the right `role`. The listener then requires `paired` (pairing modes only, rejected in `trusted`), `audio-config` and `status` in that order; PING/PONG are allowed after `hello`. Unknown record types and unknown control types are ignored at any time; `close` is honoured at any time; anything else is a `protocol-error`. A pairing listener is trusted only when its first record decrypts *and* is a valid `hello`.
 - **SESSION-4** (protocol.md §6, §7). Handling of valid records and messages sent in the wrong direction (for example `status` to a station, AUDIO stream 0 or VIDEO to a station, stream 1 to a listener), a second `hello`, and inconsistent VIDEO fragments (PROTO-9). **Resolution:** Wrong-direction messages and streams are ignored like unknown ones. A second `hello` is a `protocol-error`. An inconsistent or oversized VIDEO frame is discarded without ending the session. `audio-config` and `status` after setup are passed to the application.

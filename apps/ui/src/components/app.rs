@@ -20,7 +20,7 @@ pub enum Screen {
     Home,
     /// Add a station (listener).
     AddStation,
-    /// About Lull.
+    /// About Nestwatch.
     About,
 }
 
@@ -77,10 +77,13 @@ pub fn start_invitation_pairing(backend: BackendHandle, mut nav: Nav, input: Str
     });
 }
 
-/// The Lull app. `invitation` is a pairing invitation to open at start
+/// The Nestwatch app. `invitation` is a pairing invitation to open at start
 /// (the browser app's URL fragment, protocol.md §3.5).
 #[component]
-pub fn LullApp(backend: BackendHandle, #[props(default)] invitation: Option<String>) -> Element {
+pub fn NestwatchApp(
+    backend: BackendHandle,
+    #[props(default)] invitation: Option<String>,
+) -> Element {
     let ui = use_hook(|| {
         let ui = Ui::new();
         backend.attach(ui);

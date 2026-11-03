@@ -1,7 +1,7 @@
-# Lull design system
+# Nestwatch design system
 
 Open [mockups.html](mockups.html) in a browser (`?night` / `?day` to force a
-theme). [lull.css](lull.css) is the production stylesheet for the Dioxus
+theme). [nestwatch.css](nestwatch.css) is the production stylesheet for the Dioxus
 desktop and web apps; Android and iOS mirror its tokens (§6).
 
 ![Night theme](preview-night.png)
@@ -22,7 +22,7 @@ desktop and web apps; Android and iOS mirror its tokens (§6).
 
 ## 2. Brand
 
-- **Name**: Lull. **Mark**: a honey crescent cradling two lavender sound
+- **Name**: Nestwatch. **Mark**: a honey crescent cradling two lavender sound
   waves ([logo.svg](logo.svg)). Minimum size 16 px; on dark and light
   surfaces alike.
 - **Voice**: short, kind, specific. "Quiet", "Sound", "Reconnecting: trying 3
@@ -104,7 +104,7 @@ ease curve; all motion off under `prefers-reduced-motion`.
 | `--ink-0..3` | `background`, `surface`, `surfaceContainer`, `outlineVariant` | asset colours `Ink0..3` |
 | `--honey` | `primary` | `Color.accentColor` |
 | `--lavender` | `tertiary` | `Color("Lavender")` |
-| `--sage` / `--coral` / `--amber` | custom `LullColors` | asset colours |
+| `--sage` / `--coral` / `--amber` | custom `NestwatchColors` | asset colours |
 | Type scale | `Typography` with system default font | `.rounded` design system font |
 
 Native apps keep platform conventions (navigation, sheets, switches) while

@@ -2,7 +2,7 @@
 //! Web Audio for the browser listener (platforms.md §2.5).
 //!
 //! - Playback: a 16 kHz `AudioContext` created on the first user gesture.
-//!   An `AudioWorklet` (`audio-worklet.js`, `lull-playback`) asks the main
+//!   An `AudioWorklet` (`audio-worklet.js`, `nestwatch-playback`) asks the main
 //!   thread for frames at the device's pace; each request pulls 20 ms
 //!   frames with `ListenerEngine::pull_playback` (CORE-12). Without
 //!   `AudioWorklet` a `ScriptProcessorNode` pulls directly.
@@ -10,14 +10,14 @@
 //!   context at the device rate, blocks fed to `push_talk_capture`.
 //! - Alert sound: two short tones on the playback context.
 //!
-//! Counters are mirrored to `window.__lullAudio` for diagnostics and tests
+//! Counters are mirrored to `window.__nestwatchAudio` for diagnostics and tests
 //! (headless browsers cannot be heard).
 
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use js_sys::{Array, Float32Array, Object, Reflect};
-use lull_core::listener::ListenerEngine;
+use nestwatch_core::listener::ListenerEngine;
 use wasm_bindgen::JsCast;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::{JsFuture, spawn_local};
@@ -90,7 +90,7 @@ impl Audio {
         let stats = Object::new();
         set(&stats, "mode", "locked");
         if let Some(w) = web_sys::window() {
-            let _ = Reflect::set(&w, &JsValue::from_str("__lullAudio"), &stats);
+            let _ = Reflect::set(&w, &JsValue::from_str("__nestwatchAudio"), &stats);
         }
         Rc::new(Self {
             engine,
@@ -133,7 +133,10 @@ impl Audio {
         let ctx = match AudioContext::new_with_context_options(&opts) {
             Ok(c) => c,
             Err(e) => {
-                web_sys::console::error_2(&JsValue::from_str("Lull: no 16 kHz AudioContext"), &e);
+                web_sys::console::error_2(
+                    &JsValue::from_str("Nestwatch: no 16 kHz AudioContext"),
+                    &e,
+                );
                 return;
             }
         };
@@ -210,7 +213,7 @@ impl Audio {
         opts.set_number_of_inputs(0);
         opts.set_number_of_outputs(1);
         opts.set_output_channel_count(&Array::of1(&JsValue::from(1)));
-        let node = match AudioWorkletNode::new_with_options(ctx, "lull-playback", &opts) {
+        let node = match AudioWorkletNode::new_with_options(ctx, "nestwatch-playback", &opts) {
             Ok(n) => n,
             Err(_) => return false,
         };
@@ -252,7 +255,7 @@ impl Audio {
             return false;
         }
         set(&self.stats, "mode", "worklet");
-        log("Lull: audio playback through AudioWorklet at 16 kHz");
+        log("Nestwatch: audio playback through AudioWorklet at 16 kHz");
         let mut inner = self.inner.borrow_mut();
         inner.node = Some(node.into());
         inner.closures.push(closure.into_js_value());
@@ -266,7 +269,7 @@ impl Audio {
             ) {
             Ok(n) => n,
             Err(e) => {
-                web_sys::console::error_2(&JsValue::from_str("Lull: no ScriptProcessor"), &e);
+                web_sys::console::error_2(&JsValue::from_str("Nestwatch: no ScriptProcessor"), &e);
                 return;
             }
         };
@@ -291,7 +294,7 @@ impl Audio {
         node.set_onaudioprocess(Some(closure.as_ref().unchecked_ref()));
         let _ = node.connect_with_audio_node(&ctx.destination());
         set(&self.stats, "mode", "script-processor");
-        log("Lull: audio playback through ScriptProcessorNode (no AudioWorklet)");
+        log("Nestwatch: audio playback through ScriptProcessorNode (no AudioWorklet)");
         let mut inner = self.inner.borrow_mut();
         inner.node = Some(node.into());
         inner.closures.push(closure.into_js_value());
@@ -353,7 +356,7 @@ impl Audio {
                 Ok(s) => s.unchecked_into(),
                 Err(e) => {
                     web_sys::console::warn_2(
-                        &JsValue::from_str("Lull: microphone unavailable"),
+                        &JsValue::from_str("Nestwatch: microphone unavailable"),
                         &e,
                     );
                     return;
@@ -399,7 +402,7 @@ impl Audio {
                 })
             };
             let mut node_and_closure: Option<(JsValue, JsValue)> = None;
-            if worklet && let Ok(node) = AudioWorkletNode::new(&ctx, "lull-capture") {
+            if worklet && let Ok(node) = AudioWorkletNode::new(&ctx, "nestwatch-capture") {
                 if let Ok(port) = node.port() {
                     let this2 = this.clone();
                     let feed = feed.clone();

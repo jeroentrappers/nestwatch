@@ -574,6 +574,6 @@ mod tests {
         assert_eq!(hold_seconds(0), 1);
         assert_eq!(hold_seconds(60_000), 15);
         assert_eq!(volume_percent(0.704), 70);
-        assert_eq!(percent_encode("lull://a b"), "lull%3A%2F%2Fa%20b");
+        assert_eq!(percent_encode("nestwatch://a b"), "nestwatch%3A%2F%2Fa%20b");
     }
 }

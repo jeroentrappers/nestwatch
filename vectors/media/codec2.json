@@ -108,5 +108,5 @@
       null
     ]
   },
-  "description": "Lull codec 2 (IMA ADPCM 16 kHz) frames, media.md §2.1. Each frame: 320 input samples, the 164-byte encoding in hex (reference encoder: predictor = input[0], step_index minimising squared error over samples 1..31, ties to the lowest index), and the normative decoder output."
+  "description": "Nestwatch codec 2 (IMA ADPCM 16 kHz) frames, media.md §2.1. Each frame: 320 input samples, the 164-byte encoding in hex (reference encoder: predictor = input[0], step_index minimising squared error over samples 1..31, ties to the lowest index), and the normative decoder output."
 }

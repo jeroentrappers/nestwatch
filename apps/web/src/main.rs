@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Lull browser listener (platforms.md §2.5), served by every station
+//! Nestwatch browser listener (platforms.md §2.5), served by every station
 //! (protocol.md §3.3) and built to a self-contained static bundle
 //! (security.md PRIV-1): see `apps/web/README.md`.
 
@@ -26,7 +26,7 @@ fn main() {
 #[cfg(not(target_arch = "wasm32"))]
 fn main() {
     eprintln!(
-        "lull-web is the browser listener; build it for wasm32 with apps/web/build.sh \
+        "nestwatch-web is the browser listener; build it for wasm32 with apps/web/build.sh \
          (see apps/web/README.md)."
     );
     std::process::exit(2);
