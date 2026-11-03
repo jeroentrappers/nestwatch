@@ -1,0 +1,49 @@
+[package]
+name = "lull-net"
+description = "Lull async transports: TCP, WebSocket client and server, HTTP(S) server for the web app, mDNS"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+lull-proto = { path = "../lull-proto" }
+thiserror = "2.0.21"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+http-body-util = "0.1"
+hyper = { version = "1.8", features = ["http1", "server"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+if-addrs = "0.15"
+mdns-sd = "0.21"
+percent-encoding = "2.3"
+rcgen = { version = "0.14", default-features = false, features = ["crypto", "pem", "ring"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"] }
+serde_json = "1"
+sha2 = "0.10"
+socket2 = "0.6"
+time = "0.3"
+tokio = { version = "1", features = ["net", "rt", "time", "sync", "io-util", "fs", "process", "macros"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"] }
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["connect", "handshake"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+futures-channel = "0.3"
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+js-sys = "0.3"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = ["WebSocket", "BinaryType", "MessageEvent", "CloseEvent", "Event"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+socket2 = "0.6"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "net", "io-util"] }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["handshake"] }
+
+[lints]
+workspace = true
