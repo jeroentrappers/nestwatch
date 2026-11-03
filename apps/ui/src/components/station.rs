@@ -9,9 +9,10 @@ use super::about::ThemePicker;
 use super::app::{Nav, Screen};
 use super::common::{Brand, Ring, Segmented, SwitchRow};
 use super::listener::RoleSwitch;
+use super::relay::{RelaySettings, RelaySetup};
 use crate::backend::{BackendHandle, Ui};
 use crate::logic;
-use crate::model::{CameraHere, Gain, PairingModel, StationModel, StationRun};
+use crate::model::{CameraHere, Gain, PairingModel, RelayView, StationModel, StationRun};
 use crate::qr;
 use crate::strings as s;
 
@@ -112,6 +113,8 @@ fn RunningStation(model: StationModel) -> Element {
     }
 
     let open_pairing = backend.clone();
+    let ask_relay = !nav.prefs.read().relay_asked;
+    let relay_pill = (model.relay != RelayView::Off).then(|| logic::relay_pill(&model.relay));
     rsx! {
         main { class: "page stack station",
             header { class: "app-top",
@@ -143,6 +146,9 @@ fn RunningStation(model: StationModel) -> Element {
                 }
                 if let Some(b) = logic::battery_caption(model.battery, model.charging) {
                     span { class: "chip", "{b}" }
+                }
+                if let Some(p) = relay_pill {
+                    span { class: "{p.classes()}", "{p.text}" }
                 }
             }
             div { class: "hero",
@@ -196,6 +202,8 @@ fn RunningStation(model: StationModel) -> Element {
         }
         if *settings.read() {
             StationSettings { model: model.clone(), onclose: move |_| settings.set(false) }
+        } else if ask_relay {
+            RelaySetup { server: model.settings.relay_server.clone() }
         }
     }
 }
@@ -228,6 +236,7 @@ fn PairingSheet(
                         let left = p.max_pairings.saturating_sub(p.pairings);
                         let link = p.web_url.clone().unwrap_or_else(|| p.invite_uri.clone());
                         let link2 = link.clone();
+                        let relay_link = p.relay_web_url.clone();
                         rsx! {
                             p { class: "muted", "{s::PAIR_INTRO}" }
                             if let Some(q) = qr {
@@ -264,6 +273,12 @@ fn PairingSheet(
                                         }
                                     },
                                     if *copied.read() { "{s::COPIED}" } else { "{s::COPY}" }
+                                }
+                            }
+                            if let Some(r) = relay_link {
+                                div { class: "row link-row",
+                                    span { class: "caption", "{s::PAIR_RELAY_LINK}" }
+                                    a { class: "mono link grow", href: "{r}", "{r}" }
                                 }
                             }
                         }
@@ -408,6 +423,8 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                         },
                     }
                 }
+                hr { class: "divider" }
+                RelaySettings { model: model.clone() }
                 hr { class: "divider" }
                 h3 { "{s::TRUSTED_LISTENERS}" }
                 if model.trusted.is_empty() {

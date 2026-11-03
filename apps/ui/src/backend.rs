@@ -197,6 +197,18 @@ pub trait Backend {
     fn set_gain(&self, _gain: Gain) {}
     /// Talk-back volume (FR-TB-3).
     fn set_talkback_volume(&self, _volume: f32) {}
+    /// "Reachable through a relay server" (rendezvous.md FR-RV-1).
+    fn set_relay_enabled(&self, _on: bool) -> Result<(), UiError> {
+        Err(UiError::Unsupported)
+    }
+    /// The relay server address (FR-RV-6).
+    fn set_relay_server(&self, _origin: &str) -> Result<(), UiError> {
+        Err(UiError::Unsupported)
+    }
+    /// "Reset relay identity" (rendezvous.md §3.2).
+    fn reset_relay_identity(&self) -> Result<(), UiError> {
+        Err(UiError::Unsupported)
+    }
     /// Current Unix time in ms (for "last seen").
     fn unix_ms(&self) -> u64;
 }

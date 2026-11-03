@@ -560,4 +560,31 @@ impl Backend for EngineBackend {
             s.set_talkback_volume(volume);
         }
     }
+
+    #[cfg(feature = "native")]
+    fn set_relay_enabled(&self, on: bool) -> Result<(), UiError> {
+        let s = self
+            .station()
+            .ok_or(UiError::Other("station not running".into()))?;
+        s.set_relay_enabled(on)
+            .map_err(|e| UiError::Other(e.to_string()))
+    }
+
+    #[cfg(feature = "native")]
+    fn set_relay_server(&self, origin: &str) -> Result<(), UiError> {
+        let s = self
+            .station()
+            .ok_or(UiError::Other("station not running".into()))?;
+        s.set_relay_server(origin)
+            .map_err(|_| UiError::Other(crate::strings::RELAY_SERVER_INVALID.into()))
+    }
+
+    #[cfg(feature = "native")]
+    fn reset_relay_identity(&self) -> Result<(), UiError> {
+        let s = self
+            .station()
+            .ok_or(UiError::Other("station not running".into()))?;
+        s.reset_relay_identity()
+            .map_err(|e| UiError::Other(e.to_string()))
+    }
 }
