@@ -1,0 +1,9 @@
+# UniFFI bindings configuration (library mode reads it via cargo metadata).
+[bindings.kotlin]
+package_name = "org.lull.ffi"
+# Android cleaner on API 34+, JNA cleaner below; androidx annotations.
+android = true
+
+[bindings.swift]
+module_name = "LullFFI"
+ffi_module_name = "LullFFIFFI"
