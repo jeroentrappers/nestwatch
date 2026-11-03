@@ -92,9 +92,11 @@ fn App() -> Element {
         };
         nestwatch_desktop::backend(host, b.listener)
     });
+    // The tray reads the app's `Ui` context, so it renders inside the app.
     rsx! {
-        NestwatchApp { backend: backend.clone() }
-        Tray { backend }
+        NestwatchApp { backend: backend.clone(),
+            Tray { backend }
+        }
     }
 }
 

@@ -83,6 +83,9 @@ pub fn start_invitation_pairing(backend: BackendHandle, mut nav: Nav, input: Str
 pub fn NestwatchApp(
     backend: BackendHandle,
     #[props(default)] invitation: Option<String>,
+    /// Extra platform components that need the app's context (the desktop tray).
+    #[props(default)]
+    children: Element,
 ) -> Element {
     let ui = use_hook(|| {
         let ui = Ui::new();
@@ -159,5 +162,6 @@ pub fn NestwatchApp(
             Notices {}
             {body}
         }
+        {children}
     }
 }
