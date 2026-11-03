@@ -33,6 +33,13 @@ Environment for tests and several instances on one machine:
 `NESTWATCH_DATA_DIR`, `NESTWATCH_STATION_NAME`, `NESTWATCH_TCP_PORT`, `NESTWATCH_HTTP_PORT`,
 `NESTWATCH_HTTPS_PORT`, `NESTWATCH_LOOPBACK=1`, `NESTWATCH_NO_MDNS=1`, `NESTWATCH_WEB_DIR`.
 
+Relay (rendezvous.md FR-RV-1): the station settings hold the switch, the
+server address and "Reset relay identity". Headless or scripted stations use
+`NESTWATCH_RELAY=<origin>` (e.g. `https://nestwatch.appmire.be` or a
+self-hosted `http://127.0.0.1:8740` for tests) to turn it on, `NESTWATCH_RELAY=off`
+to turn it off (the choice is stored), and `NESTWATCH_RELAY_STUN_PORT` when the
+server's STUN service is not on UDP 3478. Registration changes are logged.
+
 Without the webview libraries, the host library still builds and tests:
 
 ```sh

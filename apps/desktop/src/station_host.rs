@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use nestwatch_core::station::{
     AssetSource, BindScope, CameraAvailability, CameraFrame, ListenConfig, PixelFormat,
-    StationConfig, StationEngine, StationError, StationEvent, WebConfig, WebOptions,
+    RelayStatus, StationConfig, StationEngine, StationError, StationEvent, WebConfig, WebOptions,
 };
 use nestwatch_core::{CameraFacing, Clock, Storage};
 use nestwatch_platform::{
@@ -18,7 +18,8 @@ use nestwatch_ui::adapter::station::RunningStation;
 
 /// Station settings from the environment (tests, servers): `NESTWATCH_STATION_NAME`,
 /// `NESTWATCH_TCP_PORT`, `NESTWATCH_HTTP_PORT`, `NESTWATCH_HTTPS_PORT`, `NESTWATCH_LOOPBACK=1`,
-/// `NESTWATCH_NO_MDNS=1`.
+/// `NESTWATCH_NO_MDNS=1`, `NESTWATCH_RELAY=<origin>|off` and
+/// `NESTWATCH_RELAY_STUN_PORT`.
 #[derive(Debug, Clone, Default)]
 pub struct StationOptions {
     /// Name used until the user renames the station.
@@ -33,6 +34,31 @@ pub struct StationOptions {
     pub loopback: bool,
     /// Do not advertise over mDNS.
     pub no_mdns: bool,
+    /// Turn the relay on with this server, or off (rendezvous.md FR-RV-1);
+    /// `None` keeps the stored setting.
+    pub relay: Option<RelayChoice>,
+    /// STUN port of the relay server instead of 3478.
+    pub relay_stun_port: Option<u16>,
+}
+
+/// The relay setting from `NESTWATCH_RELAY`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RelayChoice {
+    /// On with this server origin.
+    On(String),
+    /// Off.
+    Off,
+}
+
+impl RelayChoice {
+    /// `off`, `0` or `false` turn it off; anything else is a server origin.
+    pub fn parse(v: &str) -> Option<Self> {
+        match v.trim() {
+            "" => None,
+            "off" | "0" | "false" => Some(Self::Off),
+            origin => Some(Self::On(origin.to_owned())),
+        }
+    }
 }
 
 fn env_port(name: &str) -> Option<u16> {
@@ -53,6 +79,10 @@ impl StationOptions {
             https_port: env_port("NESTWATCH_HTTPS_PORT"),
             loopback: env_flag("NESTWATCH_LOOPBACK"),
             no_mdns: env_flag("NESTWATCH_NO_MDNS"),
+            relay: std::env::var("NESTWATCH_RELAY")
+                .ok()
+                .and_then(|v| RelayChoice::parse(&v)),
+            relay_stun_port: env_port("NESTWATCH_RELAY_STUN_PORT"),
         }
     }
 }
@@ -108,6 +138,7 @@ pub async fn start(
     let mut cfg = StationConfig::new(opts.name.clone().unwrap_or_else(default_name));
     cfg.tcp = port(opts.tcp_port, ListenConfig::default(), opts.loopback);
     cfg.mdns = !opts.no_mdns;
+    cfg.relay.stun_port = opts.relay_stun_port;
     let defaults = WebConfig::default();
     let assets = match crate::web_dir() {
         Some(d) => {
@@ -136,11 +167,52 @@ pub async fn start(
         assets,
     });
     let engine = StationEngine::start(cfg, storage, clock).await?;
-    let devices = start_devices(&platform, &engine);
+    match &opts.relay {
+        Some(RelayChoice::On(origin)) => {
+            engine.set_relay_server(origin)?;
+            engine.set_relay_enabled(true)?;
+        }
+        Some(RelayChoice::Off) => engine.set_relay_enabled(false)?,
+        None => {}
+    }
+    let mut devices = start_devices(&platform, &engine);
+    devices
+        .tasks
+        .push(tokio::spawn(relay_log_task(engine.clone())));
     Ok(RunningStation {
         engine,
         guard: Box::new(devices),
     })
+}
+
+/// Logs relay registration changes (rendezvous.md §4.1); never the
+/// mailbox ID (§6).
+async fn relay_log_task(engine: StationEngine) {
+    let mut st = engine.state();
+    let mut last = None;
+    loop {
+        let (relay, server) = {
+            let s = st.borrow_and_update();
+            (s.relay.clone(), s.settings.relay_server.clone())
+        };
+        if last.as_ref() != Some(&relay) {
+            match &relay {
+                RelayStatus::Off => log::info!("relay off"),
+                RelayStatus::Connecting => log::info!("relay: connecting to {server}"),
+                RelayStatus::Online { .. } => log::info!("relay: reachable through {server}"),
+                RelayStatus::Error { message, permanent } => {
+                    log::warn!(
+                        "relay: {message}{}",
+                        if *permanent { " (refused)" } else { "" }
+                    )
+                }
+            }
+            last = Some(relay);
+        }
+        if st.changed().await.is_err() {
+            break;
+        }
+    }
 }
 
 fn default_name() -> String {

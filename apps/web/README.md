@@ -32,6 +32,14 @@ nestwatch-desktop                                            # looks in target/n
 Open the printed `web:` address. The invitation in the URL fragment pairs
 right away and is then removed from the address bar and history.
 
+The relay server (`nestwatch-server --app-dir target/nestwatch-web`) serves
+the same bundle at `/app/` (rendezvous.md FR-RV-5). Served from `/app/`, the
+app is in **hosted mode**: it reaches stations only through that origin's
+`/nwr/1` (stations whose invitation names this server in `r=`), never
+through a station WebSocket, and pairs from `<origin>/app/#<invitation>` (the
+`relay web:` address a station prints). Over HTTPS (or on `localhost` /
+`127.0.0.1`) the page is a secure context, so talk-back works.
+
 ## Platform notes
 
 - **Storage**: device key, known stations and settings live in the origin's

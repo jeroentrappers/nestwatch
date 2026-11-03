@@ -31,7 +31,9 @@ pub enum HostMsg {
 pub struct WebHost {
     pub storage: Option<LocalStorage>,
     pub audio: Rc<Audio>,
-    pub ws_url: String,
+    /// The station's own WebSocket; `None` on a relay server, where the
+    /// page's host is not a station (rendezvous.md FR-RV-5).
+    pub ws_url: Option<String>,
     pub tx: mpsc::UnboundedSender<HostMsg>,
     pub rx: std::cell::RefCell<Option<mpsc::UnboundedReceiver<HostMsg>>>,
 }
@@ -176,6 +178,6 @@ impl Host for WebHost {
     }
 
     fn default_route(&self) -> Option<String> {
-        Some(self.ws_url.clone())
+        self.ws_url.clone()
     }
 }

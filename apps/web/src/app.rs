@@ -69,6 +69,17 @@ fn take_invitation() -> Option<String> {
     Some(href)
 }
 
+/// The relay server origin when the app is served by a relay server
+/// (rendezvous.md FR-RV-5): stations serve it at `/`, the relay server at
+/// `/app/` (OPEN-QUESTIONS RELAY-10, RVAPP-5).
+fn relay_origin() -> Option<String> {
+    let location = web_sys::window()?.location();
+    let path = location.pathname().ok()?;
+    (path == "/app" || path.starts_with("/app/"))
+        .then(|| location.origin().ok())
+        .flatten()
+}
+
 fn websocket_url() -> String {
     let location = web_sys::window().expect("window").location();
     let scheme = if location.protocol().as_deref() == Ok("https:") {
@@ -207,7 +218,10 @@ pub fn run() {
 
     #[cfg(not(feature = "demo"))]
     {
-        let ws_url = websocket_url();
+        // Hosted on a relay server: every connection goes through its
+        // /nwr/1; served by a station: its own WebSocket (protocol.md §3.3).
+        let relay = relay_origin();
+        let ws_url = relay.is_none().then(websocket_url);
         let local = LocalStorage::open();
         let storage: Arc<dyn Storage> = match &local {
             Ok(l) => Arc::new(l.clone()),
@@ -221,7 +235,8 @@ pub fn run() {
         let clock: Arc<dyn Clock> = Arc::new(SystemClock::new());
         let mut cfg = ListenerConfig::new(default_name());
         cfg.discovery = false;
-        cfg.default_websocket = Some(ws_url.clone());
+        cfg.default_websocket = ws_url.clone();
+        cfg.relay_origin = relay;
         let engine = match ListenerEngine::start(cfg, storage, clock.clone()) {
             Ok(e) => e,
             Err(e) => {

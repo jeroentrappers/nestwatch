@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use nestwatch_core::listener::{ListenerConfig, ListenerEngine, VideoRequest, VideoView};
 use nestwatch_core::{Clock, MemoryStorage, SystemClock, VideoStateKind};
-use nestwatch_desktop::station_host::{self, StationOptions};
+use nestwatch_desktop::station_host::{self, RelayChoice, StationOptions};
 use nestwatch_platform::{DesktopOptions, DesktopPlatform};
 
 #[tokio::test(flavor = "multi_thread")]
@@ -33,6 +33,9 @@ async fn station_host_without_devices() {
             https_port: Some(0),
             loopback: true,
             no_mdns: true,
+            // NESTWATCH_RELAY wiring; nothing listens on the discard port.
+            relay: Some(RelayChoice::On("http://127.0.0.1:9".into())),
+            relay_stun_port: None,
         },
     )
     .await
@@ -49,6 +52,14 @@ async fn station_host_without_devices() {
     assert!(body.contains("<title>Nestwatch</title>"));
 
     let info = station.open_pairing().await.unwrap();
+    assert!(snap.settings.relay_enabled);
+    assert!(
+        info.invite_uri.contains("&r=http%3A%2F%2F127.0.0.1%3A9&m="),
+        "{}",
+        info.invite_uri
+    );
+    assert_eq!(RelayChoice::parse("off"), Some(RelayChoice::Off));
+    assert_eq!(RelayChoice::parse(""), None);
     let mut cfg = ListenerConfig::new("Laptop");
     cfg.discovery = false;
     let listener = ListenerEngine::start(cfg, Arc::new(MemoryStorage::new()), clock).unwrap();
