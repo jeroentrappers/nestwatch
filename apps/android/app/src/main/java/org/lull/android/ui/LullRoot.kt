@@ -231,7 +231,14 @@ fun LullRoot(activity: MainActivity) {
         if (dimmed) dimmed = false else nav.pop()
     }
 
-    LullTheme(resolveColors(prefs.theme, dimmed)) {
+    val colors = resolveColors(prefs.theme, dimmed)
+    // Status and navigation bar icons follow the resolved theme, not the system one.
+    androidx.compose.runtime.SideEffect {
+        val c = androidx.core.view.WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+        c.isAppearanceLightStatusBars = !colors.dark
+        c.isAppearanceLightNavigationBars = !colors.dark
+    }
+    LullTheme(colors) {
         Surface(Modifier.fillMaxSize()) {
             when (val s = nav.top) {
                 Screen.Welcome -> WelcomeScreen(onRole = { role ->
