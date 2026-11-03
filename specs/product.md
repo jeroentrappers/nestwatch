@@ -146,7 +146,12 @@ only (browsers cannot accept connections or advertise services).
 - **FR-NET-3** Listeners MUST remember every address that worked for a
   station and try them in order of last success.
 - **FR-NET-4** No component may contact any server other than the user's own
-  devices. Updates are delivered by the platform's normal channels.
+  devices, except a rendezvous/relay server the user explicitly enables
+  (rendezvous.md), which only ever handles end-to-end encrypted traffic.
+  Updates are delivered by the platform's normal channels.
+- **FR-NET-5** For networks where direct connections fail (carrier-grade NAT,
+  client isolation, HTTPS-only firewalls), stations and listeners support the
+  optional rendezvous, hole-punching and relay service of rendezvous.md.
 
 ### 3.9 Browser listener
 
@@ -177,7 +182,8 @@ only (browsers cannot accept connections or advertise services).
 
 ## 5. Out of scope (version 1)
 
-Cloud relays or accounts, recording or history of audio/video, breathing or
+Accounts or cloud services beyond the optional, self-hostable relay of
+rendezvous.md, recording or history of audio/video, breathing or
 movement analysis, smart-home integrations, lullaby playback, multi-household
 sharing beyond pairwise pairing.
 

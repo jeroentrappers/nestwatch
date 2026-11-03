@@ -8,6 +8,7 @@ specs; where code and spec disagree, the spec wins until it is changed.
 |----------|----------|
 | [product.md](product.md) | Roles, user-facing behaviour, numbered requirements |
 | [protocol.md](protocol.md) | Nestwatch Wire Protocol 1 (NWP/1): discovery, pairing, handshake, records, control messages |
+| [rendezvous.md](rendezvous.md) | Optional rendezvous, hole punching and relay server (NWR/1) |
 | [media.md](media.md) | Audio and video pipelines, codecs, sound activation, jitter handling |
 | [security.md](security.md) | Threat model, key management, privacy rules |
 | [platforms.md](platforms.md) | Supported platforms, minimum versions, platform obligations |

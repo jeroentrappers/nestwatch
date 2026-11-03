@@ -23,6 +23,7 @@ crates/
   nestwatch-net        async transports: TCP, WebSocket client and server, HTTP(S) server for the web app, mDNS
   nestwatch-platform   traits for audio I/O, camera, key storage, power, notifications, plus desktop implementations
   nestwatch-ffi        UniFFI bindings exposing nestwatch-core to Kotlin and Swift
+  nestwatch-relay      rendezvous client and server logic (NWR/1), STUN binding, QUIC direct transport
 apps/
   desktop         Dioxus desktop app (Linux, macOS, Windows)
   web             Dioxus web listener (wasm32), served by stations
@@ -30,6 +31,7 @@ apps/
   ios             SwiftUI app on nestwatch-ffi
 tools/
   nestwatch-cli        headless station / listener / probe for testing and servers
+  nestwatch-server     rendezvous/relay server binary; also serves the landing page, web app and downloads
   conformance     independent checks of test vectors (see test-vectors.md)
 ```
 

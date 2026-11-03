@@ -71,9 +71,11 @@ flags MUST exclude them). Moving to a new device means pairing again.
 
 ## 6. Privacy rules
 
-- **PRIV-1** No network traffic except to the user's own devices: no update
-  checks, analytics, crash reporting, fonts or CDN loads (the browser app is
-  fully self-contained and served by the station).
+- **PRIV-1** No network traffic except to the user's own devices and, only
+  when the user enables it, the rendezvous/relay server (rendezvous.md §7
+  lists what that server can see). No update checks, analytics, crash
+  reporting, fonts or CDN loads (the browser app is fully self-contained and
+  served by the station or by the relay server's own origin).
 - **PRIV-2** No recording of audio or video, no media in logs. Logs contain
   no device names unless the user exports diagnostics explicitly.
 - **PRIV-3** The camera runs only on explicit listener request, with the
