@@ -1,0 +1,180 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Checks every push and pull request: formatting, lints and tests of the
+# default workspace members, the browser listener (wasm), the desktop app on
+# Linux, macOS and Windows, the Android app and the website.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  # Debug info only bloats the caches.
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  CARGO_PROFILE_TEST_DEBUG: "0"
+  # Desktop/webview dependencies for Linux (apps/desktop/README.md).
+  LINUX_DESKTOP_PACKAGES: >-
+    libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev libxdo-dev libssl-dev
+    libayatana-appindicator3-dev libasound2-dev libclang-dev pkg-config
+
+jobs:
+  rust:
+    name: Rust (fmt, clippy, tests)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libssl-dev libclang-dev pkg-config
+      - name: Install the toolchain from rust-toolchain.toml
+        run: rustup toolchain install && rustup show
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: cargo-rust-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: cargo-rust-${{ runner.os }}-
+      - name: rustfmt
+        run: cargo fmt --all --check
+      - name: clippy (default members)
+        run: cargo clippy --all-targets --locked -- -D warnings
+      - name: tests (default members)
+        run: cargo test --locked
+      - name: desktop host library without the webview
+        run: cargo test --locked -p nestwatch-desktop --no-default-features
+
+  web:
+    name: Browser listener (wasm)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install the toolchain from rust-toolchain.toml
+        run: rustup toolchain install && rustup show
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: cargo-wasm-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: cargo-wasm-${{ runner.os }}-
+      - name: Install wasm-bindgen-cli (version from Cargo.lock)
+        run: .github/scripts/install-wasm-bindgen.sh
+      - name: clippy (wasm32)
+        run: cargo clippy --locked -p nestwatch-web --target wasm32-unknown-unknown -- -D warnings
+      - name: Build the bundle
+        run: apps/web/build.sh target/nestwatch-web
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nestwatch-web
+          path: target/nestwatch-web
+          retention-days: 7
+
+  desktop:
+    name: Desktop app (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install system libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          # shellcheck disable=SC2086 # a list of package names
+          sudo apt-get install -y --no-install-recommends $LINUX_DESKTOP_PACKAGES
+      - name: Install the toolchain from rust-toolchain.toml
+        shell: bash
+        run: rustup toolchain install
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: cargo-desktop-${{ matrix.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: cargo-desktop-${{ matrix.os }}-
+      - name: clippy
+        run: cargo clippy --locked -p nestwatch-desktop --all-targets -- -D warnings
+      - name: Build
+        run: cargo build --locked --release -p nestwatch-desktop
+
+  android:
+    name: Android app
+    runs-on: ubuntu-24.04
+    env:
+      NDK_VERSION: "30.0.16248370"
+      CARGO_NDK_VERSION: "4.1.2"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install the toolchain and Android targets
+        run: |
+          rustup toolchain install
+          rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+      - name: Install the NDK and SDK platform
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION" "platforms;android-36" > /dev/null
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            ~/.cargo/bin/cargo-ndk
+            target
+          key: cargo-android-${{ runner.os }}-${{ env.CARGO_NDK_VERSION }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: cargo-android-${{ runner.os }}-${{ env.CARGO_NDK_VERSION }}-
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('apps/android/**/*.gradle.kts', 'apps/android/gradle/libs.versions.toml', 'apps/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+      - name: Install cargo-ndk
+        run: cargo ndk --version 2>/dev/null | grep -q "$CARGO_NDK_VERSION" || cargo install --locked cargo-ndk --version "$CARGO_NDK_VERSION" --force
+      - name: assembleDebug and unit tests
+        working-directory: apps/android
+        run: ./gradlew --no-daemon assembleDebug testDebugUnitTest
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nestwatch-android-debug
+          path: apps/android/app/build/outputs/apk/debug/*.apk
+          retention-days: 7
+
+  site:
+    name: Website
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build (checks string files and internal links)
+        run: apps/site/build.sh target/nestwatch-site
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nestwatch-site
+          path: target/nestwatch-site
+          retention-days: 7

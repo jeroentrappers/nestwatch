@@ -1,0 +1,419 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Builds every Nestwatch download for a version tag (v*) and attaches them to
+# a draft GitHub Release. See docs/releasing.md.
+#
+# Asset names carry no version so that
+# https://github.com/jeroentrappers/nestwatch/releases/latest/download/<name>
+# always serves the newest build; apps/site/build.py links to these names.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to (re)build, e.g. v0.1.0"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  CARGO_PROFILE_RELEASE_STRIP: symbols
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+jobs:
+  meta:
+    name: Version
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      prerelease: ${{ steps.v.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - id: v
+        name: Derive the version from the tag
+        run: |
+          case "$TAG" in v[0-9]*) ;; *) echo "::error::tag $TAG is not v<version>"; exit 1 ;; esac
+          version=${TAG#v}
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          case "$version" in *-*) echo "prerelease=true" ;; *) echo "prerelease=false" ;; esac >> "$GITHUB_OUTPUT"
+          cargo_version=$(sed -n '/^\[workspace.package\]/,/^\[/s/^version = "\(.*\)"/\1/p' Cargo.toml)
+          if [ "$cargo_version" != "${version%%-*}" ]; then
+            echo "::warning::tag $TAG does not match the workspace version $cargo_version in Cargo.toml"
+          fi
+
+  web:
+    name: Browser listener bundle
+    needs: meta
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - name: Install the toolchain from rust-toolchain.toml
+        run: rustup toolchain install && rustup show
+      - name: Install wasm-bindgen-cli (version from Cargo.lock)
+        run: .github/scripts/install-wasm-bindgen.sh
+      - name: Build
+        run: apps/web/build.sh target/nestwatch-web
+      - name: Archive
+        run: |
+          mkdir -p dist
+          tar -C target --owner=0 --group=0 -czf dist/nestwatch-web.tar.gz nestwatch-web
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-bundle
+          path: target/nestwatch-web
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-web
+          path: dist/*
+
+  site:
+    name: Website bundle
+    needs: meta
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - name: Build
+        run: apps/site/build.sh target/nestwatch-site
+      - name: Archive
+        run: |
+          mkdir -p dist
+          tar -C target --owner=0 --group=0 -czf dist/nestwatch-site.tar.gz nestwatch-site
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-site
+          path: dist/*
+
+  linux:
+    name: Linux ${{ matrix.arch }} (.deb, .rpm, .tar.gz)
+    needs: [meta, web]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Ubuntu 22.04 keeps the glibc requirement at 2.35 and is the oldest
+          # image with WebKitGTK 4.1.
+          - arch: x86_64
+            runner: ubuntu-22.04
+          - arch: aarch64
+            runner: ubuntu-22.04-arm
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - name: Install system libraries and packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev libxdo-dev libssl-dev \
+            libayatana-appindicator3-dev libasound2-dev libclang-dev pkg-config \
+            dpkg-dev rpm
+      - name: Install the toolchain from rust-toolchain.toml
+        run: rustup toolchain install && rustup show
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: cargo-release-linux-${{ matrix.arch }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-release-linux-${{ matrix.arch }}-
+      - name: Build
+        run: cargo build --locked --release -p nestwatch-desktop --bins
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-bundle
+          path: target/nestwatch-web
+      - name: Package
+        run: packaging/linux/package.sh "${{ needs.meta.outputs.version }}" ${{ matrix.arch }} target/release target/nestwatch-web dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-linux-${{ matrix.arch }}
+          path: dist/*
+
+  macos:
+    name: macOS universal (.dmg)
+    needs: [meta, web]
+    runs-on: macos-15
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "12.0"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - name: Install the toolchain and both macOS targets
+        run: |
+          rustup toolchain install
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: cargo-release-macos-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-release-macos-
+      - name: Build (Apple silicon and Intel)
+        run: |
+          cargo build --locked --release -p nestwatch-desktop --bins --target aarch64-apple-darwin
+          cargo build --locked --release -p nestwatch-desktop --bins --target x86_64-apple-darwin
+      - name: Make universal binaries
+        run: |
+          mkdir -p target/universal
+          for b in nestwatch-desktop nestwatch-station; do
+            lipo -create -output "target/universal/$b" \
+              "target/aarch64-apple-darwin/release/$b" "target/x86_64-apple-darwin/release/$b"
+            lipo -info "target/universal/$b"
+          done
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-bundle
+          path: target/nestwatch-web
+      - name: Package
+        run: |
+          mkdir -p dist
+          packaging/macos/make-dmg.sh "${{ needs.meta.outputs.version }}" target/universal target/nestwatch-web dist/nestwatch-macos-universal.dmg
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-macos
+          path: dist/*
+
+  windows:
+    name: Windows x86_64 (.msi)
+    needs: [meta, web]
+    runs-on: windows-2025
+    env:
+      WIX_VERSION: "5.0.2"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - name: Install the toolchain from rust-toolchain.toml
+        shell: bash
+        run: rustup toolchain install
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: cargo-release-windows-${{ hashFiles('Cargo.lock') }}
+          restore-keys: cargo-release-windows-
+      - name: Build
+        run: cargo build --locked --release -p nestwatch-desktop --bins
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-bundle
+          path: stage/web
+      - name: Stage files
+        shell: pwsh
+        run: |
+          Copy-Item target/release/nestwatch-desktop.exe, target/release/nestwatch-station.exe stage/
+          Get-ChildItem -Recurse stage | Select-Object -ExpandProperty FullName
+      - name: Install WiX
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version $env:WIX_VERSION
+          "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+      - name: Package
+        shell: pwsh
+        run: |
+          python packaging/windows/make-wxs.py "${{ needs.meta.outputs.version }}" stage nestwatch.wxs
+          New-Item -ItemType Directory -Force dist | Out-Null
+          wix build -arch x64 -o dist/nestwatch-windows-x86_64.msi nestwatch.wxs
+          Remove-Item dist/*.wixpdb -ErrorAction SilentlyContinue
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-windows
+          path: dist/*.msi
+
+  android:
+    name: Android (.apk)
+    needs: meta
+    runs-on: ubuntu-24.04
+    env:
+      NDK_VERSION: "30.0.16248370"
+      CARGO_NDK_VERSION: "4.1.2"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install the toolchain and Android targets
+        run: |
+          rustup toolchain install
+          rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+      - name: Install the NDK and SDK platform
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION" "platforms;android-36" > /dev/null
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-release-${{ hashFiles('apps/android/**/*.gradle.kts', 'apps/android/gradle/libs.versions.toml', 'apps/android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-release-
+      - name: Install cargo-ndk
+        run: cargo install --locked cargo-ndk --version "$CARGO_NDK_VERSION"
+      - name: assembleRelease (unsigned)
+        working-directory: apps/android
+        run: ./gradlew --no-daemon assembleRelease
+      - name: Sign
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          bt=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)
+          unsigned=$(find apps/android/app/build/outputs/apk/release -name '*-unsigned.apk' | head -n 1)
+          [ -n "$unsigned" ] || { echo "::error::no unsigned release APK found"; exit 1; }
+          mkdir -p dist
+          # 16 KiB page alignment for the uncompressed native libraries
+          # (-P needs build-tools 35+; older ones only know -p, 4 KiB).
+          "$bt/zipalign" -P 16 -f 4 "$unsigned" "$RUNNER_TEMP/aligned.apk" \
+            || "$bt/zipalign" -p -f 4 "$unsigned" "$RUNNER_TEMP/aligned.apk"
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ]; then
+            printf %s "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            out=dist/nestwatch-android.apk
+            KEY_PASSWORD=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}
+            export KEY_PASSWORD
+            "$bt/apksigner" sign --ks "$RUNNER_TEMP/release.jks" --ks-key-alias "$KEY_ALIAS" \
+              --ks-pass env:KEYSTORE_PASSWORD --key-pass env:KEY_PASSWORD \
+              --out "$out" "$RUNNER_TEMP/aligned.apk"
+            rm -f "$RUNNER_TEMP/release.jks"
+          else
+            # No signing secrets: sign with a throw-away key generated for this
+            # build only, and say so in the file name (docs/releasing.md).
+            echo "::warning::ANDROID_KEYSTORE_* secrets are not set; the APK is signed with a throw-away test key"
+            keytool -genkeypair -keystore "$RUNNER_TEMP/test.jks" -storepass testkey -keypass testkey \
+              -alias testkey -keyalg RSA -keysize 3072 -validity 365 \
+              -dname "CN=Nestwatch test key (not for distribution)" -noprompt
+            out=dist/nestwatch-android-testkey.apk
+            "$bt/apksigner" sign --ks "$RUNNER_TEMP/test.jks" --ks-key-alias testkey \
+              --ks-pass pass:testkey --key-pass pass:testkey --out "$out" "$RUNNER_TEMP/aligned.apk"
+          fi
+          "$bt/apksigner" verify --print-certs "$out"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist-android
+          path: dist/*.apk
+
+  server:
+    name: Relay server (Linux x86_64)
+    needs: meta
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      # tools/nestwatch-server is being written; until it exists in the tagged
+      # tree this job builds nothing and the release simply has no server.
+      - name: Check for the server crate
+        id: crate
+        run: |
+          if [ -f tools/nestwatch-server/Cargo.toml ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::tools/nestwatch-server does not exist in $TAG; skipping the relay server"
+          fi
+      - name: Install the toolchain from rust-toolchain.toml
+        if: steps.crate.outputs.present == 'true'
+        run: rustup toolchain install
+      - name: Build
+        if: steps.crate.outputs.present == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libssl-dev pkg-config
+          cargo build --locked --release --manifest-path tools/nestwatch-server/Cargo.toml --bin nestwatch-server
+          mkdir -p dist
+          cp target/release/nestwatch-server dist/nestwatch-server-linux-x86_64
+          file dist/nestwatch-server-linux-x86_64
+      - uses: actions/upload-artifact@v7
+        if: steps.crate.outputs.present == 'true'
+        with:
+          name: dist-server
+          path: dist/*
+
+  release:
+    name: Draft GitHub Release
+    needs: [meta, web, site, linux, macos, windows, android, server]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: dist-*
+          path: dist
+          merge-multiple: true
+      - name: Checksums
+        working-directory: dist
+        run: |
+          sha256sum -- * > SHA256SUMS
+          cat SHA256SUMS
+      - name: Release notes
+        run: |
+          {
+            echo "Nestwatch ${{ needs.meta.outputs.version }}."
+            echo
+            echo "Nestwatch is not a medical device and does not replace supervision."
+            echo
+            echo "| Platform | File |"
+            echo "|----------|------|"
+            echo "| Linux (Debian, Ubuntu) | \`nestwatch-linux-amd64.deb\`, \`nestwatch-linux-arm64.deb\` |"
+            echo "| Linux (Fedora and other RPM-based) | \`nestwatch-linux-x86_64.rpm\`, \`nestwatch-linux-aarch64.rpm\` |"
+            echo "| Linux (any) | \`nestwatch-linux-x86_64.tar.gz\`, \`nestwatch-linux-aarch64.tar.gz\` |"
+            echo "| macOS 12+ (Apple silicon and Intel) | \`nestwatch-macos-universal.dmg\` |"
+            echo "| Windows 10 21H2+ (x86_64) | \`nestwatch-windows-x86_64.msi\` |"
+            if [ -f dist/nestwatch-android.apk ]; then
+              echo "| Android 6.0+ | \`nestwatch-android.apk\` |"
+            else
+              echo "| Android 6.0+ | \`nestwatch-android-testkey.apk\` (signed with a throw-away test key: uninstall it before installing a properly signed build) |"
+            fi
+            echo "| Browser listener (static files) | \`nestwatch-web.tar.gz\` |"
+            echo "| Website (static files) | \`nestwatch-site.tar.gz\` |"
+            if [ -f dist/nestwatch-server-linux-x86_64 ]; then
+              echo "| Relay server (Linux x86_64) | \`nestwatch-server-linux-x86_64\` |"
+            fi
+            echo
+            echo "The macOS app and the Windows installer are not signed yet. macOS: open the app once, then System Settings → Privacy & Security → Open Anyway. Windows: SmartScreen → More info → Run anyway."
+            echo
+            echo "Verify downloads with \`sha256sum --check --ignore-missing SHA256SUMS\`."
+          } > "$RUNNER_TEMP/notes.md"
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags="--draft --verify-tag --generate-notes"
+          if [ "${{ needs.meta.outputs.prerelease }}" = "true" ]; then flags="$flags --prerelease"; fi
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+          else
+            # shellcheck disable=SC2086
+            gh release create "$TAG" dist/* --title "Nestwatch ${{ needs.meta.outputs.version }}" \
+              --notes-file "$RUNNER_TEMP/notes.md" $flags
+          fi
