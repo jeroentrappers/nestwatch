@@ -15,9 +15,10 @@ pub mod capture;
 pub mod codec;
 mod error;
 mod frame;
-
+pub mod gate;
+pub mod jitter;
 pub mod level;
-
+pub mod mixer;
 pub mod resample;
 
 pub use error::MediaError;
