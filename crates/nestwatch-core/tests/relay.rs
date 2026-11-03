@@ -213,7 +213,10 @@ async fn relay_only_invitation_then_direct_without_audio_gap() {
     // The switch is seamless: no disconnection on the listener.
     while let Ok(e) = events.try_recv() {
         assert!(
-            !matches!(e, nestwatch_core::listener::ListenerEvent::Disconnected { .. }),
+            !matches!(
+                e,
+                nestwatch_core::listener::ListenerEvent::Disconnected { .. }
+            ),
             "{e:?}"
         );
     }
