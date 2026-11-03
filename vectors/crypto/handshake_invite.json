@@ -1,0 +1,57 @@
+{
+  "spec": "protocol.md 4, 5",
+  "protocol_name": "Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s",
+  "mode": "invite",
+  "listener": {
+    "static_secret": "642bf8b67bdc144d94dc9bf0d00f108c314c9c95d0d67a49e665e368d447fa06",
+    "static_public": "8b1ae35cbfc73165f62dbb5bcf27ef21e3118a47a6ebb82d0ce5a6b68d9ffc39",
+    "ephemeral_secret": "830255d68ec9a11f971f715bf3d881353f5adbde605fab29968125d4446227fb",
+    "preface": "4c554c4c0102"
+  },
+  "station": {
+    "static_secret": "7fa777cda6e17557a381324e27dc002ffb28c7d2bb6ea9f95baa70d9dc8b7ce0",
+    "static_public": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
+    "ephemeral_secret": "5af4caa4e407f5c9adee7d3c38f8c78f5d2870779aa668cdc3dab21cc54113f0",
+    "preface": "4c554c4c0100"
+  },
+  "prologue": "6c756c6c2f314c554c4c01024c554c4c0100",
+  "invite_token": "1e360cb87ac26ca2cfb02368b5454456",
+  "psk": "c0b47c5cdeb5c50e5fed6dad3f2d2f8b18d2d1e9cde1c71f241f48ce2757ec17",
+  "handshake_messages": [
+    {
+      "sender": "listener",
+      "payload": "",
+      "message": "a3b38d2da3ba97882b6debecc8742d13d5af6f3691a3bbe3c3e2d57182db59160b339cb99207b443296dc3546e4899cd0bb9bce28225b5014acaec3698d59d9f2f914f9cfc2f8d5964e4fc948ae52fb55a28cf3d05f088cc60b93d716d65799b"
+    },
+    {
+      "sender": "station",
+      "payload": "",
+      "message": "06d0974ffe9796ba46f3edb2b70e13ba9dca2fb285ee615e9b6938c99ffcc373fdd1aa868ba8e28e4bcc7eb2be6a6497"
+    }
+  ],
+  "handshake_hash": "d3918ede0a26107ea8ccfbf9a793f5b7a719e2b1b4b163a0fcdbeadb2dee5a9f",
+  "verification_number": 531870,
+  "verification_display": "531 870",
+  "transport_messages": [
+    {
+      "sender": "listener",
+      "payload": "04000000000000002a",
+      "message": "7eea1aafad0b718eb4142f6602f5ffc2001d2ae2d1e76c1e9c"
+    },
+    {
+      "sender": "station",
+      "payload": "05000000000000002a",
+      "message": "e95bbdeb92c882a13ecc5c546a6c32496d0f5a03d395090734"
+    },
+    {
+      "sender": "listener",
+      "payload": "01a161746568656c6c6f",
+      "message": "7e8650a8aef7f7de8d15cb3502e2369d0de5316381d89736eb8c"
+    },
+    {
+      "sender": "station",
+      "payload": "",
+      "message": "86e48e59c684454f0da02eb149eff41f"
+    }
+  ]
+}

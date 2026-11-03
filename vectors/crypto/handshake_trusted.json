@@ -1,0 +1,55 @@
+{
+  "spec": "protocol.md 4, 5",
+  "protocol_name": "Noise_IK_25519_ChaChaPoly_BLAKE2s",
+  "mode": "trusted",
+  "listener": {
+    "static_secret": "642bf8b67bdc144d94dc9bf0d00f108c314c9c95d0d67a49e665e368d447fa06",
+    "static_public": "8b1ae35cbfc73165f62dbb5bcf27ef21e3118a47a6ebb82d0ce5a6b68d9ffc39",
+    "ephemeral_secret": "9d077eb124c5b9b92b8f58da82029f0988a7d718d116e675a70dd14ec60a02bb",
+    "preface": "4c554c4c0101"
+  },
+  "station": {
+    "static_secret": "7fa777cda6e17557a381324e27dc002ffb28c7d2bb6ea9f95baa70d9dc8b7ce0",
+    "static_public": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
+    "ephemeral_secret": "f66eaed1f4f70af534b41d02611f399031c92b3ab29851739cf65a6ede9af9f4",
+    "preface": "4c554c4c0100"
+  },
+  "prologue": "6c756c6c2f314c554c4c01014c554c4c0100",
+  "handshake_messages": [
+    {
+      "sender": "listener",
+      "payload": "",
+      "message": "1a19f5153c5e67ac45a19a99a068cf312f1df066a05aa260cf3cb0ddcec1145e2466b6f411758565bd02b7a1a922d03bcd1f41ca08b6f6c1497987bf0e1d05921f1c107e4c06e66e3109252c13e2a9865b4d70fbf806912c6c0930671276b50a"
+    },
+    {
+      "sender": "station",
+      "payload": "",
+      "message": "243d40932756fa5e619e315b9295c19cf4dcaa31e204d72652a31ed26abde530882fe8701737c65121f6df5b55b8ba27"
+    }
+  ],
+  "handshake_hash": "8bb13647af755471131dbb6f47d189d6fe97ca01d7e36b5bcd8efdc04d77faaa",
+  "verification_number": null,
+  "verification_display": null,
+  "transport_messages": [
+    {
+      "sender": "listener",
+      "payload": "04000000000000002a",
+      "message": "399f689549e1c1b19abe969787dba3c40332a468c3b931ee7b"
+    },
+    {
+      "sender": "station",
+      "payload": "05000000000000002a",
+      "message": "5ac5095bdb0391e707b08fec2f4072dd730e93963a0ea48727"
+    },
+    {
+      "sender": "listener",
+      "payload": "01a161746568656c6c6f",
+      "message": "01b2b07bfaaa3d9c8691f1ae75d0af4aa19b4d7aa4994f901dc9"
+    },
+    {
+      "sender": "station",
+      "payload": "",
+      "message": "863ce2066e668cd0f0983436c15941f7"
+    }
+  ]
+}
