@@ -13,6 +13,12 @@ pub const AGC_MAX_GAIN_DB: f32 = 24.0;
 pub const AGC_RAISE_DB_PER_S: f32 = 3.0;
 /// Frames below this input level are never amplified (§1.1).
 pub const AGC_NOISE_FLOOR_DBFS: f32 = -70.0;
+/// A frame is a sound event when it is this far above the tracked room noise
+/// floor (§1.1); only events move the AGC gain up.
+pub const AGC_EVENT_MARGIN_DB: f32 = 12.0;
+/// How fast the tracked noise floor may rise, in dB per second (§1.1). It
+/// follows the room down immediately.
+pub const NOISE_FLOOR_RISE_DB_PER_S: f32 = 0.5;
 
 /// Manual microphone gain step (§1.1).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -55,16 +61,18 @@ pub enum GainSetting {
 
 /// Gain stage implementing manual steps and the AGC of §1.1.
 ///
-/// The AGC gain moves between 0 and +24 dB. For each frame at or above
-/// -70 dBFS the desired gain is the one that brings the frame to -24 dBFS;
-/// decreases take effect on that same frame (well within the 50 ms attack),
-/// increases are limited to +3 dB/s. Frames below -70 dBFS pass at 0 dB and
-/// leave the AGC state untouched.
+/// The AGC gain moves between 0 and +24 dB and only follows sound events:
+/// frames at or above -70 dBFS and at least [`AGC_EVENT_MARGIN_DB`] above the
+/// tracked room noise floor. For an event the desired gain brings the frame
+/// to -24 dBFS; decreases take effect on that frame (well within the 50 ms
+/// attack), increases are limited to +3 dB/s. Other frames keep the current
+/// gain, so a quiet or steady room is never pumped up between events.
 #[derive(Debug, Clone)]
 pub struct GainControl {
     setting: GainSetting,
     agc_db: f32,
     applied: f32,
+    floor_db: Option<f32>,
 }
 
 impl GainControl {
@@ -74,6 +82,7 @@ impl GainControl {
             setting,
             agc_db: 0.0,
             applied: 1.0,
+            floor_db: None,
         }
     }
 
@@ -87,6 +96,7 @@ impl GainControl {
         if setting != self.setting {
             self.setting = setting;
             self.agc_db = 0.0;
+            self.floor_db = None;
         }
     }
 
@@ -98,24 +108,41 @@ impl GainControl {
         }
     }
 
-    /// Applies gain to one frame in place and returns the gain in dB used at
-    /// the end of the frame.
+    /// Tracked room noise floor in dBFS (AGC only).
+    pub fn noise_floor_dbfs(&self) -> Option<f32> {
+        self.floor_db
+    }
+
+    /// Applies gain to one frame in place and returns the room level: the
+    /// frame's level after the manual step but before AGC (§1). Thresholds,
+    /// meters and level reports use this value, so they do not drift while
+    /// the AGC adapts.
     pub fn process(&mut self, frame: &mut PcmFrame) -> f32 {
-        let target_db = match self.setting {
-            GainSetting::Manual(step) => step.db(),
+        let input = level_dbfs(frame);
+        let (target_db, room_level) = match self.setting {
+            GainSetting::Manual(step) => (step.db(), input + step.db()),
             GainSetting::Auto => {
-                let input = level_dbfs(frame);
+                let rise = NOISE_FLOOR_RISE_DB_PER_S * FRAME_MS as f32 / 1000.0;
+                let floor = match self.floor_db {
+                    None => input,
+                    Some(f) if input < f => input,
+                    Some(f) => (f + rise).min(input),
+                };
+                self.floor_db = Some(floor);
+                let is_event =
+                    input >= AGC_NOISE_FLOOR_DBFS && input >= floor + AGC_EVENT_MARGIN_DB;
                 if input < AGC_NOISE_FLOOR_DBFS {
-                    0.0
+                    (0.0, input)
                 } else {
                     let desired = (AGC_TARGET_DBFS - input).clamp(0.0, AGC_MAX_GAIN_DB);
                     let max_raise = AGC_RAISE_DB_PER_S * FRAME_MS as f32 / 1000.0;
-                    self.agc_db = if desired < self.agc_db {
-                        desired
-                    } else {
-                        (self.agc_db + max_raise).min(desired)
-                    };
-                    self.agc_db
+                    if desired < self.agc_db {
+                        // Never let a frame clip past the target, event or not.
+                        self.agc_db = desired;
+                    } else if is_event {
+                        self.agc_db = (self.agc_db + max_raise).min(desired);
+                    }
+                    (self.agc_db, input)
                 }
             }
         };
@@ -131,16 +158,17 @@ impl GainControl {
             *s = (f32::from(*s) * g).round().clamp(-32768.0, 32767.0) as i16;
         }
         self.applied = target;
-        target_db
+        room_level.max(crate::level::LEVEL_FLOOR_DBFS)
     }
 }
 
 /// One processed capture frame.
 #[derive(Debug, Clone, PartialEq)]
 pub struct CapturedFrame {
-    /// 16 kHz mono PCM after gain.
+    /// 16 kHz mono PCM after gain (manual step or AGC).
     pub pcm: PcmFrame,
-    /// Level after gain (§1), used for meters, `level` records and the gate.
+    /// Room level (§1): after the manual step, before AGC. Used for meters,
+    /// `level` records and the sound-activation gate.
     pub level_dbfs: f32,
 }
 
@@ -220,8 +248,7 @@ impl CaptureChain {
         for (d, s) in pcm.iter_mut().zip(self.resampled.drain(..FRAME_SAMPLES)) {
             *d = (s * 32768.0).round().clamp(-32768.0, 32767.0) as i16;
         }
-        self.gain.process(&mut pcm);
-        let level_dbfs = level_dbfs(&pcm);
+        let level_dbfs = self.gain.process(&mut pcm);
         Some(CapturedFrame { pcm, level_dbfs })
     }
 }
@@ -256,34 +283,46 @@ mod tests {
         }
     }
 
+    /// Feeds one frame and returns (room level reported, AGC gain after it).
+    fn feed(g: &mut GainControl, level: f32, phase: &mut f32) -> (f32, f32) {
+        let mut f = tone_frame(level, phase);
+        let room = g.process(&mut f);
+        (room, g.agc_gain_db())
+    }
+
     #[test]
-    fn media_1_1_agc_raises_slowly_to_target() {
+    fn media_1_1_agc_raises_slowly_to_target_on_events() {
         let mut g = GainControl::new(GainSetting::Auto);
         let mut phase = 0.0;
-        // -40 dBFS input wants +16 dB; at 3 dB/s that takes 16/3 s.
+        // A quiet room sets the noise floor; then a -40 dBFS sound event wants
+        // +16 dB, reached at 3 dB/s after 16/3 s.
+        for _ in 0..50 {
+            feed(&mut g, -65.0, &mut phase);
+        }
         let mut gains = Vec::new();
         for _ in 0..500 {
-            let mut f = tone_frame(-40.0, &mut phase);
-            gains.push(g.process(&mut f));
+            gains.push(feed(&mut g, -40.0, &mut phase).1);
         }
-        // After 1 s at most +3 dB.
         assert!(gains[49] <= 3.0 + 1e-3 && gains[49] > 2.9, "{}", gains[49]);
         for w in gains.windows(2) {
             assert!(w[1] - w[0] <= 0.06 + 1e-4);
         }
         assert!((gains[499] - 16.0).abs() < 0.05, "{}", gains[499]);
         let mut f = tone_frame(-40.0, &mut phase);
-        g.process(&mut f);
+        let room = g.process(&mut f);
         assert!((level_dbfs(&f) - AGC_TARGET_DBFS).abs() < 0.3);
+        // The reported room level is the level before AGC (§1).
+        assert!((room - (-40.0)).abs() < 0.3, "{room}");
     }
 
     #[test]
     fn media_1_1_agc_max_gain_is_24_db() {
         let mut g = GainControl::new(GainSetting::Auto);
         let mut phase = 0.0;
+        // Quiet frames keep the noise floor low between -60 dBFS events.
         for _ in 0..1000 {
-            let mut f = tone_frame(-60.0, &mut phase);
-            g.process(&mut f);
+            feed(&mut g, -75.0, &mut phase);
+            feed(&mut g, -60.0, &mut phase);
         }
         assert!((g.agc_gain_db() - AGC_MAX_GAIN_DB).abs() < 1e-3);
     }
@@ -293,8 +332,8 @@ mod tests {
         let mut g = GainControl::new(GainSetting::Auto);
         let mut phase = 0.0;
         for _ in 0..1000 {
-            let mut f = tone_frame(-50.0, &mut phase);
-            g.process(&mut f);
+            feed(&mut g, -75.0, &mut phase);
+            feed(&mut g, -50.0, &mut phase);
         }
         assert!(g.agc_gain_db() > 23.9);
         // A loud event at -10 dBFS: within 50 ms (2.5 frames) the output is at
@@ -309,12 +348,39 @@ mod tests {
     }
 
     #[test]
-    fn media_1_1_agc_does_not_amplify_noise_floor() {
+    fn media_1_1_agc_never_pumps_up_a_steady_room() {
+        // Regression: a steady -60 dBFS room used to be raised by up to 24 dB
+        // until it crossed listeners' sound-activation thresholds.
+        let mut g = GainControl::new(GainSetting::Auto);
+        let mut phase = 0.0;
+        for _ in 0..1500 {
+            let (room, gain) = feed(&mut g, -60.0, &mut phase);
+            assert_eq!(gain, 0.0);
+            assert!((room - (-60.0)).abs() < 0.3, "{room}");
+        }
+        // After a sound event raised the gain, a quiet room keeps it, not more.
+        for _ in 0..100 {
+            feed(&mut g, -40.0, &mut phase);
+        }
+        let held = g.agc_gain_db();
+        assert!(held > 1.0);
+        for _ in 0..500 {
+            let (room, gain) = feed(&mut g, -60.0, &mut phase);
+            assert_eq!(gain, held);
+            assert!(
+                (room - (-60.0)).abs() < 0.3,
+                "room level stays before AGC: {room}"
+            );
+        }
+    }
+
+    #[test]
+    fn media_1_1_agc_does_not_amplify_below_minus_70() {
         let mut g = GainControl::new(GainSetting::Auto);
         let mut phase = 0.0;
         for _ in 0..200 {
-            let mut f = tone_frame(-40.0, &mut phase);
-            g.process(&mut f);
+            feed(&mut g, -75.0, &mut phase);
+            feed(&mut g, -40.0, &mut phase);
         }
         let before = g.agc_gain_db();
         assert!(before > 3.0);

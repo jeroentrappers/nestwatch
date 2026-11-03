@@ -9,18 +9,23 @@ session → jitter buffer (per station) → decoder / concealment → volume →
 
 - Internal capture format: 16 kHz, mono, 16-bit signed PCM, frames of 20 ms
   (320 samples). Implementations resample from the device rate.
-- **Level**: the RMS of each 20 ms frame after gain, in dBFS
-  (`20·log10(rms / 32768)`, floor `-90`). The value used for meters, `level`
-  records and sound activation is this per-frame level.
+- **Level**: the RMS of each 20 ms frame in dBFS
+  (`20·log10(rms / 32768)`, floor `-90`), measured **after the manual gain
+  step and before AGC**. This **room level** is what meters, `level` records
+  and sound activation use, so a threshold keeps its meaning while the AGC
+  adapts.
 
 ### 1.1 Gain and automatic gain control
 
 - Manual gain steps: 0, +6, +12, +18 dB.
-- AGC (default on) targets a speech-like level of `-24 dBFS` for loud
-  events. It raises gain slowly (at most +3 dB per second, up to +24 dB) and
-  lowers it fast (attack within 50 ms), never amplifying frames below
-  `-70 dBFS` so the background noise floor is not pumped up. AGC runs before
-  the level meter, so thresholds refer to what listeners hear.
+- AGC (default on) shapes only what listeners hear. It tracks the room's
+  noise floor (following drops immediately and rises at most 0.5 dB/s) and
+  treats a frame as a **sound event** when it is at least 12 dB above that
+  floor and above `-70 dBFS`. Only events raise the gain, slowly (at most
+  +3 dB per second, up to +24 dB), towards a level of `-24 dBFS`; any frame
+  that would exceed the target lowers it immediately (attack within 50 ms).
+  Between events the gain holds, so a quiet or steady room is never pumped up,
+  and frames below `-70 dBFS` are never amplified.
 
 ## 2. Audio codecs
 
@@ -127,8 +132,8 @@ available) and is sent as stream 1 only while `talk-state` is `granted`.
 Resolved implementation questions. These statements are normative and take
 precedence over looser wording above.
 
-- **MEDIA-1** (media.md §1.1). Can the AGC attenuate (gain below 0 dB) when input is louder than -24 dBFS, and what counts as a "loud event"? **Resolution:** AGC gain stays within 0..+24 dB and never attenuates. Every frame at or above -70 dBFS (input, before gain) is treated as an event: desired gain = clamp(-24 − level, 0, 24).
-- **MEDIA-2** (media.md §1.1). How are frames below -70 dBFS handled by the AGC? **Resolution:** They pass at 0 dB (with a ramp back up on the next louder frame) and do not change the AGC state.
+- **MEDIA-1** (media.md §1.1). Superseded: the AGC is event-based relative to a tracked noise floor (§1.1), and levels for meters, `level` records and the gate are measured before AGC (§1). The earlier rule that every frame above -70 dBFS counts as an event pumped quiet rooms above listener thresholds.
+- **MEDIA-2** (media.md §1.1). Frames below -70 dBFS pass at unity gain and do not change the AGC gain.
 - **MEDIA-3** (media.md §1.1). Exact attack behaviour ("within 50 ms") **Resolution:** Gain decreases apply to the whole frame that triggered them (≤ 20 ms); increases ramp linearly inside a frame and are limited to +0.06 dB per 20 ms frame (3 dB/s).
 - **MEDIA-4** (media.md §2.1). How does the encoder choose `step_index`, and must decoders reject a non-zero reserved byte? **Resolution:** Reference encoder: predictor = sample 0; step_index = the index (0..88) minimising squared coding error over samples 1..31, ties to the lowest; no state carried between frames. Decoders ignore the reserved byte and reject step_index > 88 or a length other than 164.
 - **MEDIA-5** (media.md §2.2). Is "6 dB per repetition" exact or a halving? **Resolution:** Exact: gains 10^(−6n/20) (0.501, 0.251, 0.126), rounded to nearest.
