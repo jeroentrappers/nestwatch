@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English reference text (NFR-I18N-1). -->
+<resources>
+    <string name="app_name">Nestwatch</string>
+    <string name="promise">A private baby monitor for the devices you already own. Everything stays on your network.</string>
+    <string name="disclaimer">Nestwatch is not a medical device and does not replace supervision. Always check on your child in person.</string>
+    <string name="role_station">This device watches</string>
+    <string name="role_station_hint">Put it in the child\'s room. It listens and, when asked, shows the camera.</string>
+    <string name="role_listener">This device listens</string>
+    <string name="role_listener_hint">Follow one or more rooms from here.</string>
+    <string name="disclaimer_ack">Choosing a role confirms that you have read this.</string>
+
+    <string name="close">Close</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="settings">Settings</string>
+    <string name="about">About Nestwatch</string>
+    <string name="theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_night">Night</string>
+    <string name="theme_day">Day</string>
+    <string name="unnamed">Unnamed device</string>
+    <string name="about_body">Nestwatch connects your own devices directly, on your home network or your own VPN. There is no account, no cloud and no tracking. Audio and video are end-to-end encrypted.</string>
+    <string name="version">Version</string>
+    <string name="device_id">Device ID</string>
+    <string name="license">Free software under the GNU AGPL 3.0 or later.</string>
+    <string name="change_role">Change role</string>
+    <string name="change_role_hint">Stops what this device is doing now and shows the role choice again.</string>
+
+    <!-- Permissions (security.md PRIV-4) -->
+    <string name="perm_mic_title">Microphone</string>
+    <string name="perm_mic_station">The station listens to the room so your listeners can hear it. Audio only goes to devices you paired.</string>
+    <string name="perm_mic_talk">Talk-back sends your voice to the station while you hold the button.</string>
+    <string name="perm_camera_title">Camera</string>
+    <string name="perm_camera_station">Allow the camera so a paired listener can open a live view on request. The camera is off otherwise, and this screen shows when it is on.</string>
+    <string name="perm_camera_scan">The camera is used to scan the station\'s pairing QR code. Nothing is recorded.</string>
+    <string name="perm_notifications_title">Notifications</string>
+    <string name="perm_notifications">Nestwatch alerts you when a room gets loud, a station becomes unreachable or its battery runs low.</string>
+    <string name="perm_continue">Continue</string>
+    <string name="perm_not_now">Not now</string>
+    <string name="perm_denied_mic">Without the microphone the station cannot listen. You can allow it in the system settings.</string>
+    <string name="open_settings">Open settings</string>
+
+    <!-- Battery optimisation (platforms.md §2.2) -->
+    <string name="battery_title">Keep Nestwatch running</string>
+    <string name="battery_body">Android may pause apps to save battery, which would stop monitoring with the screen off. Allow Nestwatch to ignore battery optimisation so it keeps running.</string>
+    <string name="battery_allow">Allow</string>
+    <string name="battery_dismiss">Not now</string>
+
+    <!-- Station -->
+    <string name="station_starting">Starting the station…</string>
+    <string name="station_failed">The station could not start</string>
+    <string name="retry">Try again</string>
+    <string name="station_stopped">The station is not running.</string>
+    <string name="station_start">Start the station</string>
+    <string name="station_stop">Stop the station</string>
+    <string name="pair_listener">Pair a listener</string>
+    <string name="dim_screen">Dim screen</string>
+    <string name="tap_to_brighten">Tap anywhere to brighten</string>
+    <string name="dimmed_label">Screen dimmed. Monitoring continues. Activate to brighten.</string>
+    <string name="no_listeners">Nobody is listening yet.</string>
+    <string name="listeners_heading">Listening now</string>
+    <string name="mode_sound_activated">sound-activated</string>
+    <string name="mode_always_on">always on</string>
+    <string name="via_browser">browser</string>
+    <string name="hearing">hearing the room</string>
+    <string name="talking_now">talking</string>
+    <string name="watching_now">camera</string>
+    <string name="ring_quiet">quiet</string>
+    <string name="ring_sound">sound</string>
+    <string name="db">dB</string>
+    <string name="ring_label">Room level</string>
+    <string name="camera_on">Camera on</string>
+    <string name="camera_off">Camera off</string>
+    <string name="talk_off">Talk-back off</string>
+    <string name="nobody_listening">Nobody listening</string>
+    <plurals name="listening_count">
+        <item quantity="one">%d listening</item>
+        <item quantity="other">%d listening</item>
+    </plurals>
+    <string name="talking_through">%s is talking</string>
+    <string name="station_keeps_running">The station keeps running with the screen off. Stopping it here ends monitoring.</string>
+    <string name="station_settings">Station settings</string>
+    <string name="station_name">Station name</string>
+    <string name="camera_allowed">Allow the camera</string>
+    <string name="talk_allowed">Allow talk-back</string>
+    <string name="mic_sensitivity">Microphone sensitivity</string>
+    <string name="gain_auto">Auto</string>
+    <string name="talkback_volume">Talk-back volume</string>
+    <string name="trusted_listeners">Paired listeners</string>
+    <string name="no_trusted">No listener is paired yet.</string>
+    <string name="revoke">Remove</string>
+    <string name="revoke_confirm">Remove %s? It will need to pair again.</string>
+    <string name="camera_unavailable_here">No camera found</string>
+    <string name="camera_denied_here">Camera permission denied</string>
+    <string name="battery_here">Battery %d%%</string>
+    <string name="addresses">Addresses</string>
+
+    <!-- Pairing sheet -->
+    <string name="pair_intro">Scan with the Nestwatch app on the listening device.</string>
+    <string name="pair_code_intro">No camera? Enter this code</string>
+    <string name="pair_station_id">Station ID</string>
+    <string name="qr_label">Pairing QR code</string>
+    <string name="pair_opening">Opening pairing…</string>
+    <string name="pair_closed">Pairing is closed.</string>
+    <string name="pair_just_paired">Paired now. Check that the listener shows the same number:</string>
+    <string name="pair_open_for">Open for %1$s · %2$s</string>
+    <plurals name="pair_devices_left">
+        <item quantity="one">1 more device</item>
+        <item quantity="other">up to %d devices</item>
+    </plurals>
+    <string name="pair_close">Close pairing</string>
+
+    <!-- Add a station -->
+    <string name="add_station">Add a station</string>
+    <string name="scan_qr">Scan the QR code</string>
+    <string name="scan_hint">Point the camera at the QR code on the station.</string>
+    <string name="scan_not_nestwatch">That QR code is not a Nestwatch invitation.</string>
+    <string name="nearby">Nearby</string>
+    <string name="nearby_searching">Looking for stations on this network…</string>
+    <string name="pairing_open">pairing open</string>
+    <string name="already_paired">already paired</string>
+    <string name="not_pairing">pairing closed</string>
+    <string name="invite_field">Invitation link</string>
+    <string name="invite_hint">Paste the nestwatch:// link shown on the station.</string>
+    <string name="invite_submit">Pair with link</string>
+    <string name="code_field">Pairing code</string>
+    <string name="code_field_for">Pairing code shown on %s</string>
+    <string name="code_submit">Pair with code</string>
+    <string name="station_id_field">Station ID (shown under the code)</string>
+    <string name="address_field">Station address (optional, for VPN)</string>
+    <string name="address_hint">For example nursery.tailnet.ts.net:47100 or 100.101.102.103:47100.</string>
+    <string name="pairing">Pairing…</string>
+    <string name="verify_prompt">Check that the station shows the same number</string>
+    <string name="verify_same">Same, continue</string>
+    <string name="verify_different">Different</string>
+    <string name="verify_removed">The station was removed again. Pair once more, close to the station.</string>
+    <string name="by_code">Use a code</string>
+    <string name="by_link">Use a link</string>
+    <string name="err_invalid_invite">That link is not a Nestwatch invitation.</string>
+    <string name="err_invalid_code">That code is not valid. It has 10 letters and digits.</string>
+    <string name="err_invalid_id">That station ID is not valid.</string>
+    <string name="err_invalid_address">That address is not valid. Use host:port.</string>
+    <string name="err_unreachable">The station could not be reached. Is it on and on the same network?</string>
+    <string name="err_refused">The station is not pairing right now. Open pairing on the station.</string>
+    <string name="err_rejected">Pairing failed. The code may be wrong or the invitation expired.</string>
+    <string name="err_too_many">You already follow 8 stations.</string>
+    <string name="err_not_connected">The station is not connected.</string>
+    <string name="err_generic">Something went wrong.</string>
+
+    <!-- Listener home -->
+    <string name="no_stations">No stations yet. Add the station in your child\'s room to start listening.</string>
+    <string name="keeps_listening">Nestwatch keeps listening with the screen off.</string>
+    <string name="status_quiet">Quiet</string>
+    <string name="status_sound">Sound</string>
+    <string name="status_live">Listening</string>
+    <string name="status_connecting">Connecting</string>
+    <string name="status_reconnecting">Reconnecting</string>
+    <string name="status_paused">Paused</string>
+    <string name="status_needs_pairing">Needs pairing</string>
+    <string name="status_talking">%s talking</string>
+    <string name="status_you_talk">You are talking</string>
+    <string name="path_lan">home network</string>
+    <string name="path_vpn">via VPN</string>
+    <string name="trying">trying…</string>
+    <plurals name="trying_addresses">
+        <item quantity="one">trying 1 address…</item>
+        <item quantity="other">trying %d addresses…</item>
+    </plurals>
+    <string name="attempt">attempt %d</string>
+    <string name="needs_pairing_hint">This station removed this device. Pair again to listen.</string>
+    <string name="paused_hint">Not listening to this station.</string>
+    <string name="resume">Resume</string>
+    <string name="level_now">%s now</string>
+    <string name="level_last">last %s</string>
+    <string name="opens_above">opens above %s</string>
+    <string name="no_level">no level yet</string>
+    <string name="battery">Battery %d%%</string>
+    <string name="battery_charging">Battery %d%%, charging</string>
+    <string name="mute">Mute</string>
+    <string name="unmute">Unmute</string>
+    <string name="solo">Solo</string>
+    <string name="unsolo">Hear all</string>
+    <string name="camera">Camera</string>
+    <string name="hold_to_talk">Hold to talk</string>
+    <string name="talking">Talking… release to stop</string>
+    <string name="talk_wait">Connecting the speaker…</string>
+    <string name="talk_busy">%s is talking</string>
+    <string name="talk_busy_someone">Someone else is talking</string>
+    <string name="talk_disabled">Talk-back is off on the station</string>
+    <string name="talk_state_on">talking</string>
+    <string name="talk_state_off">not talking</string>
+    <string name="station_settings_of">Settings for %s</string>
+
+    <!-- Per-station settings (listener) -->
+    <string name="listen_mode">Listening mode</string>
+    <string name="mode_always">Always on</string>
+    <string name="mode_sound">When there\'s sound</string>
+    <string name="calibrate_hint">The line is the room\'s level over the last minute. Drag the threshold just above the quiet part.</string>
+    <string name="calibrate_continuous">The line is the room\'s level over the last minute. The threshold only matters for alerts in this mode.</string>
+    <string name="threshold">Sound threshold</string>
+    <string name="threshold_value">%d dB</string>
+    <string name="hold_time">Keep listening after sound</string>
+    <plurals name="seconds">
+        <item quantity="one">1 second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+    <string name="volume">Volume</string>
+    <string name="percent">%d%%</string>
+    <string name="alert_sound_toggle">Alert sound</string>
+    <string name="alert_unreachable_toggle">Alert if unreachable</string>
+    <string name="alert_battery_toggle">Alert on low battery</string>
+    <string name="add_address">Add an address</string>
+    <string name="address_added">Address added.</string>
+    <string name="pause">Stop listening</string>
+    <string name="forget">Forget this station</string>
+    <string name="forget_confirm">Forget it? You will need to pair again.</string>
+    <string name="forget_yes">Forget</string>
+    <string name="connected_via">Connected via %s</string>
+
+    <!-- Camera view -->
+    <string name="camera_of">Camera · %s</string>
+    <string name="camera_live">Camera live</string>
+    <string name="camera_starting">Starting the camera…</string>
+    <string name="camera_disabled">The camera is turned off on the station.</string>
+    <string name="camera_unavailable">The station has no camera available.</string>
+    <string name="camera_denied">The station\'s camera permission is denied.</string>
+    <string name="camera_stopped">The camera stopped.</string>
+    <string name="night_image">Night image</string>
+    <string name="switch_camera">Switch camera</string>
+    <string name="camera_alt">Live camera image of %s</string>
+    <string name="frame_info">%1$d×%2$d · %3$d fps</string>
+
+    <!-- Alerts -->
+    <string name="alert_sound">Sound in %s</string>
+    <string name="alert_unreachable">%s is unreachable</string>
+    <string name="alert_reachable">%s is back</string>
+    <string name="alert_battery">%1$s: battery low (%2$d%%)</string>
+    <string name="alert_body">Open Nestwatch to listen.</string>
+
+    <!-- Time -->
+    <string name="ago_now">just now</string>
+    <string name="ago_minutes">%d min ago</string>
+    <string name="ago_hours">%d h ago</string>
+    <string name="ago_yesterday">yesterday</string>
+    <plurals name="ago_days">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+    <string name="paired_seen">paired %1$s · last seen %2$s</string>
+
+    <!-- Notifications -->
+    <string name="channel_service">Monitoring</string>
+    <string name="channel_service_desc">Shown while this device is a station or listens.</string>
+    <string name="channel_sound">Sound alerts</string>
+    <string name="channel_sound_desc">A quiet room starts making sound.</string>
+    <string name="channel_connection">Connection alerts</string>
+    <string name="channel_connection_desc">A station is unreachable or back.</string>
+    <string name="channel_battery">Battery alerts</string>
+    <string name="channel_battery_desc">A station\'s battery runs low.</string>
+    <string name="notif_station_title">Nestwatch station is listening</string>
+    <string name="notif_station_starting">Starting…</string>
+    <string name="notif_listener_title">Nestwatch is listening</string>
+    <string name="notif_listener_idle">No station followed</string>
+    <plurals name="notif_listener_text">
+        <item quantity="one">%1$d station · %2$d live</item>
+        <item quantity="other">%1$d stations · %2$d live</item>
+    </plurals>
+</resources>

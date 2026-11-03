@@ -26,7 +26,9 @@ Specification phase. Start with [specs/](specs/README.md).
 | Design system | done (`design/`) |
 | Rust core | planned |
 | Desktop apps (Dioxus) and browser listener (wasm) | first version (`apps/`) |
-| Android (Compose) and iOS (SwiftUI) apps on the Rust core | planned |
+| UniFFI bindings for Kotlin and Swift (`crates/nestwatch-ffi`) | first version |
+| Android app (Compose) | first version (`apps/android`) |
+| iOS app (SwiftUI) on the Rust core | planned |
 
 ## License
 

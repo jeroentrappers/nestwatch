@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window theme before Compose draws; Compose maps the Nestwatch tokens (design/README.md §6). -->
+    <style name="Theme.Nestwatch" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/ink0_day</item>
+        <item name="android:statusBarColor">@color/ink0_day</item>
+        <item name="android:navigationBarColor">@color/ink0_day</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

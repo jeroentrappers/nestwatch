@@ -14,11 +14,24 @@ pub const TAILSCALE_TIMEOUT: Duration = Duration::from_secs(2);
 
 /// Every interface address with its interface name, unfiltered
 /// ([`order_endpoints`] drops what must not be listed).
+///
+/// On Android this is unsupported (`getifaddrs` needs API 24); apps pass
+/// the interface addresses they get from the platform.
+#[cfg(not(target_os = "android"))]
 pub fn interface_addrs() -> io::Result<Vec<InterfaceAddr>> {
     Ok(if_addrs::get_if_addrs()?
         .into_iter()
         .map(|i| InterfaceAddr::new(i.name.clone(), i.ip()))
         .collect())
+}
+
+/// Every interface address (unsupported on Android, see above).
+#[cfg(target_os = "android")]
+pub fn interface_addrs() -> io::Result<Vec<InterfaceAddr>> {
+    Err(io::Error::new(
+        io::ErrorKind::Unsupported,
+        "interfaces come from the app on Android",
+    ))
 }
 
 /// Places the Tailscale CLI may be installed besides `PATH`.
