@@ -159,8 +159,11 @@ error, to avoid becoming a key-membership oracle).
 
 `psk = HKDF-SHA256(ikm = invite_token, salt = station_public_key, info = "lull/1 invite psk", L = 32)`.
 
-The station accepts if pairing mode is open and the handshake succeeds; it
-then adds the listener's static key to its trusted list.
+The station accepts if pairing mode is open and the handshake succeeds. In
+`IKpsk2` the station's handshake completes before it has proof that the
+listener knew the PSK, so the station MUST add the listener's static key to
+its trusted list only after the first transport message from the listener
+(its `hello`) decrypts successfully. The same rule applies to mode `code`.
 
 ### 5.3 Mode `code`: `XXpsk3`
 

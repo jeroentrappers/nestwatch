@@ -77,7 +77,7 @@ only (browsers cannot accept connections or advertise services).
 - **FR-PAIR-4** After pairing, the listener MUST reconnect without any code.
   A station's pairing mode MUST NOT be needed for reconnects.
 - **FR-PAIR-5** Pairing MUST show both devices a short verification phrase
-  derived from the session (see protocol.md §6.5) so users can spot a
+  derived from the session (see protocol.md §5.5) so users can spot a
   man-in-the-middle when pairing by code.
 - **FR-PAIR-6** Revoking a listener on the station MUST end its sessions
   immediately and reject it afterwards. Forgetting a station on a listener
