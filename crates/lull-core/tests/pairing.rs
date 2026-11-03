@@ -349,3 +349,34 @@ async fn protocol_9_same_listener_again_replaces_the_old_session() {
     first.shutdown().await;
     station.shutdown().await;
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn fr_pair_3_ten_minute_window_on_a_manual_clock() {
+    use std::sync::Arc;
+    let clock = Arc::new(lull_core::ManualClock::new(5_000, 1_700_000_000_000));
+    let station = lull_core::station::StationEngine::start(
+        station_config("Nursery"),
+        Arc::new(lull_core::MemoryStorage::new()),
+        clock.clone(),
+    )
+    .await
+    .unwrap();
+    let mut sev = station.events();
+    let info = station.open_pairing().await.unwrap();
+    assert_eq!(info.closes_at_ms, 5_000 + 600_000);
+    clock.advance(599_000);
+    tokio::time::sleep(Duration::from_millis(400)).await;
+    assert!(station.snapshot().pairing.is_some());
+    clock.advance(1_000);
+    let e = wait_event(&mut sev, "expired", |e| {
+        matches!(e, StationEvent::PairingClosed { .. })
+    })
+    .await;
+    assert_eq!(
+        e,
+        StationEvent::PairingClosed {
+            reason: PairingEnd::Expired
+        }
+    );
+    station.shutdown().await;
+}

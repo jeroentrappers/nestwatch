@@ -148,3 +148,43 @@ async fn fr_ls_1_unfollow_and_follow_again() {
     station.shutdown().await;
     l.shutdown().await;
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn fr_al_2_unreachable_after_20_s_on_a_manual_clock() {
+    use std::sync::Arc;
+    let (station, _) = station("Nursery").await;
+    let clock = Arc::new(lull_core::ManualClock::new(1_000, 1_700_000_000_000));
+    let l = lull_core::listener::ListenerEngine::start(
+        listener_config("Parents"),
+        Arc::new(lull_core::MemoryStorage::new()),
+        clock.clone(),
+    )
+    .unwrap();
+    let id = pair(&station, &l).await;
+    let mut lev = l.events();
+    station.shutdown().await;
+    wait_event(&mut lev, "disconnected", |e| {
+        matches!(e, ListenerEvent::Disconnected { .. })
+    })
+    .await;
+    // Spec value (20 s): nothing at 19 s, the alert just after 20 s.
+    clock.advance(19_000);
+    let early = wait_event_for(&mut lev, Duration::from_millis(400), "early", |e| {
+        matches!(e, ListenerEvent::Alert { .. })
+    })
+    .await;
+    assert_eq!(early, None);
+    clock.advance(1_500);
+    let e = wait_event(&mut lev, "unreachable", |e| {
+        matches!(e, ListenerEvent::Alert { .. })
+    })
+    .await;
+    assert_eq!(
+        e,
+        ListenerEvent::Alert {
+            station_id: id,
+            alert: Alert::Unreachable
+        }
+    );
+    l.shutdown().await;
+}

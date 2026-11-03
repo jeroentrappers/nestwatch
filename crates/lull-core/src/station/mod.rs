@@ -28,9 +28,9 @@ use std::time::Duration;
 
 use lull_crypto::{DeviceKey, InviteToken, PairingCode};
 use lull_media::capture::{GainSetting, GainStep};
+use lull_net::StationListener;
 use lull_net::mdns::{Advertisement, Advertiser};
-use lull_net::web::{AssetSource, StationCert, WebConfig, WebServer};
-use lull_net::{ListenConfig, StationListener};
+use lull_net::web::{StationCert, WebServer};
 use lull_proto::control::{CloseReason, Control, Hello, Role, StationStatus, caps};
 use lull_proto::{Endpoint, Host, Invitation, StationTxt};
 use minicbor::{Decode, Encode};
@@ -42,8 +42,8 @@ use crate::persist;
 use crate::storage::{Storage, StorageError};
 use crate::types::{ListenMode, Transport, clamp_name};
 
-pub use lull_net::web::{AssetSource as WebAssets, WebConfig as WebServerConfig};
-pub use lull_net::{BindScope, ListenConfig as PortConfig};
+pub use lull_net::web::{AssetSource, WebConfig};
+pub use lull_net::{BindScope, ListenConfig};
 pub use media::{CameraAvailability, CameraFrame, CameraRequest, PixelFormat};
 pub use pairing::PairingEnd;
 pub use trust::{KEY_TRUST, TrustedListener};
@@ -621,6 +621,13 @@ impl fmt::Debug for StationEngine {
             .field("device_id", &self.shared.device_id)
             .finish_non_exhaustive()
     }
+}
+
+/// Reads the trusted listener list from `storage` without starting an engine.
+pub fn stored_trusted_listeners(
+    storage: &dyn Storage,
+) -> Result<Vec<TrustedListener>, StorageError> {
+    Ok(TrustStore::load(storage)?.list().to_vec())
 }
 
 fn cert_names(endpoints: &[Endpoint]) -> Vec<Host> {

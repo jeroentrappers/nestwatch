@@ -762,6 +762,11 @@ impl fmt::Debug for ListenerEngine {
     }
 }
 
+/// Reads the known station list from `storage` without starting an engine.
+pub fn stored_stations(storage: &dyn Storage) -> Result<Vec<KnownStation>, StorageError> {
+    store::load_stations(storage)
+}
+
 fn parse_station_id(id: &str) -> Result<String, ListenerError> {
     lull_proto::DeviceId::parse(id)
         .map(|d| d.as_str().to_owned())
