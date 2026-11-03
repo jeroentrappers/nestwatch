@@ -1,0 +1,34 @@
+[package]
+name = "lull-desktop"
+description = "Lull desktop app (Linux, macOS, Windows): station and listener"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[[bin]]
+name = "lull-desktop"
+path = "src/main.rs"
+required-features = ["window"]
+
+[features]
+default = ["window"]
+## The Dioxus desktop window (WebKitGTK on Linux, WKWebView, WebView2).
+## Without it only the engine/platform host library is built.
+window = ["dioxus/desktop", "dioxus/launch"]
+
+[dependencies]
+dioxus = { version = "0.7.10", default-features = false, features = ["macro", "html", "signals", "hooks", "document"] }
+dirs = "6"
+log = "0.4"
+lull-core = { path = "../../crates/lull-core" }
+lull-platform = { path = "../../crates/lull-platform" }
+lull-ui = { path = "../ui", features = ["native"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "net", "io-util"] }
+
+[dev-dependencies]
+
+[lints]
+workspace = true

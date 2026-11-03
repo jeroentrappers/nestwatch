@@ -87,6 +87,10 @@ struct StationArgs {
     /// Stop after this many seconds.
     #[arg(long, value_name = "SECS")]
     duration: Option<u64>,
+    /// Answer camera requests with a synthetic moving test pattern (tests;
+    /// the CLI has no camera otherwise).
+    #[arg(long)]
+    test_camera: bool,
 }
 
 #[derive(Parser, Debug)]
@@ -266,10 +270,31 @@ async fn run_station(a: StationArgs, storage: Arc<dyn Storage>) -> Result<(), St
         print_qr(&info.invite_uri);
     }
     let source = spawn_source(&a, station.clone())?;
+    let test_camera = a.test_camera;
+    let camera_station = station.clone();
     let printer = tokio::spawn(async move {
+        let mut camera: Option<tokio::task::JoinHandle<()>> = None;
         loop {
             match events.recv().await {
-                Ok(e) => print_station_event(&e),
+                Ok(e) => {
+                    print_station_event(&e);
+                    if test_camera {
+                        match &e {
+                            StationEvent::CameraWanted(r) => {
+                                if let Some(c) = camera.take() {
+                                    c.abort();
+                                }
+                                camera = Some(spawn_test_camera(camera_station.clone(), r.clone()));
+                            }
+                            StationEvent::CameraNotWanted => {
+                                if let Some(c) = camera.take() {
+                                    c.abort();
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                }
                 Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) => {}
                 Err(_) => break,
             }
@@ -309,14 +334,45 @@ fn print_station_event(e: &StationEvent) {
         StationEvent::ListenerUnpaired { listener_id } => {
             println!("unpaired: {}", grouped_id(listener_id))
         }
-        StationEvent::CameraWanted(r) => println!(
-            "camera wanted {}x{} at {} fps (no camera in the CLI)",
-            r.max_w, r.max_h, r.max_fps
-        ),
+        StationEvent::CameraWanted(r) => {
+            println!("camera wanted {}x{} at {} fps", r.max_w, r.max_h, r.max_fps)
+        }
         StationEvent::CameraNotWanted => println!("camera not wanted"),
         StationEvent::TalkStarted { name } => println!("talk-back from {name}"),
         StationEvent::TalkEnded => println!("talk-back ended"),
     }
+}
+
+/// Pushes a moving RGB test pattern at the requested size and rate.
+fn spawn_test_camera(
+    station: StationEngine,
+    req: lull_core::station::CameraRequest,
+) -> tokio::task::JoinHandle<()> {
+    tokio::spawn(async move {
+        let (w, h) = (req.max_w.clamp(16, 640), req.max_h.clamp(16, 480));
+        let period = Duration::from_millis(1000 / u64::from(req.max_fps.clamp(1, 30)));
+        let mut tick = tokio::time::interval(period);
+        let mut t = 0u32;
+        loop {
+            tick.tick().await;
+            let mut data = Vec::with_capacity((w * h * 3) as usize);
+            for y in 0..h {
+                for x in 0..w {
+                    let band = ((x + t * 4) / 40) % 2 == 0;
+                    data.push(if band { 200 } else { 40 });
+                    data.push(((y * 255) / h) as u8);
+                    data.push(((x * 255) / w) as u8);
+                }
+            }
+            station.push_camera_frame(&lull_core::station::CameraFrame {
+                width: w,
+                height: h,
+                format: lull_core::station::PixelFormat::Rgb,
+                data,
+            });
+            t = t.wrapping_add(1);
+        }
+    })
 }
 
 /// Starts the audio source task.

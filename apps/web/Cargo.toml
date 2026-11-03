@@ -1,0 +1,39 @@
+[package]
+name = "lull-web"
+description = "Lull browser listener (wasm32), served by stations"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[features]
+default = []
+## Demo backend with made-up stations instead of the engine (design previews).
+demo = []
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+dioxus = { version = "0.7.10", default-features = false, features = ["macro", "html", "signals", "hooks", "web", "launch"] }
+lull-ui = { path = "../ui", features = ["web"] }
+lull-core = { path = "../../crates/lull-core", default-features = false, features = ["web"] }
+base64 = "0.22.1"
+gloo-timers = { version = "0.3", features = ["futures"] }
+js-sys = "0.3"
+tokio = { version = "1", default-features = false, features = ["sync"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = [
+  "Window", "Document", "Element", "HtmlElement", "Location", "History", "Storage",
+  "MediaDevices", "MediaStream", "MediaStreamConstraints", "MediaStreamTrack",
+  "AudioContext", "AudioContextOptions", "AudioContextState", "BaseAudioContext", "AudioDestinationNode", "AudioNode",
+  "AudioWorklet", "AudioWorkletNode", "AudioWorkletNodeOptions", "Worklet", "MessagePort", "MessageEvent",
+  "ScriptProcessorNode", "AudioProcessingEvent", "AudioBuffer", "MediaStreamAudioSourceNode",
+  "OscillatorNode", "GainNode", "AudioParam", "OscillatorType",
+  "Notification", "NotificationOptions", "NotificationPermission",
+  "MediaQueryList", "Event", "EventTarget", "KeyboardEvent", "console", "AddEventListenerOptions",
+  "Navigator",
+] }
+
+[lints]
+workspace = true

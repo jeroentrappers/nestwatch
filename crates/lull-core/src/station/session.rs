@@ -44,6 +44,8 @@ pub(crate) struct Sess {
     pub ring: Option<usize>,
     pub gate: Option<ListenGate>,
     pub mode: ListenMode,
+    /// Sound activation threshold from the last `listen` (dBFS).
+    pub threshold_dbfs: f32,
     pub video: Option<Watch>,
     pub rtt_ms: Option<u64>,
 }
@@ -159,6 +161,7 @@ pub(crate) async fn run(shared: Arc<Shared>, link: Link) {
                 ring: None,
                 gate: None,
                 mode: ListenMode::Continuous,
+                threshold_dbfs: -90.0,
                 video: None,
                 rtt_ms: None,
             },
@@ -303,6 +306,7 @@ fn on_control(shared: &Shared, id: u64, s: &mut Session, c: Control) {
         Control::Listen(l) => {
             if let Some(e) = g.sessions.get_mut(&id) {
                 e.mode = ListenMode::from_wire(l.mode);
+                e.threshold_dbfs = l.threshold;
                 if let Some(gate) = e.gate.as_mut() {
                     gate.set_config(GateConfig {
                         mode: match e.mode {
