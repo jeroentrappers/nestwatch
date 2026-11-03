@@ -3,7 +3,9 @@
 //! service over D-Bus (pure Rust) on Linux, Notification Center on macOS,
 //! toast notifications on Windows.
 
-use super::{Notification, Notifier, Urgency};
+#[cfg(not(target_os = "macos"))]
+use super::Urgency;
+use super::{Notification, Notifier};
 use crate::{APP_NAME, PlatformError};
 
 /// The notify-rust backend.
