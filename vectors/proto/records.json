@@ -1,0 +1,163 @@
+{
+  "description": "LWP/1 records: type (u8) || body (protocol.md §6). Control messages use RFC 8949 core deterministic encoding.",
+  "invalid": [
+    {
+      "hex": "",
+      "name": "empty"
+    },
+    {
+      "hex": "0200020000000000000000",
+      "name": "audio-truncated-header"
+    },
+    {
+      "hex": "020202000000000000000000aa",
+      "name": "audio-bad-stream"
+    },
+    {
+      "hex": "0301000004d201020304028001e0000200",
+      "name": "video-truncated-header"
+    },
+    {
+      "hex": "0301000004d201020304028001e0000000000524436281a0bfdefd1c3b5a7998b7d6f51433527190afceed0c2b4a6988a7c6e504234261809fbe",
+      "name": "video-zero-frag-count"
+    },
+    {
+      "hex": "0301000004d201020304028001e0000300030524436281a0bfdefd1c3b5a7998b7d6f51433527190afceed0c2b4a6988a7c6e504234261809fbe",
+      "name": "video-index-not-below-count"
+    },
+    {
+      "hex": "0401020304050607",
+      "name": "ping-short"
+    },
+    {
+      "hex": "05010203040506070809",
+      "name": "pong-long"
+    },
+    {
+      "hex": "0180",
+      "name": "control-not-a-map"
+    },
+    {
+      "hex": "01a1617466756e7061697200",
+      "name": "control-trailing-bytes"
+    }
+  ],
+  "vectors": [
+    {
+      "hex": "01a761746568656c6c6f636170706a6c756c6c2f302e312e3064636170738565617564696f63766f786474616c6b65766964656f6762617474657279646e616d65674e75727365727964726f6c656773746174696f6e65617564696f82010265766964656f8101",
+      "name": "control-hello",
+      "record": {
+        "message": {
+          "app": "lull/0.1.0",
+          "audio": [
+            1,
+            2
+          ],
+          "caps": [
+            "audio",
+            "vox",
+            "talk",
+            "video",
+            "battery"
+          ],
+          "name": "Nursery",
+          "role": "station",
+          "t": "hello",
+          "video": [
+            1
+          ]
+        },
+        "type": "control"
+      }
+    },
+    {
+      "hex": "01a161746a766964656f2d73746f70",
+      "name": "control-video-stop",
+      "record": {
+        "message": {
+          "t": "video-stop"
+        },
+        "type": "control"
+      }
+    },
+    {
+      "hex": "0200020200000000000000000726456483a2c1e0ff1e3d5c7b9ab9d8f71635547392b1d0ef0e2d4c6b8aa9c8e70625446382a1c0dffe1d3c5b7a99b8d7f61534537291b0cfee0d2c4b6a89a8c7e60524436281a0bfdefd1c3b5a7998b7d6f51433527190afceed0c2b4a6988a7c6e504234261809fbeddfc1b3a597897b6d5f4133251708faecdec0b2a496887a6c5e4032241607f9ebddcfb1a39587796b5d4f31231506f8eadcceb0a29486786a5c4",
+      "name": "audio-adpcm-burst-start",
+      "record": {
+        "codec": 2,
+        "flags": 2,
+        "payload": "0726456483a2c1e0ff1e3d5c7b9ab9d8f71635547392b1d0ef0e2d4c6b8aa9c8e70625446382a1c0dffe1d3c5b7a99b8d7f61534537291b0cfee0d2c4b6a89a8c7e60524436281a0bfdefd1c3b5a7998b7d6f51433527190afceed0c2b4a6988a7c6e504234261809fbeddfc1b3a597897b6d5f4133251708faecdec0b2a496887a6c5e4032241607f9ebddcfb1a39587796b5d4f31231506f8eadcceb0a29486786a5c4",
+        "seq": 0,
+        "stream": 0,
+        "timestamp": 0,
+        "type": "audio"
+      }
+    },
+    {
+      "hex": "0200020100000029000099c00928476685a4c3e201203f5e7d9cbbda",
+      "name": "audio-preroll",
+      "record": {
+        "codec": 2,
+        "flags": 1,
+        "payload": "0928476685a4c3e201203f5e7d9cbbda",
+        "seq": 41,
+        "stream": 0,
+        "timestamp": 39360,
+        "type": "audio"
+      }
+    },
+    {
+      "hex": "02010100fffffffffffffc40032241607f9ebddcfb1a39587796b5d4f31231506f8eadcceb0a29486786a5c4e30221405f7e9dbcdbfa1938577695b4d3f211304f6e8daccbea0928",
+      "name": "audio-talkback-wrapping",
+      "record": {
+        "codec": 1,
+        "flags": 0,
+        "payload": "032241607f9ebddcfb1a39587796b5d4f31231506f8eadcceb0a29486786a5c4e30221405f7e9dbcdbfa1938577695b4d3f211304f6e8daccbea0928",
+        "seq": 4294967295,
+        "stream": 1,
+        "timestamp": 4294966336,
+        "type": "audio"
+      }
+    },
+    {
+      "hex": "0301000004d201020304028001e0000200030524436281a0bfdefd1c3b5a7998b7d6f51433527190afceed0c2b4a6988a7c6e504234261809fbe",
+      "name": "video-last-fragment",
+      "record": {
+        "capture_ms": 16909060,
+        "codec": 1,
+        "frag_count": 3,
+        "frag_index": 2,
+        "frame_id": 1234,
+        "height": 480,
+        "payload": "0524436281a0bfdefd1c3b5a7998b7d6f51433527190afceed0c2b4a6988a7c6e504234261809fbe",
+        "type": "video",
+        "width": 640
+      }
+    },
+    {
+      "hex": "040000018bcfe5687b",
+      "name": "ping",
+      "record": {
+        "clock_ms": 1700000000123,
+        "type": "ping"
+      }
+    },
+    {
+      "hex": "050000018bcfe5687b",
+      "name": "pong",
+      "record": {
+        "clock_ms": 1700000000123,
+        "type": "pong"
+      }
+    },
+    {
+      "hex": "10010203",
+      "name": "unknown-type-0x10",
+      "record": {
+        "body": "010203",
+        "record_type": 16,
+        "type": "unknown"
+      }
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "description": "DNS-SD TXT strings for _lull._tcp.local. (protocol.md §3.4)",
+  "invalid": [
+    {
+      "name": "version-2",
+      "strings": [
+        "v=2",
+        "id=mfrggzdfmztwq2lk",
+        "pair=0"
+      ]
+    },
+    {
+      "name": "missing-id",
+      "strings": [
+        "v=1",
+        "pair=0"
+      ]
+    },
+    {
+      "name": "bad-pair",
+      "strings": [
+        "v=1",
+        "id=mfrggzdfmztwq2lk",
+        "pair=yes"
+      ]
+    }
+  ],
+  "vectors": [
+    {
+      "name": "pairing-open",
+      "strings": [
+        "v=1",
+        "id=mfrggzdfmztwq2lk",
+        "pair=1",
+        "http=47180",
+        "https=47181"
+      ],
+      "txt": {
+        "http": 47180,
+        "https": 47181,
+        "id": "mfrggzdfmztwq2lk",
+        "pair": true
+      }
+    },
+    {
+      "name": "pairing-closed-no-https",
+      "strings": [
+        "v=1",
+        "id=mfrggzdfmztwq2lk",
+        "pair=0",
+        "http=47182"
+      ],
+      "txt": {
+        "http": 47182,
+        "https": null,
+        "id": "mfrggzdfmztwq2lk",
+        "pair": false
+      }
+    }
+  ]
+}

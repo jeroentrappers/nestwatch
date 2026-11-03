@@ -1,0 +1,64 @@
+{
+  "description": "LWP/1 prefaces and Noise prologue (protocol.md §4)",
+  "invalid": [
+    {
+      "hex": "4c554c4c01",
+      "name": "truncated"
+    },
+    {
+      "hex": "4c554c580101",
+      "name": "bad-magic"
+    },
+    {
+      "hex": "4c554c4c0201",
+      "name": "version-2"
+    },
+    {
+      "hex": "4c554c4c0109",
+      "name": "unknown-mode"
+    }
+  ],
+  "listener": [
+    {
+      "hex": "4c554c4c0101",
+      "mode": "trusted"
+    },
+    {
+      "hex": "4c554c4c0102",
+      "mode": "invite"
+    },
+    {
+      "hex": "4c554c4c0103",
+      "mode": "code"
+    }
+  ],
+  "prologue": [
+    {
+      "hex": "6c756c6c2f314c554c4c01024c554c4c0100",
+      "listener_hex": "4c554c4c0102",
+      "station_hex": "4c554c4c0100"
+    }
+  ],
+  "station": [
+    {
+      "hex": "4c554c4c0100",
+      "status": "ok"
+    },
+    {
+      "hex": "4c554c4c0101",
+      "status": "unsupported-version"
+    },
+    {
+      "hex": "4c554c4c0102",
+      "status": "pairing-closed"
+    },
+    {
+      "hex": "4c554c4c0103",
+      "status": "busy"
+    },
+    {
+      "hex": "4c554c4c0104",
+      "status": "rate-limited"
+    }
+  ]
+}
