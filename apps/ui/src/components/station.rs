@@ -20,12 +20,16 @@ use crate::strings as s;
 pub fn StationScreen() -> Element {
     let backend = use_context::<BackendHandle>();
     let ui = use_context::<Ui>();
+    let nav = use_context::<Nav>();
     let run = ui.station.read().clone();
     // Start the station when this screen shows and it is not running.
     {
         let backend = backend.clone();
-        use_hook(move || {
+        // An effect, not a hook: it writes signals, which must not happen
+        // while rendering.
+        use_effect(move || {
             if matches!(*ui.station.peek(), StationRun::Stopped) {
+                nav.update_prefs(&backend, |p| p.station_autostart = true);
                 let f = backend.start_station();
                 spawn_forever(async move {
                     let _ = f.await;
@@ -60,6 +64,7 @@ pub fn StationScreen() -> Element {
                             class: "btn primary",
                             r#type: "button",
                             onclick: move |_| {
+                                nav.update_prefs(&retry, |p| p.station_autostart = true);
                                 let f = retry.start_station();
                                 spawn_forever(async move {
                                     let _ = f.await;
@@ -293,6 +298,7 @@ fn PairingSheet(
 #[component]
 fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
     let backend = use_context::<BackendHandle>();
+    let nav = use_context::<Nav>();
     let mut name = use_signal(|| model.name.clone());
     let mut tb_draft = use_signal(|| None::<u32>);
     let set = model.settings.clone();
@@ -457,6 +463,7 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                     class: "btn ghost",
                     r#type: "button",
                     onclick: move |_| {
+                        nav.update_prefs(&b_stop, |p| p.station_autostart = false);
                         let f = b_stop.stop_station();
                         spawn_forever(f);
                         onclose.call(());

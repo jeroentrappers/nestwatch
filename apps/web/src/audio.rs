@@ -262,7 +262,7 @@ impl Audio {
     fn start_script_processor(self: &Rc<Self>, ctx: &AudioContext) {
         let node: ScriptProcessorNode = match ctx
             .create_script_processor_with_buffer_size_and_number_of_input_channels_and_number_of_output_channels(
-                1280, 0, 1,
+                1024, 0, 1,
             ) {
             Ok(n) => n,
             Err(e) => {
@@ -271,21 +271,19 @@ impl Audio {
             }
         };
         let this = self.clone();
+        // Buffers are powers of two (1024 = 64 ms), frames are 320 samples:
+        // carry the rest of a pulled frame over to the next callback.
+        let mut carry: std::collections::VecDeque<f32> = std::collections::VecDeque::new();
         let closure =
             Closure::<dyn FnMut(AudioProcessingEvent)>::new(move |e: AudioProcessingEvent| {
                 let Ok(out) = e.output_buffer() else { return };
                 let len = out.length() as usize;
-                let mut data = vec![0f32; len];
-                for chunk in data.chunks_mut(FRAME) {
-                    if chunk.len() == FRAME {
-                        this.pull_frame(chunk);
-                    } else {
-                        let mut tmp = [0f32; FRAME];
-                        this.pull_frame(&mut tmp);
-                        let n = chunk.len();
-                        chunk.copy_from_slice(&tmp[..n]);
-                    }
+                let mut frame = [0f32; FRAME];
+                while carry.len() < len {
+                    this.pull_frame(&mut frame);
+                    carry.extend(frame);
                 }
+                let data: Vec<f32> = carry.drain(..len).collect();
                 let _ = out.copy_to_channel(&data, 0);
                 this.counters.borrow_mut().played += len as f64;
                 this.publish_counters();

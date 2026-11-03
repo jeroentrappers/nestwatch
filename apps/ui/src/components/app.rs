@@ -109,12 +109,26 @@ pub fn LullApp(backend: BackendHandle, #[props(default)] invitation: Option<Stri
             backend.apply_theme(theme);
         });
     }
+    // A station that ran when the app last closed starts again, whatever
+    // screen shows (FR-ST-5: monitoring continues).
+    {
+        let backend = backend.clone();
+        use_effect(move || {
+            if caps.station && nav.prefs.peek().station_autostart {
+                let f = backend.start_station();
+                spawn_forever(async move {
+                    let _ = f.await;
+                });
+            }
+        });
+    }
     // An invitation from the address bar pairs right away.
     {
         let backend = backend.clone();
-        use_hook(move || {
-            if let Some(inv) = invitation {
-                start_invitation_pairing(backend, nav, inv);
+        let mut pending = Some(invitation);
+        use_effect(move || {
+            if let Some(Some(inv)) = pending.take() {
+                start_invitation_pairing(backend.clone(), nav, inv);
             }
         });
     }
