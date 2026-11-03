@@ -187,7 +187,7 @@ code, pre { font-family: var(--font-mono); }
 .code {
   margin: 0; padding: var(--space-4); border-radius: var(--radius-m);
   background: var(--ink-2); border: 1px solid var(--ink-3);
-  font-size: 13px; line-height: 1.55; overflow-x: auto; color: var(--text-1);
+  font-size: 13px; line-height: 1.55; overflow-x: auto; color: var(--text-1); tab-size: 4;
   max-width: 100%;
 }
 
