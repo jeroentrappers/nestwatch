@@ -631,6 +631,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "lull-session"
+version = "0.1.0"
+dependencies = [
+ "lull-crypto",
+ "lull-proto",
+ "thiserror",
+]
+
+[[package]]
 name = "mdns-sd"
 version = "0.21.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
