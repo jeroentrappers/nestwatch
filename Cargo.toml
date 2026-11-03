@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "tools/lull-cli", "apps/ui"]
+members = ["crates/*", "tools/lull-cli", "apps/ui", "apps/web"]
 
 [workspace.package]
 version = "0.1.0"
