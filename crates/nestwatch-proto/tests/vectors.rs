@@ -21,7 +21,7 @@ use nestwatch_proto::preface::prologue;
 use nestwatch_proto::record::{AudioFlags, AudioStream};
 use nestwatch_proto::{
     AudioHeader, Control, DeviceId, Endpoint, Host, Invitation, ListenerPreface, Mode, Record,
-    StationPreface, StationTxt, Status, VideoHeader,
+    RelayRef, StationPreface, StationTxt, Status, VideoHeader,
 };
 use serde_json::{Map, Value, json};
 
@@ -664,12 +664,16 @@ fn generate_control() -> Value {
 }
 
 fn invitation_json(inv: &Invitation) -> Value {
-    json!({
+    let mut v = json!({
         "station_key": hex(&inv.station_key),
         "token": hex(&inv.token),
         "name": inv.name,
         "endpoints": inv.endpoints.iter().map(ToString::to_string).collect::<Vec<_>>(),
-    })
+    });
+    if let Some(r) = &inv.relay {
+        v["relay"] = json!({"server": r.server, "mailbox": hex(&r.mailbox)});
+    }
+    v
 }
 
 fn sample_invitation() -> Invitation {
@@ -687,6 +691,7 @@ fn sample_invitation() -> Invitation {
         .iter()
         .map(|e| Endpoint::parse(e).unwrap())
         .collect(),
+        relay: None,
     }
 }
 
@@ -702,11 +707,19 @@ fn generate_invitations() -> Value {
         endpoints: vec![Endpoint::parse("10.0.0.5:47101").unwrap()],
         ..full.clone()
     };
+    let relayed = Invitation {
+        relay: Some(RelayRef {
+            server: "https://nestwatch.appmire.be".into(),
+            mailbox: pattern(16, 0x3C).try_into().unwrap(),
+        }),
+        ..full.clone()
+    };
     let origin = "http://192.168.1.20:47180";
     let vectors: Vec<Value> = [
         ("full", &full),
         ("minimal", &minimal),
         ("unicode-name", &unicode),
+        ("relay", &relayed),
     ]
     .iter()
     .map(|(n, inv)| {
@@ -737,6 +750,7 @@ fn generate_invitations() -> Value {
         json!({"name": "reordered-and-uppercase-scheme", "uri": format!("NESTWATCH://INVITE?{}", reordered.join("&")), "invitation": invitation_json(&full)}),
         json!({"name": "no-name-parameter", "uri": minimal.to_uri().unwrap().replace("&n=", ""), "invitation": invitation_json(&minimal)}),
         json!({"name": "more-than-8-endpoints", "uri": nine, "invitation": invitation_json(&nine_expect)}),
+        json!({"name": "relay-origin-normalised", "uri": relayed.to_uri().unwrap().replace("https%3A%2F%2Fnestwatch.appmire.be", "HTTPS%3A%2F%2FNestwatch.Appmire.BE%2F"), "invitation": invitation_json(&relayed)}),
     ];
     let invalid = vec![
         json!({"name": "wrong-scheme", "uri": uri.replace("nestwatch://", "http://")}),
@@ -747,9 +761,13 @@ fn generate_invitations() -> Value {
         json!({"name": "duplicate-key", "uri": format!("{uri}&v=1")}),
         json!({"name": "name-too-long", "uri": minimal.to_uri().unwrap().replace("&n=", &format!("&n={}", "x".repeat(65)))}),
         json!({"name": "bad-endpoint", "uri": format!("{uri}&a=fd7a%3A%3A1%3A47100")}),
+        json!({"name": "relay-without-mailbox", "uri": format!("{uri}&r=https%3A%2F%2Fnestwatch.appmire.be")}),
+        json!({"name": "mailbox-without-relay", "uri": format!("{uri}&m=PD0-P0BBQkNERUZHSElKSw")}),
+        json!({"name": "relay-with-path", "uri": format!("{uri}&r=https%3A%2F%2Fnestwatch.appmire.be%2Fnwr%2F1&m=PD0-P0BBQkNERUZHSElKSw")}),
+        json!({"name": "short-mailbox", "uri": format!("{uri}&r=https%3A%2F%2Fnestwatch.appmire.be&m=AAAA")}),
     ];
     json!({
-        "description": "Invitation URIs (protocol.md §3.5). Keys and tokens are base64url without padding in the URI; hex here. Percent-encoding leaves only RFC 3986 unreserved characters unescaped.",
+        "description": "Invitation URIs (protocol.md §3.5) with the optional relay parameters r and m (rendezvous.md §3.2, OPEN-QUESTIONS RELAY-1). Keys, tokens and mailbox IDs are base64url without padding in the URI; hex here. Percent-encoding leaves only RFC 3986 unreserved characters unescaped.",
         "vectors": vectors,
         "parse_only": parse_only,
         "invalid": invalid,
@@ -1032,6 +1050,10 @@ fn invitation_from_json(v: &Value) -> Invitation {
             .iter()
             .map(|e| Endpoint::parse(s(e)).unwrap())
             .collect(),
+        relay: v.get("relay").map(|r| RelayRef {
+            server: s(&r["server"]).into(),
+            mailbox: unhex(s(&r["mailbox"])).try_into().unwrap(),
+        }),
     }
 }
 

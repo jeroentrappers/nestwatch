@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Invitation URIs (protocol.md §3.5).
+//! Invitation URIs (protocol.md §3.5), with the optional relay parameters
+//! `r` and `m` (rendezvous.md §3.2).
 
 use base64::Engine as _;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
@@ -17,6 +18,10 @@ pub const STATION_KEY_LEN: usize = 32;
 pub const INVITE_TOKEN_LEN: usize = 16;
 /// Maximum endpoints in an invitation (protocol.md §3.5).
 pub const MAX_INVITE_ENDPOINTS: usize = 8;
+/// Mailbox ID length (rendezvous.md §3.2).
+pub const MAILBOX_ID_LEN: usize = 16;
+/// Longest relay server origin accepted (OPEN-QUESTIONS RELAY-1).
+pub const MAX_RELAY_ORIGIN_LEN: usize = 255;
 
 /// Characters left unescaped: RFC 3986 unreserved (`ALPHA DIGIT - . _ ~`).
 const COMPONENT: &AsciiSet = &NON_ALPHANUMERIC
@@ -54,6 +59,55 @@ pub enum InviteError {
     Endpoint(#[from] EndpointError),
 }
 
+/// The relay server and mailbox of a station (rendezvous.md §3.2): the
+/// invitation parameters `r` and `m`.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RelayRef {
+    /// Server origin in normalised form ([`normalize_relay_origin`]), e.g.
+    /// `https://nestwatch.appmire.be`.
+    pub server: String,
+    /// The station's mailbox ID.
+    pub mailbox: [u8; MAILBOX_ID_LEN],
+}
+
+/// Validates and normalises a relay server origin (rendezvous.md §3.1,
+/// OPEN-QUESTIONS RELAY-1): `http` or `https` scheme, a host (DNS name,
+/// IPv4 or bracketed IPv6 literal) and an optional port, nothing else. A
+/// single trailing `/` is dropped; scheme and host are lower-cased.
+pub fn normalize_relay_origin(origin: &str) -> Option<String> {
+    let origin = origin.trim();
+    let origin = origin.strip_suffix('/').unwrap_or(origin);
+    if origin.is_empty() || origin.len() > MAX_RELAY_ORIGIN_LEN {
+        return None;
+    }
+    let (scheme, rest) = origin.split_once("://")?;
+    let scheme = scheme.to_ascii_lowercase();
+    if scheme != "http" && scheme != "https" {
+        return None;
+    }
+    // host[:port] only: no userinfo, path, query or fragment.
+    if rest.is_empty() || rest.contains(['/', '?', '#', '@', '\\']) {
+        return None;
+    }
+    // A port is present if the text after the last `:` follows the host
+    // (not inside a bracketed IPv6 literal, and not a bare IPv6 literal).
+    let has_port = match rest.rfind(':') {
+        None => false,
+        Some(i) if rest.starts_with('[') => rest[..i].ends_with(']'),
+        Some(_) => rest.matches(':').count() == 1,
+    };
+    if !has_port && !rest.starts_with('[') && rest.contains(':') {
+        return None;
+    }
+    let host = if has_port {
+        Endpoint::parse(rest).ok()?.to_string()
+    } else {
+        let e = Endpoint::parse(&format!("{rest}:1")).ok()?.to_string();
+        e.strip_suffix(":1")?.to_owned()
+    };
+    Some(format!("{scheme}://{}", host.to_ascii_lowercase()))
+}
+
 /// A parsed invitation (protocol.md §3.5).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invitation {
@@ -65,6 +119,9 @@ pub struct Invitation {
     pub name: String,
     /// Endpoints in preference order, at most [`MAX_INVITE_ENDPOINTS`].
     pub endpoints: Vec<Endpoint>,
+    /// Relay server and mailbox (`r`, `m`), when the station is reachable
+    /// through a relay (rendezvous.md §3.2).
+    pub relay: Option<RelayRef>,
 }
 
 fn decode_fixed<const N: usize>(v: &str, key: &'static str) -> Result<[u8; N], InviteError> {
@@ -97,7 +154,7 @@ fn decode_component(v: &str, key: &'static str) -> Result<String, InviteError> {
 
 impl Invitation {
     /// Builds the `nestwatch://invite?...` URI with parameters in the order
-    /// `v, s, t, n, a...`.
+    /// `v, s, t, n, a..., r, m`.
     pub fn to_uri(&self) -> Result<String, InviteError> {
         if self.name.len() > MAX_NAME_LEN {
             return Err(InviteError::NameTooLong);
@@ -115,11 +172,20 @@ impl Invitation {
             uri.push_str("&a=");
             uri.extend(utf8_percent_encode(&e.to_string(), COMPONENT));
         }
+        if let Some(relay) = &self.relay {
+            let server =
+                normalize_relay_origin(&relay.server).ok_or(InviteError::InvalidParameter("r"))?;
+            uri.push_str("&r=");
+            uri.extend(utf8_percent_encode(&server, COMPONENT));
+            uri.push_str("&m=");
+            uri.push_str(&URL_SAFE_NO_PAD.encode(relay.mailbox));
+        }
         Ok(uri)
     }
 
     /// Parses a `nestwatch://invite?...` URI. Unknown parameters are ignored;
     /// `v`, `s` and `t` are required; endpoints after the eighth are ignored.
+    /// `r` and `m` are optional but only valid together (RELAY-1).
     pub fn parse(uri: &str) -> Result<Self, InviteError> {
         let uri = uri.trim();
         let query = uri
@@ -129,6 +195,7 @@ impl Invitation {
             .ok_or(InviteError::NotAnInvitation)?;
         let query = query.split('#').next().unwrap_or_default();
         let (mut v, mut s, mut t, mut n) = (None, None, None, None);
+        let (mut r, mut m) = (None, None);
         let mut endpoints = Vec::new();
         for pair in query.split('&').filter(|p| !p.is_empty()) {
             let (key, value) = pair.split_once('=').unwrap_or((pair, ""));
@@ -137,6 +204,8 @@ impl Invitation {
                 "s" => set_once(&mut s, value, "s")?,
                 "t" => set_once(&mut t, value, "t")?,
                 "n" => set_once(&mut n, value, "n")?,
+                "r" => set_once(&mut r, value, "r")?,
+                "m" => set_once(&mut m, value, "m")?,
                 "a" if endpoints.len() < MAX_INVITE_ENDPOINTS => {
                     endpoints.push(Endpoint::parse(&decode_component(value, "a")?)?);
                 }
@@ -155,11 +224,22 @@ impl Invitation {
         if name.len() > MAX_NAME_LEN {
             return Err(InviteError::NameTooLong);
         }
+        let relay = match (r, m) {
+            (None, None) => None,
+            (Some(_), None) => return Err(InviteError::MissingParameter("m")),
+            (None, Some(_)) => return Err(InviteError::MissingParameter("r")),
+            (Some(r), Some(m)) => Some(RelayRef {
+                server: normalize_relay_origin(&decode_component(r, "r")?)
+                    .ok_or(InviteError::InvalidParameter("r"))?,
+                mailbox: decode_fixed(m, "m")?,
+            }),
+        };
         Ok(Self {
             station_key,
             token,
             name,
             endpoints,
+            relay,
         })
     }
 
@@ -214,6 +294,89 @@ mod tests {
                 Endpoint::parse("100.101.102.103:47100").unwrap(),
                 Endpoint::parse("[fd7a:115c:a1e0::7]:47100").unwrap(),
             ],
+            relay: None,
+        }
+    }
+
+    #[test]
+    fn relay_parameters() {
+        let mut s = sample();
+        s.relay = Some(RelayRef {
+            server: "https://nestwatch.appmire.be".into(),
+            mailbox: core::array::from_fn(|i| i as u8 * 3),
+        });
+        let uri = s.to_uri().unwrap();
+        assert!(uri.ends_with("&r=https%3A%2F%2Fnestwatch.appmire.be&m=AAMGCQwPEhUYGx4hJCcqLQ"));
+        assert_eq!(Invitation::parse(&uri).unwrap(), s);
+        let web = s.to_web_url("http://10.0.0.1:47180").unwrap();
+        assert_eq!(Invitation::parse_web_url(&web).unwrap(), s);
+        // Older parsers ignore r/m; without them the invitation is plain.
+        let plain = uri.split("&r=").next().unwrap();
+        assert_eq!(Invitation::parse(plain).unwrap().relay, None);
+        // Only together, well-formed, once.
+        let (head, tail) = uri.split_once("&m=").unwrap();
+        assert_eq!(
+            Invitation::parse(head),
+            Err(InviteError::MissingParameter("m"))
+        );
+        let no_r = format!("{}&m={tail}", uri.split("&r=").next().unwrap());
+        assert_eq!(
+            Invitation::parse(&no_r),
+            Err(InviteError::MissingParameter("r"))
+        );
+        assert_eq!(
+            Invitation::parse(&format!("{head}&m=AAAA")),
+            Err(InviteError::InvalidParameter("m"))
+        );
+        assert_eq!(
+            Invitation::parse(&format!("{uri}&m={tail}")),
+            Err(InviteError::DuplicateParameter("m"))
+        );
+        let bad_r = uri.replace("https%3A%2F%2F", "ftp%3A%2F%2F");
+        assert_eq!(
+            Invitation::parse(&bad_r),
+            Err(InviteError::InvalidParameter("r"))
+        );
+        s.relay.as_mut().unwrap().server = "https://x/path".into();
+        assert_eq!(s.to_uri(), Err(InviteError::InvalidParameter("r")));
+    }
+
+    #[test]
+    fn relay_origins() {
+        let ok = [
+            (
+                "https://nestwatch.appmire.be",
+                "https://nestwatch.appmire.be",
+            ),
+            ("HTTPS://Relay.Example.ORG/", "https://relay.example.org"),
+            ("http://127.0.0.1:8740", "http://127.0.0.1:8740"),
+            ("https://[2001:DB8::1]:8443", "https://[2001:db8::1]:8443"),
+            ("https://[2001:db8::1]", "https://[2001:db8::1]"),
+            ("https://relay.example:443", "https://relay.example:443"),
+        ];
+        for (input, want) in ok {
+            assert_eq!(
+                normalize_relay_origin(input).as_deref(),
+                Some(want),
+                "{input}"
+            );
+        }
+        let bad = [
+            "",
+            "relay.example",
+            "wss://relay.example",
+            "https://",
+            "https://relay.example/nwr/1",
+            "https://user@relay.example",
+            "https://relay.example?x",
+            "https://relay.example#x",
+            "https://2001:db8::1",
+            "https://relay.example:0",
+            "https://relay.example:99999",
+            "https://bad host",
+        ];
+        for input in bad {
+            assert_eq!(normalize_relay_origin(input), None, "{input}");
         }
     }
 
