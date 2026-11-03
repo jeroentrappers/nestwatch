@@ -20,6 +20,7 @@ pub mod jitter;
 pub mod level;
 pub mod mixer;
 pub mod resample;
+pub mod video;
 
 pub use error::MediaError;
 pub use frame::{AudioFrame, CodecId, FrameFlags};
