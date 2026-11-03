@@ -12,8 +12,8 @@ use dioxus::prelude::*;
 use crate::backend::{Backend, LocalFuture, Ui};
 use crate::model::{
     CameraHere, Capabilities, Conn, Frame, Gain, LevelHistory, ListenerModel, ListenerRow, Mode,
-    Nearby, NetPath, PairOutcome, PairingModel, Platform, Prefs, StationModel, StationRun,
-    StationSettingsModel, Talk, Theme, Tile, TileSettings, TrustedRow, UiError, Video,
+    Nearby, NetPath, PairOutcome, PairingModel, Platform, Prefs, RelayView, StationModel,
+    StationRun, StationSettingsModel, Talk, Theme, Tile, TileSettings, TrustedRow, UiError, Video,
 };
 
 /// Timer of the hosting platform.
@@ -113,6 +113,7 @@ pub fn demo_listener() -> ListenerModel {
     nursery.alerting = true;
     let mut leo = tile(LEO, "Leo's room");
     leo.charging = Some(true);
+    leo.path = Some(NetPath::Relayed);
     let mut grandma = tile(GRANDMA, "Grandma's");
     grandma.conn = Conn::Reconnecting {
         attempt: 3,
@@ -162,6 +163,7 @@ pub fn demo_station() -> StationModel {
                 talking: false,
                 watching: true,
                 web: false,
+                relayed: true,
             },
             ListenerRow {
                 session: 2,
@@ -173,6 +175,7 @@ pub fn demo_station() -> StationModel {
                 talking: false,
                 watching: false,
                 web: true,
+                relayed: false,
             },
         ],
         camera_on: true,
@@ -197,6 +200,8 @@ pub fn demo_station() -> StationModel {
             talk_enabled: true,
             talkback_volume: 0.8,
             gain: Gain::Auto,
+            relay_enabled: true,
+            relay_server: "https://nestwatch.appmire.be".into(),
         },
         fingerprint: Some("3A:9F:12:C4:7E:08:B1:55:2D:6A:90:EE:41:7C:D3:28:5B:0F:A6:19:84:C2:7D:E3:11:4B:9A:60:F5:2E:8C:D7".into()),
         http_url: Some("http://192.168.1.20:47180/".into()),
@@ -204,6 +209,7 @@ pub fn demo_station() -> StationModel {
         battery: Some(82),
         charging: Some(false),
         camera_here: CameraHere::Available,
+        relay: RelayView::Online,
     }
 }
 
@@ -457,6 +463,7 @@ impl Backend for DemoBackend {
             m.pairing = Some(PairingModel {
                 invite_uri: "nestwatch://invite?v=1&s=q2X8Yb5Nw1Kc7Rt3Vm9Lp4Hd6Fg0Js2Az8Ce5Ui1Oy3&t=Z9x8W7v6U5t4S3r2Q1p0Ng&n=Nursery&a=192.168.1.20%3A47100&a=100.101.102.103%3A47100".into(),
                 web_url: Some("http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1".into()),
+                relay_web_url: Some("https://nestwatch.appmire.be/app/#nestwatch%3A%2F%2Finvite%3Fv%3D1".into()),
                 code: "7KQ2M-X9RTA".into(),
                 remaining_ms: 552_000,
                 pairings: 0,
@@ -485,6 +492,36 @@ impl Backend for DemoBackend {
         {
             m.name = name.to_owned();
         }
+        Ok(())
+    }
+
+    fn set_relay_enabled(&self, on: bool) -> Result<(), UiError> {
+        if let Some(mut ui) = self.ui.get()
+            && let StationRun::Running(m) = &mut *ui.station.write()
+        {
+            m.settings.relay_enabled = on;
+            m.relay = if on {
+                RelayView::Online
+            } else {
+                RelayView::Off
+            };
+        }
+        Ok(())
+    }
+
+    fn set_relay_server(&self, origin: &str) -> Result<(), UiError> {
+        if !origin.starts_with("https://") && !origin.starts_with("http://") {
+            return Err(UiError::Other(crate::strings::RELAY_SERVER_INVALID.into()));
+        }
+        if let Some(mut ui) = self.ui.get()
+            && let StationRun::Running(m) = &mut *ui.station.write()
+        {
+            m.settings.relay_server = origin.trim_end_matches('/').to_owned();
+        }
+        Ok(())
+    }
+
+    fn reset_relay_identity(&self) -> Result<(), UiError> {
         Ok(())
     }
 }

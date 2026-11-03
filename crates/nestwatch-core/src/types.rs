@@ -36,13 +36,18 @@ impl ListenMode {
     }
 }
 
-/// Transport flavour of a session (protocol.md §3.2, §3.3).
+/// Transport flavour of a session (protocol.md §3.2, §3.3; rendezvous.md
+/// §4.2, §5.2).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Transport {
     /// TCP.
     Tcp,
     /// WebSocket (browser listeners).
     WebSocket,
+    /// A relay pipe through the rendezvous server (WebSocket framing).
+    Relayed,
+    /// The direct QUIC path opened by hole punching (TCP framing).
+    Direct,
 }
 
 impl From<nestwatch_net::LinkKind> for Transport {
@@ -57,8 +62,8 @@ impl From<nestwatch_net::LinkKind> for Transport {
 impl Transport {
     pub(crate) fn flavor(self) -> nestwatch_session::Flavor {
         match self {
-            Self::Tcp => nestwatch_session::Flavor::Tcp,
-            Self::WebSocket => nestwatch_session::Flavor::WebSocket,
+            Self::Tcp | Self::Direct => nestwatch_session::Flavor::Tcp,
+            Self::WebSocket | Self::Relayed => nestwatch_session::Flavor::WebSocket,
         }
     }
 }

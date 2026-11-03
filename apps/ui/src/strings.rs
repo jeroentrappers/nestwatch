@@ -108,6 +108,8 @@ pub const MODE_SOUND_ACTIVATED: &str = "sound-activated";
 pub const MODE_ALWAYS_ON: &str = "always on";
 /// Listener uses the browser.
 pub const VIA_BROWSER: &str = "browser";
+/// Listener row: connected through the relay server.
+pub const VIA_RELAY: &str = "relayed";
 /// Hearing now.
 pub const HEARING: &str = "hearing the room";
 /// Talking now.
@@ -159,6 +161,63 @@ pub const HTTPS_FINGERPRINT_HINT: &str =
 pub const BROWSER_ADDRESS: &str = "Browser address";
 /// Camera unavailable on this station.
 pub const CAMERA_UNAVAILABLE_HERE: &str = "No camera found";
+
+// ----- relay (station, rendezvous.md FR-RV-1, §7) ----------------------------
+
+/// Relay setting.
+pub const RELAY_TITLE: &str = "Reachable through a relay server";
+/// What the relay is for.
+pub const RELAY_INTRO: &str = "Lets your listeners reach this station when a direct connection is not possible, for example on mobile data, guest Wi-Fi or another network. On your home network nothing changes.";
+/// What the server operator can see (rendezvous.md §7).
+pub const RELAY_CAN_SEE: &str = "The server can see that this station is online, its public IP address, which IP addresses connect to it and when, and how much data flows.";
+/// What the server cannot see (rendezvous.md §7).
+pub const RELAY_CANNOT_SEE: &str = "It cannot see or hear anything else: audio, video, messages, device names, pairing codes and keys are encrypted end to end between your devices, and invitations never pass through it.";
+/// Traffic analysis note (rendezvous.md §7).
+pub const RELAY_TRAFFIC_NOTE: &str =
+    "With sound activation, the amount of data can show when there is sound in the room.";
+/// Heading of the "can see" paragraph.
+pub const RELAY_CAN_SEE_HEADING: &str = "What the server can see";
+/// Heading of the "cannot see" paragraph.
+pub const RELAY_CANNOT_SEE_HEADING: &str = "What it cannot see";
+/// Server address field.
+pub const RELAY_SERVER: &str = "Relay server";
+/// Server address hint (FR-RV-6).
+pub const RELAY_SERVER_HINT: &str =
+    "Keep the Nestwatch server or enter the address of your own (https://…).";
+/// Invalid server address.
+pub const RELAY_SERVER_INVALID: &str = "Enter a server address like https://relay.example.org";
+/// The server set by default.
+pub fn relay_server_named(server: &str) -> String {
+    format!("Server: {server}")
+}
+/// Status pill: off.
+pub const RELAY_OFF: &str = "Relay off";
+/// Status pill: connecting.
+pub const RELAY_CONNECTING: &str = "Connecting to relay…";
+/// Status pill: registered.
+pub const RELAY_ONLINE: &str = "Reachable via relay";
+/// Status pill: failed.
+pub const RELAY_ERROR: &str = "Relay unreachable";
+/// Status pill: refused for good.
+pub const RELAY_REFUSED: &str = "Relay refused this station";
+/// Hint for a permanent refusal.
+pub const RELAY_REFUSED_HINT: &str = "Reset the relay identity or choose another server.";
+/// Reset relay identity.
+pub const RELAY_RESET: &str = "Reset relay identity";
+/// What resetting means.
+pub const RELAY_RESET_HINT: &str = "Creates a new relay address for this station. Listeners that use the relay need a new invitation.";
+/// Confirm the reset.
+pub const RELAY_RESET_CONFIRM: &str = "Reset now";
+/// Setup question (asked once).
+pub const RELAY_SETUP_TITLE: &str = "Reach this station from anywhere?";
+/// Setup: opt in.
+pub const RELAY_SETUP_YES: &str = "Use the relay server";
+/// Setup: keep it off.
+pub const RELAY_SETUP_NO: &str = "Not now";
+/// Setup footnote.
+pub const RELAY_SETUP_LATER: &str = "You can change this at any time in the station settings.";
+/// Pairing sheet: the relay link.
+pub const PAIR_RELAY_LINK: &str = "Link via relay";
 /// Camera permission denied on this station.
 pub const CAMERA_DENIED_HERE: &str = "Camera permission denied";
 
@@ -299,6 +358,10 @@ pub const STATUS_YOU_TALK: &str = "You are talking";
 pub const PATH_LAN: &str = "home network";
 /// Path: VPN.
 pub const PATH_VPN: &str = "via VPN";
+/// Path: hole-punched across the internet (rendezvous.md FR-RV-4).
+pub const PATH_DIRECT: &str = "direct (internet)";
+/// Path: through the relay server (rendezvous.md FR-RV-4).
+pub const PATH_RELAYED: &str = "relayed";
 /// Trying addresses.
 pub fn trying_addresses(n: usize) -> String {
     match n {

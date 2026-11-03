@@ -8,6 +8,7 @@ pub mod camera;
 pub mod common;
 pub mod listener;
 pub mod notices;
+pub mod relay;
 pub mod settings_panel;
 pub mod station;
 pub mod welcome;

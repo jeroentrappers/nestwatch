@@ -134,7 +134,7 @@ async fn fr_net_3_remembers_working_addresses_in_order_of_success() {
     assert_eq!(s.stations[0].route.as_deref(), Some(good.as_str()));
     assert_eq!(
         s.stations[0].path,
-        Some(nestwatch_core::listener::NetPath::Lan)
+        Some(nestwatch_core::listener::NetPath::HomeNetwork)
     );
     station.shutdown().await;
     l.shutdown().await;

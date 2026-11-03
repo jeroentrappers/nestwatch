@@ -7,12 +7,18 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.nestwatch.android.R
 import org.nestwatch.android.core.LevelHistory
+import org.nestwatch.android.core.RelayLook
+import org.nestwatch.android.core.pathLabel
+import org.nestwatch.android.core.relayLook
 import org.nestwatch.android.core.clampThreshold
 import org.nestwatch.android.core.fractionToDb
 import org.nestwatch.android.core.levelFraction
 import org.nestwatch.android.ui.screens.QrDecoder
 import org.nestwatch.android.ui.screens.clock
+import org.nestwatch.ffi.NetworkPath
+import org.nestwatch.ffi.RelayStatus
 
 class LogicTest {
     @Test
@@ -68,5 +74,22 @@ class LogicTest {
         val y = ByteArray(w * h) { i -> if (m.get(i % w, i / w)) 0 else 255.toByte() }
         assertEquals(text, QrDecoder().decode(y, w, w, h))
         assertNull(QrDecoder().decode(ByteArray(w * h) { 127 }, w, w, h))
+    }
+
+    @Test
+    fun pathLabelsCoverEveryPath() {
+        // FR-LS-3, rendezvous.md FR-RV-4.
+        assertEquals(R.string.path_lan, pathLabel(NetworkPath.LAN))
+        assertEquals(R.string.path_vpn, pathLabel(NetworkPath.VPN))
+        assertEquals(R.string.path_direct, pathLabel(NetworkPath.DIRECT))
+        assertEquals(R.string.path_relayed, pathLabel(NetworkPath.RELAYED))
+    }
+
+    @Test
+    fun relayStatusPills() {
+        assertEquals(RelayLook.Off, relayLook(RelayStatus.Off))
+        assertEquals(RelayLook.Connecting, relayLook(RelayStatus.Connecting))
+        assertEquals(RelayLook.Online, relayLook(RelayStatus.Online("203.0.113.9:4000")))
+        assertEquals(RelayLook.Error, relayLook(RelayStatus.Error("offline", false)))
     }
 }

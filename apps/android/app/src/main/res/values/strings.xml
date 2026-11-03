@@ -163,6 +163,30 @@
     <string name="status_you_talk">You are talking</string>
     <string name="path_lan">home network</string>
     <string name="path_vpn">via VPN</string>
+    <string name="path_direct">direct (internet)</string>
+    <string name="path_relayed">relayed</string>
+
+    <!-- Relay (rendezvous.md FR-RV-1, §7) -->
+    <string name="relay_title">Reachable through a relay server</string>
+    <string name="relay_server_is">Server: %1$s</string>
+    <string name="relay_explain">When home Wi-Fi or a VPN cannot reach this station, listeners can connect through a relay server. Everything stays end-to-end encrypted between your own devices.</string>
+    <string name="relay_can_see">What the server can see: that this station is online, its public IP address, which addresses connect to it and when, and how much data flows.</string>
+    <string name="relay_cannot_see">What it cannot see: audio, video, messages, device names, pairing codes or keys.</string>
+    <string name="relay_server">Server address</string>
+    <string name="relay_server_hint">For example https://nestwatch.appmire.be or your own server</string>
+    <string name="relay_server_invalid">That is not a server address (https://host or https://host:port).</string>
+    <string name="relay_pill">Relay: %1$s</string>
+    <string name="relay_status_off">Off</string>
+    <string name="relay_status_connecting">Connecting</string>
+    <string name="relay_status_online">Online</string>
+    <string name="relay_status_error">Not reachable</string>
+    <string name="relay_reset">Reset relay identity</string>
+    <string name="relay_reset_confirm">Make a new relay identity? Listeners that use the relay need a new invitation from this station.</string>
+    <string name="relay_reset_do">Reset</string>
+    <string name="relay_setup_title">Use the relay server?</string>
+    <string name="relay_setup_yes">Make it reachable</string>
+    <string name="relay_setup_no">Not now</string>
+    <string name="relay_setup_later">You can change this later in settings.</string>
     <string name="trying">trying…</string>
     <plurals name="trying_addresses">
         <item quantity="one">trying 1 address…</item>

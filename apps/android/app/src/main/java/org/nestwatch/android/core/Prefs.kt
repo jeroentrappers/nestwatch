@@ -23,6 +23,8 @@ data class UiPrefs(
     val batteryNoticeDismissed: Boolean = false,
     /** The station was running when the app last stopped. */
     val stationWasRunning: Boolean = false,
+    /** The station setup asked about the relay (rendezvous.md FR-RV-1). */
+    val relayAsked: Boolean = false,
 )
 
 /** Loads and stores [UiPrefs] and publishes them as a flow. */
@@ -39,6 +41,7 @@ class Prefs(context: Context) {
             .getOrDefault(ThemeChoice.System),
         batteryNoticeDismissed = sp.getBoolean("battery-notice", false),
         stationWasRunning = sp.getBoolean("station-running", false),
+        relayAsked = sp.getBoolean("relay-asked", false),
     )
 
     fun update(f: (UiPrefs) -> UiPrefs) {
@@ -53,6 +56,7 @@ class Prefs(context: Context) {
             putString("theme", p.theme.name)
             putBoolean("battery-notice", p.batteryNoticeDismissed)
             putBoolean("station-running", p.stationWasRunning)
+            putBoolean("relay-asked", p.relayAsked)
         }
     }
 }

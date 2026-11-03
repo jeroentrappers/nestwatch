@@ -85,13 +85,17 @@ pub enum Conn {
     NeedsPairing,
 }
 
-/// Network path (FR-LS-3).
+/// Network path (FR-LS-3, rendezvous.md FR-RV-4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NetPath {
     /// Local network.
     Lan,
     /// User VPN.
     Vpn,
+    /// Hole-punched path across the internet.
+    Direct,
+    /// Through the relay server.
+    Relayed,
 }
 
 /// Talk-back state of one tile (FR-TB-1).
@@ -299,6 +303,28 @@ pub struct StationSettingsModel {
     pub talkback_volume: f32,
     /// Gain.
     pub gain: Gain,
+    /// "Reachable through a relay server" (rendezvous.md FR-RV-1).
+    pub relay_enabled: bool,
+    /// The relay server origin (FR-RV-6).
+    pub relay_server: String,
+}
+
+/// Relay registration as shown on the station (rendezvous.md FR-RV-1).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RelayView {
+    /// The setting is off.
+    Off,
+    /// Connecting to the server.
+    Connecting,
+    /// Registered.
+    Online,
+    /// The last attempt failed.
+    Error {
+        /// What went wrong.
+        message: String,
+        /// Only a new identity or another server helps.
+        permanent: bool,
+    },
 }
 
 /// A connected listener row (FR-ST-3).
@@ -322,6 +348,8 @@ pub struct ListenerRow {
     pub watching: bool,
     /// Browser listener.
     pub web: bool,
+    /// Connected through the relay server.
+    pub relayed: bool,
 }
 
 /// A paired listener (FR-ST-7).
@@ -344,6 +372,9 @@ pub struct PairingModel {
     pub invite_uri: String,
     /// Browser address with the invitation fragment.
     pub web_url: Option<String>,
+    /// The browser listener on the relay server with the invitation
+    /// fragment (rendezvous.md FR-RV-5).
+    pub relay_web_url: Option<String>,
     /// Code `XXXXX-XXXXX`.
     pub code: String,
     /// Time left.
@@ -398,6 +429,8 @@ pub struct StationModel {
     pub charging: Option<bool>,
     /// Camera availability.
     pub camera_here: CameraHere,
+    /// Relay registration.
+    pub relay: RelayView,
 }
 
 /// Station run state as the UI sees it.
@@ -540,6 +573,8 @@ pub struct Prefs {
     pub theme: Theme,
     /// The station should run on launch (desktop).
     pub station_autostart: bool,
+    /// The station setup asked about the relay (rendezvous.md FR-RV-1).
+    pub relay_asked: bool,
 }
 
 impl Prefs {
@@ -556,9 +591,10 @@ impl Prefs {
             Theme::Day => "day",
         };
         format!(
-            "v=1\nrole={role}\ndisclaimer={}\ntheme={theme}\nstation_autostart={}\n",
+            "v=1\nrole={role}\ndisclaimer={}\ntheme={theme}\nstation_autostart={}\nrelay_asked={}\n",
             u8::from(self.disclaimer_ok),
-            u8::from(self.station_autostart)
+            u8::from(self.station_autostart),
+            u8::from(self.relay_asked)
         )
     }
 
@@ -577,6 +613,7 @@ impl Prefs {
                 ("theme", "night") => p.theme = Theme::Night,
                 ("theme", "day") => p.theme = Theme::Day,
                 ("station_autostart", v) => p.station_autostart = v == "1",
+                ("relay_asked", v) => p.relay_asked = v == "1",
                 _ => {}
             }
         }
@@ -653,6 +690,7 @@ mod tests {
             disclaimer_ok: true,
             theme: Theme::Day,
             station_autostart: true,
+            relay_asked: true,
         };
         assert_eq!(Prefs::decode(&p.encode()), p);
         assert_eq!(Prefs::decode("garbage\nrole=alien"), Prefs::default());

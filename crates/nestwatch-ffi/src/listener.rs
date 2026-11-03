@@ -188,13 +188,17 @@ pub enum Connection {
     NeedsPairing,
 }
 
-/// Network path of a live session (FR-LS-3).
+/// Network path of a live session (FR-LS-3, rendezvous.md FR-RV-4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
 pub enum NetworkPath {
-    /// Local network.
+    /// Local network ("home network").
     Lan,
     /// User-operated VPN.
     Vpn,
+    /// Hole-punched path across the internet ("direct (internet)").
+    Direct,
+    /// Through the relay server ("relayed").
+    Relayed,
 }
 
 /// Talk-back state with one station (FR-TB-1).
@@ -689,6 +693,13 @@ impl Listener {
         media::i16_to_le(&out)
     }
 
+    /// Tells the engine the device's network changed (Android
+    /// `ConnectivityManager` callback): reconnects retry at once and
+    /// relayed sessions try a direct path again (rendezvous.md §5.2).
+    pub fn network_changed(&self) {
+        self.engine.network_changed();
+    }
+
     /// Reports a station found by the platform's DNS-SD browser.
     pub fn add_discovered(&self, service: DiscoveredService) -> Result<(), NestwatchError> {
         let txt = nestwatch_proto::StationTxt::from_pairs(
@@ -857,8 +868,10 @@ fn tile(v: &StationView) -> StationTile {
         name: v.name.clone(),
         connection: connection(&v.status),
         path: v.path.map(|p| match p {
-            NetPath::Lan => NetworkPath::Lan,
+            NetPath::HomeNetwork => NetworkPath::Lan,
             NetPath::Vpn => NetworkPath::Vpn,
+            NetPath::Direct => NetworkPath::Direct,
+            NetPath::Relayed => NetworkPath::Relayed,
         }),
         route: v.route.clone(),
         level_dbfs: v.level_dbfs,

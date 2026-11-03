@@ -14,11 +14,11 @@ use std::time::Duration;
 
 use clap::{Parser, Subcommand};
 use nestwatch_core::listener::{
-    ConnStatus, ListenSettings, ListenerConfig, ListenerEngine, ListenerEvent, Route,
+    ConnStatus, ListenSettings, ListenerConfig, ListenerEngine, ListenerEvent, NetPath, Route,
 };
 use nestwatch_core::station::{
-    AssetSource, BindScope, ListenConfig, StationConfig, StationEngine, StationEvent, WebConfig,
-    WebOptions,
+    AssetSource, BindScope, ListenConfig, RelayStatus, StationConfig, StationEngine, StationEvent,
+    WebConfig, WebOptions,
 };
 use nestwatch_core::{DirStorage, Endpoint, Storage, SystemClock, grouped_id};
 
@@ -95,6 +95,24 @@ struct StationArgs {
     /// the CLI has no camera otherwise).
     #[arg(long)]
     test_camera: bool,
+    /// Make the station reachable through this relay server (e.g.
+    /// https://nestwatch.appmire.be or a self-hosted origin); kept for later
+    /// runs.
+    #[arg(long, value_name = "ORIGIN", conflicts_with = "no_relay")]
+    relay: Option<String>,
+    /// Turn the relay off (kept for later runs).
+    #[arg(long)]
+    no_relay: bool,
+    /// Make a new relay mailbox; listeners need a new invitation.
+    #[arg(long)]
+    reset_relay_identity: bool,
+    /// Put no direct endpoints into invitations (reachable through the
+    /// relay only).
+    #[arg(long, conflicts_with = "endpoints")]
+    no_endpoints: bool,
+    /// STUN port of the relay server instead of 3478.
+    #[arg(long, value_name = "PORT")]
+    relay_stun_port: Option<u16>,
 }
 
 #[derive(Parser, Debug)]
@@ -129,6 +147,12 @@ struct ListenArgs {
     /// Stop after this many seconds.
     #[arg(long, value_name = "SECS")]
     duration: Option<u64>,
+    /// STUN port of relay servers instead of 3478.
+    #[arg(long, value_name = "PORT")]
+    relay_stun_port: Option<u16>,
+    /// Stay on the relay; do not punch a direct path.
+    #[arg(long)]
+    no_direct: bool,
 }
 
 fn data_dir(cli: &Cli) -> PathBuf {
@@ -227,6 +251,13 @@ async fn run_station(a: StationArgs, storage: Arc<dyn Storage>) -> Result<(), St
         }
         cfg.endpoints = Some(eps);
     }
+    if a.no_endpoints {
+        cfg.endpoints = Some(Vec::new());
+    }
+    cfg.relay.stun_port = a.relay_stun_port;
+    if a.loopback {
+        cfg.relay.punch_bind = std::net::SocketAddr::from(([127, 0, 0, 1], 0));
+    }
     if !a.no_web {
         let defaults = WebConfig::default();
         let http = defaults.http.unwrap_or_default();
@@ -252,6 +283,19 @@ async fn run_station(a: StationArgs, storage: Arc<dyn Storage>) -> Result<(), St
     {
         station.rename(n).map_err(|e| e.to_string())?;
     }
+    if let Some(origin) = &a.relay {
+        station
+            .set_relay_server(origin)
+            .map_err(|e| e.to_string())?;
+        station.set_relay_enabled(true).map_err(|e| e.to_string())?;
+    } else if a.no_relay {
+        station
+            .set_relay_enabled(false)
+            .map_err(|e| e.to_string())?;
+    }
+    if a.reset_relay_identity {
+        station.reset_relay_identity().map_err(|e| e.to_string())?;
+    }
     let s = station.snapshot();
     println!("station {} id {}", s.name, grouped_id(&s.device_id));
     println!(
@@ -270,9 +314,13 @@ async fn run_station(a: StationArgs, storage: Arc<dyn Storage>) -> Result<(), St
         if let Some(w) = &info.web_url {
             println!("web: {w}");
         }
+        if let Some(w) = &info.relay_web_url {
+            println!("relay web: {w}");
+        }
         println!("code: {}", info.code);
         print_qr(&info.invite_uri);
     }
+    let relay = spawn_relay_printer(station.clone());
     let source = spawn_source(&a, station.clone())?;
     let test_camera = a.test_camera;
     let camera_station = station.clone();
@@ -306,9 +354,41 @@ async fn run_station(a: StationArgs, storage: Arc<dyn Storage>) -> Result<(), St
     });
     stop_signal(a.duration).await;
     source.abort();
+    relay.abort();
     station.shutdown().await;
     printer.abort();
     Ok(())
+}
+
+/// Prints relay registration changes (rendezvous.md §4.1).
+fn spawn_relay_printer(station: StationEngine) -> tokio::task::JoinHandle<()> {
+    tokio::spawn(async move {
+        let mut st = station.state();
+        let mut last: Option<RelayStatus> = None;
+        loop {
+            let (relay, server) = {
+                let s = st.borrow_and_update();
+                (s.relay.clone(), s.settings.relay_server.clone())
+            };
+            if last.as_ref() != Some(&relay) {
+                match &relay {
+                    RelayStatus::Off => println!("relay: off"),
+                    RelayStatus::Connecting => println!("relay: connecting to {server}"),
+                    RelayStatus::Online { observed } => {
+                        println!("relay: online at {server} (seen as {observed})")
+                    }
+                    RelayStatus::Error { message, permanent } => println!(
+                        "relay: {}error: {message}",
+                        if *permanent { "permanent " } else { "" }
+                    ),
+                }
+                last = Some(relay);
+            }
+            if st.changed().await.is_err() {
+                break;
+            }
+        }
+    })
 }
 
 fn print_station_event(e: &StationEvent) {
@@ -522,6 +602,8 @@ async fn discover_pairing_station(l: &ListenerEngine) -> Result<(String, Vec<Rou
 async fn run_listen(a: ListenArgs, storage: Arc<dyn Storage>) -> Result<(), String> {
     let mut cfg = ListenerConfig::new(a.name.clone());
     cfg.discovery = !a.no_mdns;
+    cfg.relay.stun_port = a.relay_stun_port;
+    cfg.relay.direct = !a.no_direct;
     let l = ListenerEngine::start(cfg, storage, Arc::new(SystemClock::new()))
         .map_err(|e| e.to_string())?;
     if l.snapshot().name != a.name {
@@ -589,6 +671,7 @@ async fn run_listen(a: ListenArgs, storage: Arc<dyn Storage>) -> Result<(), Stri
         let l = l.clone();
         tokio::spawn(async move {
             let mut last: Vec<(String, ConnStatus)> = Vec::new();
+            let mut paths: Vec<(String, Option<NetPath>)> = Vec::new();
             let mut tick = tokio::time::interval(Duration::from_secs(1));
             loop {
                 tick.tick().await;
@@ -596,6 +679,15 @@ async fn run_listen(a: ListenArgs, storage: Arc<dyn Storage>) -> Result<(), Stri
                 for v in &s.stations {
                     if !last.iter().any(|(id, st)| id == &v.id && *st == v.status) {
                         println!("{}: {}", v.name, describe_status(&v.status));
+                    }
+                    if v.path.is_some() && !paths.iter().any(|(id, p)| id == &v.id && *p == v.path)
+                    {
+                        println!(
+                            "{}: path {} via {}",
+                            v.name,
+                            describe_path(v.path),
+                            v.route.as_deref().unwrap_or("-")
+                        );
                     }
                     if v.status == ConnStatus::Live {
                         println!(
@@ -613,6 +705,7 @@ async fn run_listen(a: ListenArgs, storage: Arc<dyn Storage>) -> Result<(), Stri
                     .iter()
                     .map(|v| (v.id.clone(), v.status.clone()))
                     .collect();
+                paths = s.stations.iter().map(|v| (v.id.clone(), v.path)).collect();
             }
         })
     };
@@ -629,6 +722,17 @@ async fn run_listen(a: ListenArgs, storage: Arc<dyn Storage>) -> Result<(), Stri
     l.shutdown().await;
     printer.abort();
     Ok(())
+}
+
+/// The tile's path label (rendezvous.md FR-RV-4).
+fn describe_path(p: Option<NetPath>) -> &'static str {
+    match p {
+        Some(NetPath::HomeNetwork) => "home network",
+        Some(NetPath::Vpn) => "VPN",
+        Some(NetPath::Direct) => "direct (internet)",
+        Some(NetPath::Relayed) => "relayed",
+        None => "-",
+    }
 }
 
 fn describe_status(s: &ConnStatus) -> String {
@@ -723,6 +827,7 @@ fn list(storage: &dyn Storage) -> Result<(), String> {
             .routes_by_success()
             .iter()
             .map(ToString::to_string)
+            .chain(s.relay.clone().map(|r| Route::Relay(r).to_string()))
             .collect();
         println!(
             "station {} ({}){}: {}",

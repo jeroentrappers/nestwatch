@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.nestwatch.android.R
 import org.nestwatch.android.core.Nestwatch
+import org.nestwatch.android.core.pathLabel
 import org.nestwatch.android.service.ListenerService
 import org.nestwatch.android.ui.hasPermission
 import org.nestwatch.android.ui.notificationPermission
@@ -44,7 +45,6 @@ import org.nestwatch.android.ui.components.SecondaryButton
 import org.nestwatch.android.ui.theme.nestwatch
 import org.nestwatch.ffi.Connection
 import org.nestwatch.ffi.ListenMode
-import org.nestwatch.ffi.NetworkPath
 import org.nestwatch.ffi.StationTile
 import org.nestwatch.ffi.TalkState
 import kotlin.math.roundToInt
@@ -168,7 +168,7 @@ private fun StationTileView(t: StationTile, solo: String?, onSettings: () -> Uni
                     color = if (it.toInt() < 15 && t.charging != true) nestwatch.amber else nestwatch.text3,
                 )
             }
-            t.path?.let { Caption(stringResource(if (it == NetworkPath.VPN) R.string.path_vpn else R.string.path_lan)) }
+            t.path?.let { Caption(stringResource(pathLabel(it))) }
             if (t.cameraOn) Caption(stringResource(R.string.camera_on), color = nestwatch.honey)
         }
         when (val c = t.connection) {

@@ -2,7 +2,7 @@
 //! Pure presentation logic: level mapping, formatting, status pills and
 //! calibration chart geometry. No Dioxus, no engines; unit tested.
 
-use crate::model::{Conn, ListenerRow, Mode, NetPath, Talk, Tile};
+use crate::model::{Conn, ListenerRow, Mode, NetPath, RelayView, Talk, Tile};
 use crate::strings as s;
 
 /// dBFS shown at the left end of meters (0 %).
@@ -196,6 +196,8 @@ pub fn tile_subtitle(tile: &Tile) -> String {
         Conn::Live => match tile.path {
             Some(NetPath::Vpn) => s::PATH_VPN.into(),
             Some(NetPath::Lan) => s::PATH_LAN.into(),
+            Some(NetPath::Direct) => s::PATH_DIRECT.into(),
+            Some(NetPath::Relayed) => s::PATH_RELAYED.into(),
             None => String::new(),
         },
         Conn::Connecting { tried, .. } | Conn::Reconnecting { tried, .. } => {
@@ -362,7 +364,23 @@ pub fn listener_row_caption(l: &ListenerRow) -> String {
     if l.web {
         parts.push(s::VIA_BROWSER);
     }
+    if l.relayed {
+        parts.push(s::VIA_RELAY);
+    }
     parts.join(" · ")
+}
+
+/// The station's relay status pill (rendezvous.md FR-RV-1).
+pub fn relay_pill(r: &RelayView) -> Pill {
+    match r {
+        RelayView::Off => Pill::new("plain", s::RELAY_OFF),
+        RelayView::Connecting => Pill::new("warn", s::RELAY_CONNECTING),
+        RelayView::Online => Pill::new("calm", s::RELAY_ONLINE),
+        RelayView::Error {
+            permanent: true, ..
+        } => Pill::new("warn", s::RELAY_REFUSED),
+        RelayView::Error { .. } => Pill::new("warn", s::RELAY_ERROR),
+    }
 }
 
 /// "Camera on · Mum": who watches.
@@ -530,6 +548,7 @@ mod tests {
             talking: false,
             watching,
             web: false,
+            relayed: false,
         }
     }
 
@@ -549,6 +568,30 @@ mod tests {
         assert!(anyone_hearing(&open));
         assert_eq!(camera_pill(&rows), format!("{} · Mum", s::CAMERA_ON));
         assert_eq!(listener_row_caption(&rows[1]), "always on · camera");
+        let mut relayed = rows[0].clone();
+        relayed.relayed = true;
+        assert_eq!(listener_row_caption(&relayed), "sound-activated · relayed");
+    }
+
+    #[test]
+    fn fr_rv_4_path_labels_and_relay_pill() {
+        let mut t = tile();
+        for (p, label) in [
+            (NetPath::Lan, "home network"),
+            (NetPath::Vpn, "via VPN"),
+            (NetPath::Direct, "direct (internet)"),
+            (NetPath::Relayed, "relayed"),
+        ] {
+            t.path = Some(p);
+            assert_eq!(tile_subtitle(&t), label);
+        }
+        assert_eq!(relay_pill(&RelayView::Off).classes(), "pill plain");
+        assert_eq!(relay_pill(&RelayView::Online).text, s::RELAY_ONLINE);
+        let refused = RelayView::Error {
+            message: "mailbox-taken".into(),
+            permanent: true,
+        };
+        assert_eq!(relay_pill(&refused).text, s::RELAY_REFUSED);
     }
 
     #[test]

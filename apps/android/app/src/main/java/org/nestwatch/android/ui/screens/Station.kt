@@ -72,6 +72,7 @@ import org.nestwatch.android.ui.components.SecondaryButton
 import org.nestwatch.android.ui.theme.MonoCode
 import org.nestwatch.android.ui.theme.nestwatch
 import org.nestwatch.ffi.ListenMode
+import org.nestwatch.ffi.ListenerTransport
 import org.nestwatch.ffi.StationSnapshot
 import org.nestwatch.ffi.groupedId
 import org.nestwatch.ffi.qrCode
@@ -151,6 +152,7 @@ private fun StatusPills(s: StationSnapshot) {
         )
         s.talker?.let { Pill(stringResource(R.string.talking_through, it), PillKind.Voice) }
         if (!s.settings.talkEnabled) Pill(stringResource(R.string.talk_off), PillKind.Neutral)
+        if (s.settings.relayEnabled) RelayPill(s.relay)
     }
 }
 
@@ -159,6 +161,7 @@ private fun StatusPills(s: StationSnapshot) {
 private fun RunningStation(s: StationSnapshot, onDim: () -> Unit) {
     val context = LocalContext.current
     var pairing by remember { mutableStateOf(false) }
+    RelaySetupPrompt(s)
     StatusPills(s)
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         LevelRing(s.levelDbfs, s.strictestThresholdDbfs, s.soundOpen)
@@ -172,6 +175,11 @@ private fun RunningStation(s: StationSnapshot, onDim: () -> Unit) {
                 val bits = buildList {
                     add(stringResource(if (l.mode == ListenMode.ACTIVATED) R.string.mode_sound_activated else R.string.mode_always_on))
                     if (l.web) add(stringResource(R.string.via_browser))
+                    when (l.transport) {
+                        ListenerTransport.RELAYED -> add(stringResource(R.string.path_relayed))
+                        ListenerTransport.DIRECT -> add(stringResource(R.string.path_direct))
+                        else -> {}
+                    }
                     if (l.open) add(stringResource(R.string.hearing))
                     if (l.talking) add(stringResource(R.string.talking_now))
                     if (l.watching) add(stringResource(R.string.watching_now))

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! Sessions, pairing and the per-station reconnect loop (FR-LS-1,
-//! FR-LS-5, FR-NET-3, FR-PAIR-4).
+//! FR-LS-5, FR-NET-3, FR-PAIR-4), including the relay route and the move
+//! from a relayed to a direct path (rendezvous.md FR-RV-2, FR-RV-3, §5.2).
 
 use std::net::SocketAddr;
 use std::sync::Arc;
@@ -17,9 +18,11 @@ use nestwatch_session::{
 };
 use tokio::sync::{mpsc, oneshot};
 
+use super::relay;
 use super::{
     Alert, Cmd, ConnStatus, Inner, KnownStation, ListenerError, ListenerEvent, NetPath, PairResult,
-    Route, Shared, StationSettings, TalkView, VideoFrameEvent, VideoView, talk_view, video_start,
+    Route, Shared, StationSettings, TalkView, VideoFrameEvent, VideoView, effective_video,
+    talk_view, video_start,
 };
 use crate::pump;
 use crate::rt;
@@ -40,9 +43,38 @@ pub(crate) struct Outcome {
 
 type Reply = oneshot::Sender<Result<PairResult, ListenerError>>;
 
-async fn dial(shared: &Shared, route: &Route) -> Result<Link, String> {
+#[cfg(feature = "native")]
+use super::relay::Punch;
+
+/// Nothing to punch with in the browser.
+#[cfg(not(feature = "native"))]
+pub(crate) enum Punch {}
+
+/// An opened link and what is known about its path.
+pub(crate) struct Dialed {
+    pub link: Link,
+    pub path: NetPath,
+    /// Hole punching material of a relayed link (native).
+    pub punch: Option<Punch>,
+}
+
+async fn dial(shared: &Shared, route: &Route) -> Result<Dialed, String> {
+    if let Route::Relay(r) = route {
+        return relay::dial(shared, r).await;
+    }
+    let link = dial_direct(shared, route).await?;
+    let path = net_path(link.info().peer);
+    Ok(Dialed {
+        link,
+        path,
+        punch: None,
+    })
+}
+
+async fn dial_direct(shared: &Shared, route: &Route) -> Result<Link, String> {
     let timeout = shared.cfg.dial_timeout;
     match route {
+        Route::Relay(_) => Err("not a direct route".into()),
         #[cfg(feature = "native")]
         Route::Tcp(e) => nestwatch_net::dial::dial(e, timeout)
             .await
@@ -71,11 +103,12 @@ async fn dial(shared: &Shared, route: &Route) -> Result<Link, String> {
     }
 }
 
-/// LAN or VPN from the peer address (protocol.md §3.5 ranges).
+/// Home network or VPN from the peer address (protocol.md §3.5 ranges,
+/// CORE-11).
 fn net_path(peer: Option<SocketAddr>) -> NetPath {
     match peer {
         Some(p) if nestwatch_proto::endpoint::is_vpn_address(p.ip()) => NetPath::Vpn,
-        _ => NetPath::Lan,
+        _ => NetPath::HomeNetwork,
     }
 }
 
@@ -94,8 +127,16 @@ fn apply(s: &mut ListenerSession, cmd: Cmd) {
 struct Ctx<'a> {
     shared: &'a Arc<Shared>,
     serial: u64,
-    route: Route,
+    /// The stored route this session uses (none for a punched path).
+    route: Option<Route>,
+    /// Shown as the station's route.
+    label: String,
     path: NetPath,
+    /// Hole punching material of a relayed session.
+    #[cfg_attr(not(feature = "native"), allow(dead_code))]
+    punch: Option<Punch>,
+    /// For a direct session: the relayed session it replaces (§5.2).
+    replaces: Option<u64>,
     tx: mpsc::UnboundedSender<Cmd>,
     reply: Option<Reply>,
     remember: Vec<Route>,
@@ -112,7 +153,7 @@ async fn attempt(
     reply: Option<Reply>,
     remember: Vec<Route>,
 ) -> Outcome {
-    let link = match dial(shared, &route).await {
+    let dialed = match dial(shared, &route).await {
         Ok(l) => l,
         Err(e) => {
             if let Some(r) = reply {
@@ -125,8 +166,36 @@ async fn attempt(
             };
         }
     };
+    let label = route.to_string();
+    run_session(
+        shared,
+        dialed,
+        Some(route),
+        label,
+        mode,
+        station_id,
+        reply,
+        remember,
+        None,
+    )
+    .await
+}
+
+/// Runs one NWP/1 listener session over an opened link until it ends.
+#[allow(clippy::too_many_arguments)]
+pub(super) async fn run_session(
+    shared: &Arc<Shared>,
+    dialed: Dialed,
+    route: Option<Route>,
+    label: String,
+    mode: ListenerMode,
+    station_id: Option<String>,
+    reply: Option<Reply>,
+    remember: Vec<Route>,
+    replaces: Option<u64>,
+) -> Outcome {
+    let Dialed { link, path, punch } = dialed;
     let flavor = crate::types::Transport::from(link.kind()).flavor();
-    let path = net_path(link.info().peer);
     let hello = {
         let g = shared.lock();
         shared.hello(&g)
@@ -153,7 +222,10 @@ async fn attempt(
         shared,
         serial: shared.next_session(),
         route,
+        label,
         path,
+        punch,
+        replaces,
         tx,
         reply,
         remember,
@@ -193,8 +265,11 @@ impl Ctx<'_> {
                     settings: StationSettings::default(),
                     needs_pairing: false,
                     paired_unix_ms: shared.clock.unix_ms(),
+                    relay: None,
                 };
-                known.note_endpoint(&self.route, None);
+                if let Some(r) = &self.route {
+                    known.note_endpoint(r, None);
+                }
                 for r in &self.remember {
                     known.note_endpoint(r, None);
                 }
@@ -225,6 +300,10 @@ impl Ctx<'_> {
                 let Some(id) = self.out.station_id.clone() else {
                     return;
                 };
+                if let Some(old) = self.replaces {
+                    self.switch_path(s, &id, old, station, audio_codec, &status);
+                    return;
+                }
                 let unix = shared.clock.unix_ms();
                 let mut g = shared.lock();
                 let Some(rt) = g.stations.get_mut(&id) else {
@@ -234,8 +313,11 @@ impl Ctx<'_> {
                 rt.cmd = Some((self.serial, self.tx.clone()));
                 rt.status = ConnStatus::Live;
                 rt.path = Some(self.path);
-                rt.route = Some(self.route.to_string());
-                rt.known.note_endpoint(&self.route, Some(unix));
+                rt.route = Some(self.label.clone());
+                rt.draining = None;
+                if let Some(r) = &self.route {
+                    rt.known.note_endpoint(r, Some(unix));
+                }
                 if !station.name.is_empty() {
                     rt.known.name = station.name.clone();
                 }
@@ -247,10 +329,20 @@ impl Ctx<'_> {
                 let _ = s.send_control(Control::Listen(rt.known.settings.listen.to_wire()));
                 if let Some(req) = rt.video_req {
                     rt.video = VideoView::Requested;
-                    let _ = s.send_control(video_start(req));
+                    let _ = s.send_control(video_start(effective_video(req, rt.path)));
                 }
                 if let Some((camera, night)) = rt.video_options {
                     let _ = s.send_control(Control::VideoOptions { camera, night });
+                }
+                #[cfg(feature = "native")]
+                if let Some(p) = self.punch.take() {
+                    rt::spawn(relay::upgrade(
+                        shared.clone(),
+                        id.clone(),
+                        rt.known.key,
+                        self.serial,
+                        p,
+                    ));
                 }
                 let reachable = rt.alerts.on_up();
                 let name = rt.known.name.clone();
@@ -339,6 +431,83 @@ impl Ctx<'_> {
         }
     }
 
+    /// A direct session replacing the relayed session `old` is set up
+    /// (rendezvous.md §5.2 item 4): it takes over the station, the relayed
+    /// session is closed with `replaced`, and the relayed audio already
+    /// buffered keeps playing until the direct stream decodes its first
+    /// frame.
+    fn switch_path(
+        &mut self,
+        s: &mut ListenerSession,
+        id: &str,
+        old: u64,
+        station: nestwatch_proto::control::Hello,
+        audio_codec: u8,
+        status: &StationStatus,
+    ) {
+        let shared = self.shared;
+        let mut g = shared.lock();
+        let Some(rt) = g.stations.get_mut(id) else {
+            s.close(CloseReason::Shutdown, None);
+            return;
+        };
+        match &rt.cmd {
+            Some((serial, tx)) if *serial == old => {
+                let _ = tx.send(Cmd::Close(CloseReason::Replaced));
+                rt.draining = rt.jitter.take();
+            }
+            // The relayed session already ended: just take over.
+            None if rt.following => {}
+            _ => {
+                s.close(CloseReason::Shutdown, None);
+                return;
+            }
+        }
+        let was_live = rt.status == ConnStatus::Live;
+        if let Some(r) = &self.route {
+            rt.known.note_endpoint(r, Some(shared.clock.unix_ms()));
+        }
+        rt.cmd = Some((self.serial, self.tx.clone()));
+        rt.status = ConnStatus::Live;
+        rt.path = Some(self.path);
+        rt.route = Some(self.label.clone());
+        rt.caps = station.caps.clone();
+        if !station.name.is_empty() {
+            rt.known.name = station.name.clone();
+        }
+        rt.codec = Some(CodecId(audio_codec));
+        rt.jitter = JitterBuffer::new(CodecId(audio_codec)).ok();
+        let _ = s.send_control(Control::Listen(rt.known.settings.listen.to_wire()));
+        if let Some(req) = rt.video_req {
+            rt.video = VideoView::Requested;
+            let _ = s.send_control(video_start(effective_video(req, rt.path)));
+        }
+        if let Some((camera, night)) = rt.video_options {
+            let _ = s.send_control(Control::VideoOptions { camera, night });
+        }
+        // Talk-back belongs to a session: ask again on the new one.
+        if matches!(rt.talk, TalkView::Granted | TalkView::Requested) {
+            let _ = s.send_control(Control::TalkRequest);
+            rt.talk = TalkView::Requested;
+        }
+        self.out.live = true;
+        let reachable = !was_live && rt.alerts.on_up();
+        apply_status(shared, &mut g, id, status);
+        shared.apply_mixer(&mut g, id);
+        if !was_live {
+            shared.emit_after_publish(
+                &mut g,
+                ListenerEvent::Connected {
+                    station_id: id.to_owned(),
+                },
+            );
+        }
+        if reachable {
+            shared.alert(&g, id, Alert::Reachable);
+        }
+        shared.publish(&mut g);
+    }
+
     fn on_control(&mut self, c: Control) {
         let shared = self.shared;
         let Some(id) = self.out.station_id.clone() else {
@@ -424,37 +593,21 @@ impl Ctx<'_> {
                 .stations
                 .get(&id)
                 .is_some_and(|rt| rt.cmd.as_ref().is_some_and(|(s, _)| *s == self.serial));
-            if ours && let Some(rt) = g.stations.get_mut(&id) {
+            let handover = matches!(self.out.close, Some(CloseReason::Replaced))
+                && self.out.live
+                && g.stations.get(&id).is_some_and(|rt| rt.upgrading);
+            if ours
+                && handover
+                && let Some(rt) = g.stations.get_mut(&id)
+            {
+                // The station already switched to the direct session that is
+                // still finishing its setup here (§5.2 item 4): stay live and
+                // keep the buffered audio playing.
                 rt.cmd = None;
-                rt.jitter = None;
-                rt.codec = None;
-                rt.open = false;
-                rt.path = None;
-                rt.route = None;
-                rt.rtt_ms = None;
-                rt.talk = TalkView::Idle;
-                rt.video = if rt.video_req.is_some() {
-                    VideoView::Requested
-                } else {
-                    VideoView::Off
-                };
-                rt.alerts.on_down(now);
-                if rt.following {
-                    rt.status = ConnStatus::Reconnecting {
-                        attempt: 1,
-                        tried: Vec::new(),
-                    };
-                }
-                shared.stop_talk_capture(&mut g, &id);
-                shared.apply_mixer(&mut g, &id);
-                shared.emit_after_publish(
-                    &mut g,
-                    ListenerEvent::Disconnected {
-                        station_id: id,
-                        reason: reason.clone(),
-                    },
-                );
+                rt.draining = rt.jitter.take();
                 shared.publish(&mut g);
+            } else if ours {
+                detach(shared, &mut g, &id, now, reason.clone());
             }
         }
         if let Some(r) = self.reply.take() {
@@ -466,6 +619,45 @@ impl Ctx<'_> {
         }
         self.out
     }
+}
+
+/// The station's live session is gone: reset its runtime state and report
+/// the disconnection.
+pub(super) fn detach(shared: &Shared, g: &mut Inner, id: &str, now: u64, reason: String) {
+    let Some(rt) = g.stations.get_mut(id) else {
+        return;
+    };
+    rt.cmd = None;
+    rt.jitter = None;
+    rt.draining = None;
+    rt.codec = None;
+    rt.open = false;
+    rt.path = None;
+    rt.route = None;
+    rt.rtt_ms = None;
+    rt.talk = TalkView::Idle;
+    rt.video = if rt.video_req.is_some() {
+        VideoView::Requested
+    } else {
+        VideoView::Off
+    };
+    rt.alerts.on_down(now);
+    if rt.following {
+        rt.status = ConnStatus::Reconnecting {
+            attempt: 1,
+            tried: Vec::new(),
+        };
+    }
+    shared.stop_talk_capture(g, id);
+    shared.apply_mixer(g, id);
+    shared.emit_after_publish(
+        g,
+        ListenerEvent::Disconnected {
+            station_id: id.to_owned(),
+            reason,
+        },
+    );
+    shared.publish(g);
 }
 
 fn status_name(s: Status) -> &'static str {
@@ -523,18 +715,34 @@ fn candidates(shared: &Shared, g: &Inner, id: &str) -> Vec<Route> {
     out.extend(discovered_in(g, id));
     if let Some(rt) = g.stations.get(id) {
         out.extend(rt.known.routes_by_success());
+        // FR-NET-3 / FR-RV-2: the relay after every direct route.
+        out.extend(rt.known.relay.clone().map(Route::Relay));
     }
     let mut seen = Vec::new();
     out.retain(|r| {
-        let keep = usable(r) && !seen.contains(r);
+        let keep = usable(shared, r) && !seen.contains(r);
         seen.push(r.clone());
         keep
     });
     out
 }
 
-fn usable(route: &Route) -> bool {
-    cfg!(feature = "native") || matches!(route, Route::WebSocket(_))
+/// Whether this build can use `route`. The browser opens WebSockets only,
+/// and the relay only on the relay server's own origin (FR-RV-5).
+fn usable(shared: &Shared, route: &Route) -> bool {
+    if cfg!(feature = "native") {
+        return true;
+    }
+    match route {
+        Route::Tcp(_) => false,
+        Route::WebSocket(_) => shared.cfg.relay_origin.is_none(),
+        Route::Relay(r) => shared
+            .cfg
+            .relay_origin
+            .as_deref()
+            .and_then(nestwatch_proto::invite::normalize_relay_origin)
+            .is_some_and(|o| o == r.server),
+    }
 }
 
 #[cfg(feature = "native")]
@@ -592,7 +800,7 @@ pub(crate) async fn pair(
 ) -> Result<PairResult, ListenerError> {
     let mut list: Vec<Route> = Vec::new();
     for r in routes {
-        if usable(&r) && !list.contains(&r) {
+        if usable(shared, &r) && !list.contains(&r) {
             list.push(r);
         }
     }
@@ -702,7 +910,7 @@ pub(crate) async fn follow_loop(shared: Arc<Shared>, id: String, gen_: u64) {
             .lock()
             .stations
             .get(&id)
-            .is_some_and(|rt| rt.cmd.is_some());
+            .is_some_and(|rt| rt.cmd.is_some() || rt.upgrading);
         if busy {
             let notified = wake.notified();
             tokio::select! {

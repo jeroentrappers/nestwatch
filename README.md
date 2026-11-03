@@ -28,7 +28,7 @@ Specification phase. Start with [specs/](specs/README.md).
 | Desktop apps (Dioxus) and browser listener (wasm) | first version (`apps/`) |
 | UniFFI bindings for Kotlin and Swift (`crates/nestwatch-ffi`) | first version |
 | Android app (Compose) | first version (`apps/android`) |
-| Rendezvous and relay client (`crates/nestwatch-relay`) and server (`tools/nestwatch-server`) | first version; not yet used by the engines |
+| Rendezvous and relay client (`crates/nestwatch-relay`) and server (`tools/nestwatch-server`) | first version; used by the engines, the CLI, the desktop, browser and Android apps |
 | iOS app (SwiftUI) on the Rust core | planned |
 
 ## License

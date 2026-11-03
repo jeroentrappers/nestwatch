@@ -29,6 +29,8 @@ compile_error!("enable feature `native` or `web`");
 mod clock;
 mod persist;
 mod pump;
+#[cfg(feature = "native")]
+mod punch;
 mod rt;
 mod storage;
 mod types;

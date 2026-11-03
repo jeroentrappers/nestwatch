@@ -9,7 +9,7 @@ use std::sync::Arc;
 use dioxus::core::spawn_forever;
 use dioxus::prelude::*;
 use nestwatch_core::station::{
-    CameraAvailability, StationEngine, StationEvent, StationState, TrustedListener,
+    CameraAvailability, RelayStatus, StationEngine, StationEvent, StationState, TrustedListener,
 };
 use nestwatch_core::{Clock, ListenMode, Transport};
 use nestwatch_media::capture::{GainSetting, GainStep};
@@ -17,8 +17,8 @@ use nestwatch_media::capture::{GainSetting, GainStep};
 use super::Host;
 use crate::backend::{Ui, race};
 use crate::model::{
-    CameraHere, Gain, ListenerRow, Mode, NoticeKind, PairingModel, StationModel, StationRun,
-    StationSettingsModel, TrustedRow,
+    CameraHere, Gain, ListenerRow, Mode, NoticeKind, PairingModel, RelayView, StationModel,
+    StationRun, StationSettingsModel, TrustedRow,
 };
 
 /// Pairings per window (product.md FR-PAIR-3).
@@ -83,6 +83,7 @@ pub fn map_station(s: &StationState, trusted: &[TrustedListener], now_ms: u64) -
                 talking: l.talking,
                 watching: l.watching,
                 web: l.transport == Transport::WebSocket,
+                relayed: l.transport == Transport::Relayed,
             })
             .collect(),
         camera_on: s.camera_on,
@@ -90,6 +91,7 @@ pub fn map_station(s: &StationState, trusted: &[TrustedListener], now_ms: u64) -
         pairing: s.pairing.as_ref().map(|p| PairingModel {
             invite_uri: p.invite_uri.clone(),
             web_url: p.web_url.clone(),
+            relay_web_url: p.relay_web_url.clone(),
             code: p.code.clone(),
             remaining_ms: p.closes_at_ms.saturating_sub(now_ms),
             pairings: p.pairings,
@@ -112,6 +114,8 @@ pub fn map_station(s: &StationState, trusted: &[TrustedListener], now_ms: u64) -
                 0 | 6 | 12 | 18 => Gain::Db(s.settings.gain_db),
                 _ => Gain::Auto,
             },
+            relay_enabled: s.settings.relay_enabled,
+            relay_server: s.settings.relay_server.clone(),
         },
         fingerprint: s.https_fingerprint.clone(),
         http_url,
@@ -122,6 +126,15 @@ pub fn map_station(s: &StationState, trusted: &[TrustedListener], now_ms: u64) -
             CameraAvailability::Available => CameraHere::Available,
             CameraAvailability::Unavailable => CameraHere::Unavailable,
             CameraAvailability::Denied => CameraHere::Denied,
+        },
+        relay: match &s.relay {
+            RelayStatus::Off => RelayView::Off,
+            RelayStatus::Connecting => RelayView::Connecting,
+            RelayStatus::Online { .. } => RelayView::Online,
+            RelayStatus::Error { message, permanent } => RelayView::Error {
+                message: message.clone(),
+                permanent: *permanent,
+            },
         },
     }
 }
@@ -215,6 +228,11 @@ mod tests {
         assert_eq!(m.settings.gain, Gain::Auto);
         assert!(m.listeners.is_empty() && m.trusted.is_empty());
         assert_eq!(m.http_url, None, "no web server in loopback config");
+        // FR-RV-1: off by default, with the project's server preset.
+        assert_eq!(m.relay, RelayView::Off);
+        assert!(!m.settings.relay_enabled);
+        assert_eq!(m.settings.relay_server, "https://nestwatch.appmire.be");
+        assert_eq!(p.relay_web_url, None);
         station.shutdown().await;
     }
 

@@ -76,6 +76,9 @@ fn listener_home_renders_tiles_with_words() {
         "aria-pressed",
         &escaped(&s::unreachable_for("0:42")),
         s::KEEPS_LISTENING,
+        // FR-RV-4: the path on the tile.
+        s::PATH_VPN,
+        s::PATH_RELAYED,
     ] {
         assert!(html.contains(needle), "missing {needle:?}");
     }
@@ -89,6 +92,19 @@ fn station_and_add_station_render() {
     assert!(html.contains("2 listening"), "{html}");
     assert!(html.contains(s::PAIR_LISTENER) && html.contains(s::DIM_SCREEN));
     assert!(html.contains(s::CAMERA_ON));
+    // FR-RV-1: setup asks once about the relay, with what the server sees.
+    assert!(html.contains(&escaped(s::RELAY_SETUP_TITLE)), "{html}");
+    assert!(html.contains(s::RELAY_CAN_SEE) && html.contains(s::RELAY_CANNOT_SEE));
+    assert!(html.contains(s::RELAY_ONLINE));
+    let asked = render(
+        Platform::Desktop,
+        Prefs {
+            relay_asked: true,
+            ..prefs(Role::Station)
+        },
+        None,
+    );
+    assert!(!asked.contains(&escaped(s::RELAY_SETUP_TITLE)));
     let add = render(
         Platform::Web,
         prefs(Role::Listener),

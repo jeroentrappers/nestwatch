@@ -13,9 +13,14 @@
 //! - video: [`StationEvent::CameraWanted`] while any listener watches;
 //!   frames pushed with [`push_camera_frame`](StationEngine::push_camera_frame)
 //!   are scaled, filtered and JPEG-encoded per listener (media.md §5).
+//!
+//! With the relay setting on (rendezvous.md FR-RV-1) it also registers its
+//! mailbox at the relay server and serves listeners that come through it,
+//! relayed or over a punched direct path (rendezvous.md §4, §5).
 
 mod media;
 mod pairing;
+mod relay;
 mod session;
 mod trust;
 
@@ -46,6 +51,9 @@ pub use media::{CameraAvailability, CameraFrame, CameraRequest, PixelFormat};
 pub use nestwatch_net::web::{AssetSource, WebConfig};
 pub use nestwatch_net::{BindScope, ListenConfig};
 pub use pairing::PairingEnd;
+pub use relay::{
+    DEFAULT_SERVER as DEFAULT_RELAY_SERVER, KEY_RELAY_IDENTITY, RelayOptions, RelayStatus,
+};
 pub use trust::{KEY_TRUST, TrustedListener};
 
 use media::{Audio, Camera, Talk};
@@ -100,6 +108,9 @@ pub struct StationConfig {
     pub level_interval: Duration,
     /// Longest time between `status` messages (protocol.md §7.6: 30 s).
     pub status_interval: Duration,
+    /// Relay tunables (rendezvous.md §4, §5); the relay itself is a
+    /// setting ([`StationSettings::relay_enabled`]).
+    pub relay: RelayOptions,
 }
 
 impl StationConfig {
@@ -118,6 +129,7 @@ impl StationConfig {
             max_code_failures: 5,
             level_interval: Duration::from_millis(250),
             status_interval: Duration::from_secs(30),
+            relay: RelayOptions::default(),
         }
     }
 
@@ -131,6 +143,10 @@ impl StationConfig {
                 scope: nestwatch_net::BindScope::Loopback,
             },
             mdns: false,
+            relay: RelayOptions {
+                punch_bind: SocketAddr::from(([127, 0, 0, 1], 0)),
+                ..RelayOptions::default()
+            },
             ..Self::new(name)
         }
     }
@@ -154,6 +170,15 @@ pub struct StationSettings {
     /// Microphone gain: 255 = automatic, else manual dB (0, 6, 12, 18).
     #[n(4)]
     pub gain_db: u8,
+    /// "Reachable through a relay server" (rendezvous.md FR-RV-1); off
+    /// until the user enables it.
+    #[n(5)]
+    #[cbor(default)]
+    pub relay_enabled: bool,
+    /// The relay server origin (FR-RV-1, FR-RV-6), normalised.
+    #[n(6)]
+    #[cbor(default)]
+    pub relay_server: String,
 }
 
 impl StationSettings {
@@ -164,6 +189,8 @@ impl StationSettings {
             talk_enabled: true,
             talkback_volume: 1.0,
             gain_db: GAIN_AUTO,
+            relay_enabled: false,
+            relay_server: relay::DEFAULT_SERVER.to_owned(),
         }
     }
 
@@ -203,6 +230,9 @@ pub struct PairingInfo {
     pub invite_uri: String,
     /// The browser address with the invitation in its fragment.
     pub web_url: Option<String>,
+    /// The browser listener on the relay server with the invitation in its
+    /// fragment (rendezvous.md FR-RV-5), while the relay is on.
+    pub relay_web_url: Option<String>,
     /// The pairing code, `XXXXX-XXXXX`.
     pub code: String,
     /// Monotonic time ([`Clock::now_ms`]) at which the window closes.
@@ -280,6 +310,8 @@ pub struct StationState {
     pub settings: StationSettings,
     /// What the app last reported about the camera.
     pub camera_availability: CameraAvailability,
+    /// Relay registration (rendezvous.md FR-RV-1, §4.1).
+    pub relay: RelayStatus,
 }
 
 /// Something that happened on the station.
@@ -369,6 +401,13 @@ pub enum StationError {
     Invalid(String),
 }
 
+/// Links of one invitation.
+pub(crate) struct InvitationLinks {
+    invite_uri: String,
+    web_url: Option<String>,
+    relay_web_url: Option<String>,
+}
+
 /// Mutable state behind the engine's lock.
 pub(crate) struct Inner {
     pub running: bool,
@@ -391,6 +430,10 @@ pub(crate) struct Inner {
     pub https_port: Option<u16>,
     pub fingerprint: Option<String>,
     pub endpoints: Vec<Endpoint>,
+    pub relay_identity: Option<nestwatch_relay::MailboxIdentity>,
+    pub relay_status: RelayStatus,
+    pub relay_task: Option<relay::RelayTask>,
+    pub relay_generation: u64,
 }
 
 /// State shared by the engine handle and its tasks.
@@ -523,6 +566,7 @@ impl Shared {
             charging: g.charging,
             settings: g.settings.clone(),
             camera_availability: g.camera.availability,
+            relay: g.relay_status.clone(),
         };
         self.state_tx.send_if_modified(|s| {
             if *s == state {
@@ -560,6 +604,59 @@ impl Shared {
             .ok();
         } else if let Some(a) = g.advertiser.as_mut() {
             let _ = a.set_txt(txt);
+        }
+    }
+
+    /// The invitation and browser links for `token` (protocol.md §3.5,
+    /// rendezvous.md §3.2: `r`/`m` while the relay is on).
+    pub fn invitation_links(
+        &self,
+        g: &Inner,
+        token: &InviteToken,
+    ) -> Result<InvitationLinks, StationError> {
+        let relay = self.relay_ref(g);
+        let invitation = Invitation {
+            station_key: *self.key.public_key().as_bytes(),
+            token: *token.as_bytes(),
+            name: g.settings.name.clone(),
+            endpoints: g
+                .endpoints
+                .iter()
+                .take(nestwatch_proto::invite::MAX_INVITE_ENDPOINTS)
+                .cloned()
+                .collect(),
+            relay: relay.clone(),
+        };
+        let invite_uri = invitation
+            .to_uri()
+            .map_err(|e| StationError::Invalid(e.to_string()))?;
+        let web_url = match (g.http_port, g.endpoints.first()) {
+            (Some(port), Some(e)) => invitation
+                .to_web_url(&format!("http://{}:{port}", e.host))
+                .ok(),
+            _ => None,
+        };
+        // RELAY-10: the relay server serves the browser listener at /app/.
+        let relay_web_url =
+            relay.and_then(|r| invitation.to_web_url(&format!("{}/app", r.server)).ok());
+        Ok(InvitationLinks {
+            invite_uri,
+            web_url,
+            relay_web_url,
+        })
+    }
+
+    /// Rebuilds the open window's links after a relay change.
+    pub fn refresh_pairing_links(&self, g: &mut Inner) {
+        let Some(token) = g.pairing.as_ref().map(|w| w.token.clone()) else {
+            return;
+        };
+        if let Ok(l) = self.invitation_links(g, &token)
+            && let Some(info) = g.pairing_info.as_mut()
+        {
+            info.invite_uri = l.invite_uri;
+            info.web_url = l.web_url;
+            info.relay_web_url = l.relay_web_url;
         }
     }
 
@@ -677,8 +774,12 @@ impl StationEngine {
         let key = persist::load_or_create_device_key(&*storage)?;
         let device_id = key.device_id().as_str().to_owned();
         let trust = TrustStore::load(&*storage)?;
-        let settings = persist::load::<StationSettings>(&*storage, KEY_SETTINGS)?
+        let mut settings = persist::load::<StationSettings>(&*storage, KEY_SETTINGS)?
             .unwrap_or_else(|| StationSettings::defaults(&cfg.name));
+        if settings.relay_server.is_empty() {
+            settings.relay_server = relay::DEFAULT_SERVER.to_owned();
+        }
+        let relay_identity = relay::load_identity(&*storage)?;
 
         let tcp = StationListener::bind(cfg.tcp)?;
         let tcp_port = tcp.port();
@@ -728,6 +829,10 @@ impl StationEngine {
             https_port,
             fingerprint,
             endpoints,
+            relay_identity,
+            relay_status: RelayStatus::Off,
+            relay_task: None,
+            relay_generation: 0,
         };
         let (state_tx, _) = watch::channel(StationState {
             name: String::new(),
@@ -748,6 +853,7 @@ impl StationEngine {
             charging: None,
             settings: StationSettings::defaults(""),
             camera_availability: CameraAvailability::Available,
+            relay: RelayStatus::Off,
         });
         let (events, _) = broadcast::channel(256);
         let (shutdown, _) = watch::channel(false);
@@ -766,6 +872,12 @@ impl StationEngine {
         {
             let mut g = shared.lock();
             shared.update_mdns(&mut g, true);
+            if let Err(e) = shared.sync_relay(&mut g) {
+                g.relay_status = RelayStatus::Error {
+                    message: e.to_string(),
+                    permanent: true,
+                };
+            }
             shared.publish(&g);
         }
         spawn_accept_tcp(shared.clone(), tcp);
@@ -835,31 +947,11 @@ impl StationEngine {
             max_pairings: shared.cfg.max_pairings,
             max_code_failures: shared.cfg.max_code_failures,
         };
-        let invitation = Invitation {
-            station_key: *shared.key.public_key().as_bytes(),
-            token: *token.as_bytes(),
-            name: g.settings.name.clone(),
-            endpoints: g
-                .endpoints
-                .iter()
-                .take(nestwatch_proto::invite::MAX_INVITE_ENDPOINTS)
-                .cloned()
-                .collect(),
-            // The engine does not register with a relay server yet.
-            relay: None,
-        };
-        let invite_uri = invitation
-            .to_uri()
-            .map_err(|e| StationError::Invalid(e.to_string()))?;
-        let web_url = match (g.http_port, g.endpoints.first()) {
-            (Some(port), Some(e)) => invitation
-                .to_web_url(&format!("http://{}:{port}", e.host))
-                .ok(),
-            _ => None,
-        };
+        let links = shared.invitation_links(&g, &token)?;
         let info = PairingInfo {
-            invite_uri,
-            web_url,
+            invite_uri: links.invite_uri,
+            web_url: links.web_url,
+            relay_web_url: links.relay_web_url,
             code: code.display().to_string(),
             closes_at_ms: now + limits.duration_ms,
             pairings: 0,
@@ -871,6 +963,62 @@ impl StationEngine {
         shared.emit(StationEvent::PairingOpened);
         shared.publish(&g);
         Ok(info)
+    }
+
+    /// Turns "reachable through a relay server" on or off (rendezvous.md
+    /// FR-RV-1). Turning it on creates the mailbox identity on first use;
+    /// turning it off keeps it (§3.2). An open pairing window's invitation
+    /// is updated.
+    pub fn set_relay_enabled(&self, enabled: bool) -> Result<(), StationError> {
+        let shared = &self.shared;
+        let mut g = shared.lock();
+        if g.settings.relay_enabled == enabled && (g.relay_task.is_some() || !enabled) {
+            return Ok(());
+        }
+        g.settings.relay_enabled = enabled;
+        shared.save_settings(&g);
+        let r = shared.sync_relay(&mut g);
+        shared.refresh_pairing_links(&mut g);
+        shared.publish(&g);
+        r
+    }
+
+    /// Sets the relay server origin (FR-RV-6), e.g. a self-hosted
+    /// `https://relay.example`. Restarts the registration if the relay is on.
+    pub fn set_relay_server(&self, origin: &str) -> Result<(), StationError> {
+        let origin = relay::normalize_server(origin)?;
+        let shared = &self.shared;
+        let mut g = shared.lock();
+        if g.settings.relay_server == origin {
+            return Ok(());
+        }
+        g.settings.relay_server = origin;
+        shared.save_settings(&g);
+        let r = shared.sync_relay(&mut g);
+        shared.refresh_pairing_links(&mut g);
+        shared.publish(&g);
+        r
+    }
+
+    /// "Reset relay identity" (rendezvous.md §3.2): a new mailbox ID and
+    /// secret. Listeners paired through the old mailbox need a new
+    /// invitation to use the relay.
+    pub fn reset_relay_identity(&self) -> Result<(), StationError> {
+        let shared = &self.shared;
+        let mut g = shared.lock();
+        let r = shared.reset_relay_identity(&mut g);
+        shared.refresh_pairing_links(&mut g);
+        shared.publish(&g);
+        r
+    }
+
+    /// The mailbox ID in invitation form (`m=`), once one exists.
+    pub fn relay_mailbox(&self) -> Option<String> {
+        self.shared
+            .lock()
+            .relay_identity
+            .as_ref()
+            .map(|i| i.id().to_text())
     }
 
     /// Closes pairing mode (FR-PAIR-3).
@@ -1043,6 +1191,9 @@ impl StationEngine {
             }
             shared.close_window(&mut g, PairingEnd::Shutdown);
             g.running = false;
+            g.relay_task = None;
+            g.relay_generation += 1;
+            g.relay_status = RelayStatus::Off;
             for s in g.sessions.values() {
                 s.send(Cmd::Close(CloseReason::Shutdown, None));
             }

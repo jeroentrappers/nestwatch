@@ -7,7 +7,8 @@ use std::sync::{Arc, Mutex};
 
 use nestwatch_core::station::{
     BindScope, CameraAvailability as CoreAvailability, ConnectedListener, ListenConfig, PairingEnd,
-    PairingInfo, StationConfig, StationEngine, StationEvent, StationState, TrustedListener,
+    PairingInfo, RelayStatus as CoreRelayStatus, StationConfig, StationEngine, StationEvent,
+    StationState, TrustedListener,
 };
 use nestwatch_core::{Clock, Endpoint, SystemClock, Transport};
 use nestwatch_media::capture::{GainSetting, GainStep};
@@ -120,6 +121,48 @@ pub struct StationSettings {
     pub talkback_volume: f32,
     /// Microphone gain.
     pub gain: Gain,
+    /// "Reachable through a relay server" (rendezvous.md FR-RV-1); off
+    /// until the user enables it.
+    pub relay_enabled: bool,
+    /// The relay server origin, e.g. `https://nestwatch.appmire.be`
+    /// (FR-RV-1, FR-RV-6).
+    pub relay_server: String,
+}
+
+/// Relay registration state (rendezvous.md FR-RV-1, §4.1).
+#[derive(Debug, Clone, PartialEq, Eq, uniffi::Enum)]
+pub enum RelayStatus {
+    /// The relay setting is off.
+    Off,
+    /// Connecting to the server.
+    Connecting,
+    /// Registered: listeners can reach the station through the server.
+    Online {
+        /// The station's public address as the server sees it.
+        observed: String,
+    },
+    /// The last attempt failed.
+    Error {
+        /// What went wrong.
+        message: String,
+        /// Refused for good (`mailbox-taken`, `version`): only a new relay
+        /// identity or another server helps.
+        permanent: bool,
+    },
+}
+
+/// How a listener is connected (protocol.md §3.2, §3.3, rendezvous.md §4.2,
+/// §5.2).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
+pub enum ListenerTransport {
+    /// TCP.
+    Tcp,
+    /// WebSocket (browser).
+    WebSocket,
+    /// Through the relay server.
+    Relayed,
+    /// Hole-punched direct QUIC path.
+    Direct,
 }
 
 /// The open pairing window (FR-PAIR-1..3).
@@ -129,6 +172,9 @@ pub struct PairingSnapshot {
     pub invite_uri: String,
     /// Browser address with the invitation, if the station serves one.
     pub web_url: Option<String>,
+    /// The browser listener on the relay server with the invitation, while
+    /// the relay is on (rendezvous.md FR-RV-5).
+    pub relay_web_url: Option<String>,
     /// Pairing code `XXXXX-XXXXX`.
     pub code: String,
     /// Time left when the snapshot was taken.
@@ -162,6 +208,8 @@ pub struct ConnectedListenerInfo {
     pub watching: bool,
     /// Connected over WebSocket (browser).
     pub web: bool,
+    /// The transport of its session.
+    pub transport: ListenerTransport,
     /// Remote address.
     pub peer: Option<String>,
     /// Last round-trip time.
@@ -220,6 +268,8 @@ pub struct StationSnapshot {
     pub settings: StationSettings,
     /// What the app last reported about the camera.
     pub camera_availability: CameraAvailability,
+    /// Relay registration (FR-RV-1).
+    pub relay: RelayStatus,
 }
 
 /// A listener the station trusts (FR-ST-7).
@@ -585,6 +635,34 @@ impl Station {
         self.engine.set_gain(gain.setting());
     }
 
+    /// Turns "reachable through a relay server" on or off (rendezvous.md
+    /// FR-RV-1). The mailbox identity is created on first use and kept
+    /// when the relay is turned off.
+    pub fn set_relay_enabled(&self, enabled: bool) -> Result<(), NestwatchError> {
+        // Starting the registration spawns on the crate's runtime.
+        let _rt = rt().enter();
+        Ok(self.engine.set_relay_enabled(enabled)?)
+    }
+
+    /// Sets the relay server origin (FR-RV-6), e.g. `https://relay.example`.
+    /// Invalid origins give [`NestwatchError::Invalid`].
+    pub fn set_relay_server(&self, origin: String) -> Result<(), NestwatchError> {
+        let _rt = rt().enter();
+        Ok(self.engine.set_relay_server(&origin)?)
+    }
+
+    /// "Reset relay identity" (rendezvous.md §3.2): a new mailbox; listeners
+    /// need a new invitation to use the relay.
+    pub fn reset_relay_identity(&self) -> Result<(), NestwatchError> {
+        let _rt = rt().enter();
+        Ok(self.engine.reset_relay_identity()?)
+    }
+
+    /// The mailbox ID in invitation form (`m=`), once one exists.
+    pub fn relay_mailbox(&self) -> Option<String> {
+        self.engine.relay_mailbox()
+    }
+
     /// Reports whether the camera can be used (permission, platform).
     pub fn set_camera_availability(&self, availability: CameraAvailability) {
         self.engine.set_camera_availability(match availability {
@@ -647,6 +725,7 @@ fn pairing(p: &PairingInfo, now_ms: u64) -> PairingSnapshot {
     PairingSnapshot {
         invite_uri: p.invite_uri.clone(),
         web_url: p.web_url.clone(),
+        relay_web_url: p.relay_web_url.clone(),
         code: p.code.clone(),
         remaining_ms: p.closes_at_ms.saturating_sub(now_ms),
         pairings: p.pairings,
@@ -675,6 +754,12 @@ fn listener(l: &ConnectedListener) -> ConnectedListenerInfo {
         talking: l.talking,
         watching: l.watching,
         web: l.transport == Transport::WebSocket,
+        transport: match l.transport {
+            Transport::Tcp => ListenerTransport::Tcp,
+            Transport::WebSocket => ListenerTransport::WebSocket,
+            Transport::Relayed => ListenerTransport::Relayed,
+            Transport::Direct => ListenerTransport::Direct,
+        },
         peer: l.peer.map(|p| p.to_string()),
         rtt_ms: l.rtt_ms,
     }
@@ -728,6 +813,19 @@ pub(crate) fn snapshot(s: &StationState, now_ms: u64) -> StationSnapshot {
             talk_enabled: s.settings.talk_enabled,
             talkback_volume: s.settings.talkback_volume,
             gain: Gain::from_code(s.settings.gain_db),
+            relay_enabled: s.settings.relay_enabled,
+            relay_server: s.settings.relay_server.clone(),
+        },
+        relay: match &s.relay {
+            CoreRelayStatus::Off => RelayStatus::Off,
+            CoreRelayStatus::Connecting => RelayStatus::Connecting,
+            CoreRelayStatus::Online { observed } => RelayStatus::Online {
+                observed: observed.clone(),
+            },
+            CoreRelayStatus::Error { message, permanent } => RelayStatus::Error {
+                message: message.clone(),
+                permanent: *permanent,
+            },
         },
         camera_availability: match s.camera_availability {
             CoreAvailability::Available => CameraAvailability::Available,

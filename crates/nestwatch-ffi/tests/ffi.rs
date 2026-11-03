@@ -433,3 +433,67 @@ async fn interfaces_build_invitation_endpoints() {
     assert!(!s.endpoints.iter().any(|e| e.starts_with("127.")));
     station.stop().await;
 }
+
+/// rendezvous.md FR-RV-1, FR-RV-6, §3.2 through the FFI: off by default,
+/// a custom server, online against an in-process server on loopback, the
+/// relay in invitations, a kept mailbox and "reset relay identity".
+#[tokio::test]
+async fn relay_setting_and_status_through_the_ffi() {
+    let state = tempfile::tempdir().unwrap();
+    let config = nestwatch_server::Config {
+        http: "127.0.0.1:0".parse().unwrap(),
+        stun: None,
+        state_dir: state.path().to_owned(),
+        log_interval: 0.0,
+        ..nestwatch_server::Config::default()
+    };
+    let server = nestwatch_server::Server::start(config).await.unwrap();
+    let origin = format!("http://{}", server.http_addr());
+
+    let srec = Arc::new(StationRec::default());
+    let station = start_station(
+        loopback("Nursery"),
+        Arc::new(MemStore::default()),
+        srec.clone(),
+    )
+    .await
+    .unwrap();
+    let s = station.snapshot();
+    assert_eq!(s.relay, RelayStatus::Off);
+    assert!(!s.settings.relay_enabled);
+    assert_eq!(s.settings.relay_server, "https://nestwatch.appmire.be");
+    assert_eq!(station.relay_mailbox(), None);
+    assert!(matches!(
+        station.set_relay_server("not a server".into()),
+        Err(NestwatchError::Invalid { .. })
+    ));
+
+    station.set_relay_server(format!("{origin}/")).unwrap();
+    assert_eq!(station.snapshot().settings.relay_server, origin);
+    station.set_relay_enabled(true).unwrap();
+    wait_for("relay online", || {
+        matches!(station.snapshot().relay, RelayStatus::Online { .. })
+    })
+    .await;
+    let m1 = station.relay_mailbox().expect("mailbox created");
+    let p = station.open_pairing().await.unwrap();
+    assert!(
+        p.invite_uri.contains(&format!("m={m1}")),
+        "{}",
+        p.invite_uri
+    );
+    assert!(
+        p.relay_web_url
+            .unwrap()
+            .starts_with(&format!("{origin}/app/#")),
+        "browser listener on the relay"
+    );
+
+    station.set_relay_enabled(false).unwrap();
+    assert_eq!(station.snapshot().relay, RelayStatus::Off);
+    assert_eq!(station.relay_mailbox().as_deref(), Some(m1.as_str()));
+    station.reset_relay_identity().unwrap();
+    assert_ne!(station.relay_mailbox().unwrap(), m1);
+    station.stop().await;
+    server.shutdown().await;
+}

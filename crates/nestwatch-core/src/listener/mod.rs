@@ -6,10 +6,16 @@
 //! ([`pull_playback`](ListenerEngine::pull_playback)), sends talk-back,
 //! delivers video frames and raises alerts.
 //!
-//! It runs on tokio (`native`) or in the browser (`web`, WebSocket only).
+//! It runs on tokio (`native`) or in the browser (`web`, WebSocket and, on
+//! the relay server's own origin, the relay).
+//!
+//! Stations reachable through a relay (rendezvous.md FR-RV-2) are tried
+//! there after every direct route; a relayed session keeps trying to punch a
+//! direct path and moves to it without a gap in the audio (FR-RV-3, §5.2).
 
 mod alerts;
 mod follow;
+mod relay;
 mod store;
 
 use std::collections::{BTreeMap, VecDeque};
@@ -71,6 +77,48 @@ pub struct ListenerConfig {
     /// WebSocket URL tried for every station (the browser app's own
     /// station, `ws(s)://<page host>/nestwatch/1`).
     pub default_websocket: Option<String>,
+    /// The relay server the browser app is served from (rendezvous.md
+    /// FR-RV-5). In the browser only stations registered there are reached,
+    /// and only through it; native listeners ignore it.
+    pub relay_origin: Option<String>,
+    /// Relay and hole-punching tunables (native).
+    pub relay: RelayOptions,
+}
+
+/// Relay and hole-punching tunables of a listener (rendezvous.md §4.2, §5).
+#[derive(Debug, Clone)]
+pub struct RelayOptions {
+    /// STUN port instead of 3478 (tests, unusual deployments; §5.1).
+    pub stun_port: Option<u16>,
+    /// Local address of the punch socket (§5.2).
+    pub punch_bind: std::net::SocketAddr,
+    /// Try to move relayed sessions to a direct path (FR-RV-3).
+    pub direct: bool,
+    /// Time allowed per server request (WebSocket open, answers).
+    pub timeout: Duration,
+    /// Time allowed for the STUN Binding (§5.1).
+    pub stun_timeout: Duration,
+    /// Punching retry interval while relayed (§5.2 item 5: 5 minutes);
+    /// [`ListenerEngine::network_changed`] retries at once.
+    pub retry_interval: Duration,
+    /// Delay between a relayed session going live and the first punch
+    /// (within the station's 5 s probing window; tests use it to observe
+    /// the relayed phase).
+    pub first_punch_after: Duration,
+}
+
+impl Default for RelayOptions {
+    fn default() -> Self {
+        Self {
+            stun_port: None,
+            punch_bind: std::net::SocketAddr::from(([0, 0, 0, 0], 0)),
+            direct: true,
+            timeout: Duration::from_secs(10),
+            stun_timeout: Duration::from_millis(1500),
+            retry_interval: Duration::from_secs(300),
+            first_punch_after: Duration::ZERO,
+        }
+    }
 }
 
 impl ListenerConfig {
@@ -88,6 +136,8 @@ impl ListenerConfig {
             decode_video: false,
             max_followed: 8,
             default_websocket: None,
+            relay_origin: None,
+            relay: RelayOptions::default(),
         }
     }
 }
@@ -117,13 +167,18 @@ pub enum ConnStatus {
     NeedsPairing,
 }
 
-/// Network path of a live session (FR-LS-3).
+/// Network path of a live session (FR-LS-3, rendezvous.md FR-RV-4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum NetPath {
-    /// Local network.
-    Lan,
+    /// Local network ("home network").
+    HomeNetwork,
     /// User-operated VPN (protocol.md §3.5 ranges, interfaces or names).
     Vpn,
+    /// A hole-punched path across the internet ("direct (internet)",
+    /// rendezvous.md §5.2).
+    Direct,
+    /// Through the relay server (rendezvous.md §4.2).
+    Relayed,
 }
 
 /// Talk-back state with one station (FR-TB-1).
@@ -397,6 +452,11 @@ pub(crate) struct Rt {
     pub route: Option<String>,
     pub cmd: Option<(u64, mpsc::UnboundedSender<Cmd>)>,
     pub jitter: Option<JitterBuffer>,
+    /// The previous session's buffer after a path switch, played until the
+    /// new one yields its first decoded frame (rendezvous.md §5.2 item 4).
+    pub draining: Option<JitterBuffer>,
+    /// A direct session that replaces the relayed one is being set up.
+    pub upgrading: bool,
     pub codec: Option<CodecId>,
     pub level: Option<f32>,
     pub open: bool,
@@ -429,6 +489,8 @@ impl Rt {
             route: None,
             cmd: None,
             jitter: None,
+            draining: None,
+            upgrading: false,
             codec: None,
             level: None,
             open: false,
@@ -447,6 +509,21 @@ impl Rt {
             preroll_frames: 0,
             alerts: AlertState::default(),
         }
+    }
+
+    /// The next 20 ms of this station: the current session's audio, or,
+    /// right after a path switch, the previous session's until the new one
+    /// decodes its first frame (rendezvous.md §5.2 item 4).
+    fn pull(&mut self, now: u64) -> Option<PcmFrame> {
+        let current = self.jitter.as_mut().map(|j| j.pull(now));
+        if let Some(old) = self.draining.as_mut() {
+            if matches!(current, Some(nestwatch_media::jitter::Pulled::Audio { .. })) {
+                self.draining = None;
+            } else {
+                return Some(old.pull(now).pcm());
+            }
+        }
+        current.map(|p| p.pcm())
     }
 
     pub fn send(&self, cmd: Cmd) -> bool {
@@ -518,6 +595,9 @@ pub(crate) struct Shared {
     pub events: broadcast::Sender<ListenerEvent>,
     pub video: broadcast::Sender<VideoFrameEvent>,
     pub next_session: AtomicU64,
+    /// Signalled by [`ListenerEngine::network_changed`]: relayed sessions
+    /// retry punching (rendezvous.md §5.2 item 5).
+    pub network: Arc<Notify>,
 }
 
 /// Minimum spacing of snapshots caused by `level` updates (architecture.md
@@ -661,6 +741,9 @@ impl Shared {
                 known.note_endpoint(&e.route, e.last_success_unix_ms);
             }
             known.settings = rt.known.settings;
+            if known.relay.is_none() {
+                known.relay = rt.known.relay.clone();
+            }
             rt.known = known;
         } else {
             let id = known.id.clone();
@@ -839,6 +922,7 @@ impl ListenerEngine {
             events,
             video,
             next_session: AtomicU64::new(1),
+            network: Arc::new(Notify::new()),
         });
         let mut to_follow = Vec::new();
         {
@@ -936,15 +1020,24 @@ impl ListenerEngine {
         let inv = nestwatch_proto::Invitation::parse_any(input)
             .map_err(|e| ListenerError::Invalid(e.to_string()))?;
         let mut all = routes;
-        if !input
-            .trim()
-            .to_ascii_lowercase()
-            .starts_with("nestwatch://")
+        let lower = input.trim().to_ascii_lowercase();
+        // On the relay server's origin the page's own WebSocket is not a
+        // station (FR-RV-5).
+        let on_relay = self
+            .shared
+            .cfg
+            .relay_origin
+            .as_ref()
+            .is_some_and(|o| lower.starts_with(&o.to_ascii_lowercase()));
+        if !lower.starts_with("nestwatch://")
+            && !on_relay
             && let Some(r) = Route::websocket_for_origin(input.trim())
         {
             all.push(r);
         }
         all.extend(inv.endpoints.iter().cloned().map(Route::Tcp));
+        // FR-RV-2: the relay after every direct route.
+        all.extend(inv.relay.clone().map(Route::Relay));
         let station = nestwatch_crypto::PublicKey::from_bytes(inv.station_key);
         let token = nestwatch_crypto::InviteToken::from_bytes(&inv.token);
         let mode = nestwatch_session::ListenerMode::Invite { station, token };
@@ -1079,6 +1172,18 @@ impl ListenerEngine {
         if g.discovered.remove(fullname).is_some() {
             self.shared.publish(&mut g);
         }
+    }
+
+    /// Tells the engine that the device's network changed (interface up or
+    /// down, Wi-Fi to mobile): reconnect loops retry at once and relayed
+    /// sessions try to punch a direct path again (FR-LS-5, rendezvous.md
+    /// §5.2 item 5).
+    pub fn network_changed(&self) {
+        let g = self.shared.lock();
+        for rt in g.stations.values() {
+            rt.wake.notify_waiters();
+        }
+        self.shared.network.notify_waiters();
     }
 
     // ----- per-station settings -------------------------------------------
@@ -1250,7 +1355,7 @@ impl ListenerEngine {
             .ok_or(ListenerError::UnknownStation)?;
         rt.video_req = Some(req);
         rt.video = VideoView::Requested;
-        rt.send(Cmd::Control(video_start(req)));
+        rt.send(Cmd::Control(video_start(effective_video(req, rt.path))));
         self.shared.publish(&mut g);
         Ok(())
     }
@@ -1308,7 +1413,7 @@ impl ListenerEngine {
             if pending.is_empty() {
                 let frames: Vec<(StationHandle, PcmFrame)> = stations
                     .values_mut()
-                    .filter_map(|rt| Some((rt.handle, rt.jitter.as_mut()?.pull(now).pcm())))
+                    .filter_map(|rt| Some((rt.handle, rt.pull(now)?)))
                     .collect();
                 let inputs: Vec<(StationHandle, &PcmFrame)> =
                     frames.iter().map(|(h, f)| (*h, f)).collect();
@@ -1357,6 +1462,23 @@ impl ListenerEngine {
         }
     }
 }
+
+/// Relayed video is limited to 320×240 to respect relay capacity
+/// (rendezvous.md FR-RV-4).
+pub(crate) fn effective_video(req: VideoRequest, path: Option<NetPath>) -> VideoRequest {
+    if path == Some(NetPath::Relayed) {
+        VideoRequest {
+            max_w: req.max_w.min(RELAYED_VIDEO.0),
+            max_h: req.max_h.min(RELAYED_VIDEO.1),
+            ..req
+        }
+    } else {
+        req
+    }
+}
+
+/// Largest video size over the relay (FR-RV-4).
+pub const RELAYED_VIDEO: (u32, u32) = (320, 240);
 
 pub(crate) fn video_start(req: VideoRequest) -> Control {
     Control::VideoStart(VideoStart {
