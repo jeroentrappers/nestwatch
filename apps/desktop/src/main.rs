@@ -5,6 +5,9 @@
 //! Closing the window hides it; the station and listener keep running and
 //! the tray icon (tooltip = current state) brings the window back or quits.
 
+// Release builds on Windows run as a GUI app without a console window.
+#![cfg_attr(all(windows, not(debug_assertions)), windows_subsystem = "windows")]
+
 use std::cell::RefCell;
 use std::sync::Arc;
 
