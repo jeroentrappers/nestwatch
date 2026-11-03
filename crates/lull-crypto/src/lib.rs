@@ -17,6 +17,8 @@ mod verification;
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod vectors;
 
 pub use code::{CODE_LEN, PairingCode};
 pub use device_id::{DEVICE_ID_LEN, DeviceId};

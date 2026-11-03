@@ -1,0 +1,74 @@
+{
+  "spec": "protocol.md 5.3",
+  "argon2": "Argon2id v0x13, password = normalised code (ASCII), salt = SHA-256(\"lull/1 code salt\" || station_device_id)[0..16], m = 19456 KiB, t = 2, p = 1, length = 32, no secret, no associated data",
+  "normalisation": [
+    {
+      "input": "7K3QD-9XW2M",
+      "normalised": "7K3QD9XW2M"
+    },
+    {
+      "input": "7k3qd9xw2m",
+      "normalised": "7K3QD9XW2M"
+    },
+    {
+      "input": " 7k3qd - 9xw2m ",
+      "normalised": "7K3QD9XW2M"
+    },
+    {
+      "input": "OoIiLl0011",
+      "normalised": "0011110011"
+    },
+    {
+      "input": "ABCDE-FGHJK",
+      "normalised": "ABCDEFGHJK"
+    },
+    {
+      "input": "mnpqr-stvwx",
+      "normalised": "MNPQRSTVWX"
+    },
+    {
+      "input": "yz012-34567",
+      "normalised": "YZ01234567"
+    },
+    {
+      "input": "7K3QD-9XW2",
+      "normalised": null
+    },
+    {
+      "input": "7K3QD-9XW2MM",
+      "normalised": null
+    },
+    {
+      "input": "7K3QD-9XW2U",
+      "normalised": null
+    },
+    {
+      "input": "7K3QD_9XW2M",
+      "normalised": null
+    },
+    {
+      "input": "7K3QD\t9XW2M",
+      "normalised": null
+    }
+  ],
+  "cases": [
+    {
+      "code": "7K3QD9XW2M",
+      "station_device_id": "edrzcaait57dtrhx",
+      "salt": "9d96f7d6e1274cc2c4c01753c184b22e",
+      "psk": "53059b17edceeba74562c97be2b990c56b8a232845356e38ea4b74664c965208"
+    },
+    {
+      "code": "0000000000",
+      "station_device_id": "edrzcaait57dtrhx",
+      "salt": "9d96f7d6e1274cc2c4c01753c184b22e",
+      "psk": "26175b0ac19998cce9778faabc4e3e23fc22a7c4eac6c357cbffbedf4d19eea1"
+    },
+    {
+      "code": "ZZZZZZZZZZ",
+      "station_device_id": "bh6u44sz3tdfitae",
+      "salt": "b5ea9fc099735aa0c8927567032741ea",
+      "psk": "ed07cd65cabb064ba12bc475cd79df85c691e8540a788839ab68fd697fc1d4c9"
+    }
+  ]
+}

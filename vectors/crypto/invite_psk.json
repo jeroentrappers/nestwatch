@@ -1,0 +1,22 @@
+{
+  "spec": "protocol.md 5.2",
+  "hkdf": "HKDF-SHA256(ikm = invite_token, salt = station_public_key, info, L = 32)",
+  "info": "lull/1 invite psk",
+  "cases": [
+    {
+      "invite_token": "00000000000000000000000000000000",
+      "station_public_key": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
+      "psk": "5a18f295275d07336f1e3bf64feded60444be4d84183b0f2be2c1f4b70e397bf"
+    },
+    {
+      "invite_token": "ffffffffffffffffffffffffffffffff",
+      "station_public_key": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
+      "psk": "4034f39c158575f78b53f2170bfd26673393e736e3d562157cd4b7a70198a128"
+    },
+    {
+      "invite_token": "1e360cb87ac26ca2cfb02368b5454456",
+      "station_public_key": "d194b01d5d46b9e68687a4d03bffb13c0604ebe0fc86f4372cde017b4b584671",
+      "psk": "c0b47c5cdeb5c50e5fed6dad3f2d2f8b18d2d1e9cde1c71f241f48ce2757ec17"
+    }
+  ]
+}
