@@ -425,7 +425,7 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                             let name = if t.name.is_empty() { s::UNNAMED.to_owned() } else { t.name.clone() };
                             rsx! {
                                 div { key: "{t.id}", class: "item",
-                                    div { class: "grow title",
+                                    div { class: "grow list-title",
                                         span { "{name}" }
                                         span { class: "caption", "{caption}" }
                                     }

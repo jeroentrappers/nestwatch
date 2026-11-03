@@ -141,7 +141,7 @@ pub const TALK_ALLOWED: &str = "Allow talk-back";
 /// Gain field.
 pub const MIC_SENSITIVITY: &str = "Microphone sensitivity";
 /// Gain: automatic.
-pub const GAIN_AUTO: &str = "Automatic";
+pub const GAIN_AUTO: &str = "Auto";
 /// Talk-back volume.
 pub const TALKBACK_VOLUME: &str = "Talk-back volume";
 /// Trusted listeners heading.

@@ -40,11 +40,16 @@ body { min-height: 100vh; }
 .audio-prompt { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); width: 100%; cursor: pointer; color: var(--honey); font: inherit; border-color: var(--honey); }
 .audio-prompt strong { font-size: var(--text-l); }
 
+/* Lists */
+.list-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
 /* Forms */
 .field .label { font-size: var(--text-s); font-weight: 600; color: var(--text-2); }
 .switch-row { cursor: pointer; min-height: 44px; }
 .error { color: var(--coral); }
 .card.error { border-color: color-mix(in srgb, var(--coral) 55%, transparent); }
+.segmented { max-width: 100%; overflow-x: auto; }
+.segmented button { white-space: nowrap; }
 .btn[disabled], .segmented button[disabled] { opacity: 0.5; cursor: not-allowed; }
 .centered { text-align: center; align-items: center; }
 .full { width: 100%; }
@@ -90,4 +95,5 @@ body { min-height: 100vh; }
   .panel { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 45; max-height: 85vh; overflow: auto; border-radius: var(--radius-l) var(--radius-l) 0 0; }
   .grid { grid-template-columns: minmax(0, 1fr); }
   .station .bottom-actions { margin-top: var(--space-4); }
+  .segmented button { padding: 8px 10px; }
 }
