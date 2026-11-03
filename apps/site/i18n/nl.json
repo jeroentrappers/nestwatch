@@ -384,7 +384,7 @@
           "heading": "Wat hij doet",
           "pill": "",
           "body": [
-            "De server helpt een luisteraar een zender te bereiken zonder zijn adres te kennen, helpt beide een rechtstreekse verbinding door hun routers te openen, en geeft de versleutelde stroom door wanneer geen rechtstreekse weg werkt. Hij ziet alleen versleutelde gegevens: de handshake tussen de toestellen loopt er end-to-end doorheen. Hij biedt ook deze website en de browserluisteraar aan op zijn eigen HTTPS-adres."
+            "De server helpt een luisteraar een zender te bereiken zonder zijn adres te kennen, helpt beide een rechtstreekse verbinding door hun routers te openen, en geeft de versleutelde stroom door wanneer geen rechtstreekse weg werkt. Hij ziet alleen versleutelde gegevens: de handshake tussen de toestellen loopt er end-to-end doorheen. Hetzelfde HTTPS-adres kan ook deze website en de browserluisteraar aanbieden."
           ]
         },
         {
@@ -406,10 +406,10 @@
             "Download <code>nestwatch-server-linux-x86_64</code> bij de <a href=\"{latest}\">nieuwste release</a> (zodra beschikbaar) en installeer het als <code>/usr/local/bin/nestwatch-server</code>.",
             "Maak een systeemgebruiker en een map voor de toestand aan, bijvoorbeeld <code>/var/lib/nestwatch-server</code>.",
             "Start hem met systemd: hij luistert op een lokale HTTP-poort voor de reverse proxy en rechtstreeks op UDP 3478.",
-            "Stel nginx of Caddy in voor je domein, stuur alles door naar die lokale poort en upgrade WebSocket-verbindingen op <code>/nwr/1</code>.",
+            "Stel nginx of Caddy in voor je domein: stuur <code>/nwr/1</code> met WebSocket-upgrade door naar die lokale poort, en bied voor de rest de statische website en browserluisteraar aan (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>).",
             "Zet op elke zender <strong>Reachable through a relay server</strong> aan en vul het adres van je server in, bijvoorbeeld <code>https://relay.example.org</code>."
           ],
-          "code": "# Caddy (Caddyfile): HTTPS-certificaten en WebSocket-upgrades gaan automatisch\nrelay.example.org {\n\treverse_proxy 127.0.0.1:8480\n}",
+          "code": "# Caddyfile: HTTPS-certificaten en WebSocket-upgrades gaan automatisch\nrelay.example.org {\n\thandle /nwr/1 {\n\t\treverse_proxy 127.0.0.1:8480\n\t}\n\thandle {\n\t\t# statische bestanden: deze website, browserluisteraar in /app/\n\t\troot * /var/www/nestwatch\n\t\tfile_server\n\t}\n}",
           "after": [
             "De configuratie voor nginx, de systemd-unit en de firewallregels staan in <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
           ]

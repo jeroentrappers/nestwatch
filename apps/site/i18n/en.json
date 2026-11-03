@@ -384,7 +384,7 @@
           "heading": "What it does",
           "pill": "",
           "body": [
-            "The server helps a listener reach a station without knowing its address, helps both open a direct connection through their routers, and forwards the encrypted stream when no direct path works. It only ever sees encrypted data: the devices' own handshake runs end to end through it. It also serves this website and the browser listener from its own HTTPS address."
+            "The server helps a listener reach a station without knowing its address, helps both open a direct connection through their routers, and forwards the encrypted stream when no direct path works. It only ever sees encrypted data: the devices' own handshake runs end to end through it. The same HTTPS address can host this website and the browser listener."
           ]
         },
         {
@@ -406,10 +406,10 @@
             "Download <code>nestwatch-server-linux-x86_64</code> from the <a href=\"{latest}\">latest release</a> (when available) and install it as <code>/usr/local/bin/nestwatch-server</code>.",
             "Create a system user and a state directory, for example <code>/var/lib/nestwatch-server</code>.",
             "Run it with systemd: it listens on a local HTTP port for the reverse proxy and directly on UDP 3478.",
-            "Configure nginx or Caddy for your domain, forwarding everything to that local port and upgrading WebSocket connections on <code>/nwr/1</code>.",
+            "Configure nginx or Caddy for your domain: forward <code>/nwr/1</code> to that local port with WebSocket upgrades, and serve the static website and browser listener (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>) for everything else.",
             "On each station, turn on <strong>Reachable through a relay server</strong> and enter your server's address, for example <code>https://relay.example.org</code>."
           ],
-          "code": "# Caddy (Caddyfile): HTTPS certificates and WebSocket upgrades are automatic\nrelay.example.org {\n\treverse_proxy 127.0.0.1:8480\n}",
+          "code": "# Caddyfile: HTTPS certificates and WebSocket upgrades are automatic\nrelay.example.org {\n\thandle /nwr/1 {\n\t\treverse_proxy 127.0.0.1:8480\n\t}\n\thandle {\n\t\t# static files: this website, browser listener in /app/\n\t\troot * /var/www/nestwatch\n\t\tfile_server\n\t}\n}",
           "after": [
             "Configuration for nginx, the systemd unit and the firewall rules are in <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
           ]
