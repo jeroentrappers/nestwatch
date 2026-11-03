@@ -1,0 +1,146 @@
+{
+  "description": "Invitation URIs (protocol.md §3.5). Keys and tokens are base64url without padding in the URI; hex here. Percent-encoding leaves only RFC 3986 unreserved characters unescaped.",
+  "invalid": [
+    {
+      "name": "wrong-scheme",
+      "uri": "http://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
+    },
+    {
+      "name": "version-2",
+      "uri": "lull://invite?v=2&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
+    },
+    {
+      "name": "missing-key",
+      "uri": "lull://invite?v=1&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
+    },
+    {
+      "name": "short-token",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=AAAA"
+    },
+    {
+      "name": "padded-key",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I=&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100"
+    },
+    {
+      "name": "duplicate-key",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&v=1"
+    },
+    {
+      "name": "name-too-long",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "name": "bad-endpoint",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&a=fd7a%3A%3A1%3A47100"
+    }
+  ],
+  "parse_only": [
+    {
+      "invitation": {
+        "endpoints": [
+          "nursery.tail1234.ts.net:47100",
+          "100.101.102.103:47100",
+          "[fd7a:115c:a1e0::7]:47100",
+          "192.168.1.20:47100",
+          "[2001:db8::20]:47100"
+        ],
+        "name": "Baby's room",
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "unknown-parameters",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&x=1&future=%E2%9C%93"
+    },
+    {
+      "invitation": {
+        "endpoints": [
+          "nursery.tail1234.ts.net:47100",
+          "100.101.102.103:47100",
+          "[fd7a:115c:a1e0::7]:47100",
+          "192.168.1.20:47100",
+          "[2001:db8::20]:47100"
+        ],
+        "name": "Baby's room",
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "reordered-and-uppercase-scheme",
+      "uri": "LULL://INVITE?a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&n=Baby%27s%20room&t=pcTjAiFAX36dvNv6GThXdg&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&v=1"
+    },
+    {
+      "invitation": {
+        "endpoints": [],
+        "name": "",
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "no-name-parameter",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg"
+    },
+    {
+      "invitation": {
+        "endpoints": [
+          "nursery.tail1234.ts.net:47100",
+          "100.101.102.103:47100",
+          "[fd7a:115c:a1e0::7]:47100",
+          "192.168.1.20:47100",
+          "[2001:db8::20]:47100",
+          "10.0.0.1:47100",
+          "10.0.0.2:47100",
+          "10.0.0.3:47100"
+        ],
+        "name": "Baby's room",
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "more-than-8-endpoints",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&a=10.0.0.1%3A47100&a=10.0.0.2%3A47100&a=10.0.0.3%3A47100&a=10.0.0.4%3A47100"
+    }
+  ],
+  "vectors": [
+    {
+      "invitation": {
+        "endpoints": [
+          "nursery.tail1234.ts.net:47100",
+          "100.101.102.103:47100",
+          "[fd7a:115c:a1e0::7]:47100",
+          "192.168.1.20:47100",
+          "[2001:db8::20]:47100"
+        ],
+        "name": "Baby's room",
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "full",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100",
+      "web_origin": "http://192.168.1.20:47180",
+      "web_url": "http://192.168.1.20:47180/#lull%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3DBaby%2527s%2520room%26a%3Dnursery.tail1234.ts.net%253A47100%26a%3D100.101.102.103%253A47100%26a%3D%255Bfd7a%253A115c%253Aa1e0%253A%253A7%255D%253A47100%26a%3D192.168.1.20%253A47100%26a%3D%255B2001%253Adb8%253A%253A20%255D%253A47100"
+    },
+    {
+      "invitation": {
+        "endpoints": [],
+        "name": "",
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "minimal",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=",
+      "web_origin": "http://192.168.1.20:47180",
+      "web_url": "http://192.168.1.20:47180/#lull%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3D"
+    },
+    {
+      "invitation": {
+        "endpoints": [
+          "10.0.0.5:47101"
+        ],
+        "name": "Chambre de Zoé 🍼",
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "unicode-name",
+      "uri": "lull://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Chambre%20de%20Zo%C3%A9%20%F0%9F%8D%BC&a=10.0.0.5%3A47101",
+      "web_origin": "http://192.168.1.20:47180",
+      "web_url": "http://192.168.1.20:47180/#lull%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3DChambre%2520de%2520Zo%25C3%25A9%2520%25F0%259F%258D%25BC%26a%3D10.0.0.5%253A47101"
+    }
+  ]
+}

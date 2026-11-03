@@ -1,0 +1,82 @@
+{
+  "description": "Endpoint text form and station endpoint order (protocol.md §3.5)",
+  "invalid": [
+    "host",
+    "host:0",
+    "host:65536",
+    "fd7a::1:47100",
+    "[fe80::1%25eth0]:47100",
+    "[::1]",
+    "1.2.3:47100",
+    "-x.local:1"
+  ],
+  "order": [
+    {
+      "addresses": [
+        {
+          "addr": "2001:db8::20",
+          "interface": "wlan0"
+        },
+        {
+          "addr": "fe80::1c2b:3aff:fe4d:5e6f",
+          "interface": "wlan0"
+        },
+        {
+          "addr": "192.168.1.20",
+          "interface": "wlan0"
+        },
+        {
+          "addr": "127.0.0.1",
+          "interface": "lo"
+        },
+        {
+          "addr": "fd7a:115c:a1e0::7",
+          "interface": "tailscale0"
+        },
+        {
+          "addr": "100.101.102.103",
+          "interface": "tailscale0"
+        },
+        {
+          "addr": "10.8.0.2",
+          "interface": "wg0"
+        },
+        {
+          "addr": "100.64.12.1",
+          "interface": "eth0"
+        }
+      ],
+      "endpoints": [
+        "nursery.tail1234.ts.net:47100",
+        "100.101.102.103:47100",
+        "10.8.0.2:47100",
+        "100.64.12.1:47100",
+        "[fd7a:115c:a1e0::7]:47100",
+        "192.168.1.20:47100",
+        "[2001:db8::20]:47100"
+      ],
+      "port": 47100,
+      "vpn_dns_names": [
+        "nursery.tail1234.ts.net"
+      ]
+    }
+  ],
+  "parse": [
+    {
+      "canonical": "nursery.tail1234.ts.net:47100",
+      "input": "nursery.tail1234.ts.net:47100"
+    },
+    {
+      "canonical": "nursery.local:47100",
+      "input": "Nursery.LOCAL.:47100"
+    },
+    {
+      "canonical": "192.168.1.20:47100",
+      "input": "192.168.1.20:47100"
+    },
+    {
+      "canonical": "[fd7a:115c:a1e0::7]:47109",
+      "input": "[FD7A:115C:A1E0:0::7]:47109"
+    }
+  ]
+}

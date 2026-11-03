@@ -1,0 +1,518 @@
+{
+  "decode_only": [
+    {
+      "expect": {
+        "open": false,
+        "t": "activity"
+      },
+      "hex": "a46174686163746976697479627a7a6179646f70656ef4666675747572658201a16178f6",
+      "input": {
+        "future": [
+          1,
+          {
+            "x": null
+          }
+        ],
+        "open": false,
+        "t": "activity",
+        "zz": "y"
+      },
+      "name": "unknown-keys-ignored"
+    },
+    {
+      "expect": {
+        "unknown": "night-light"
+      },
+      "hex": "a261746b6e696768742d6c69676874656c6576656c03",
+      "input": {
+        "level": 3,
+        "t": "night-light"
+      },
+      "name": "unknown-type"
+    },
+    {
+      "expect": {
+        "hold_ms": 4000,
+        "mode": "activated",
+        "preroll_ms": 500,
+        "t": "listen",
+        "threshold": -12.34567928314209
+      },
+      "hex": "a56174666c697374656e646d6f64656961637469766174656467686f6c645f6d73190fa0697468726573686f6c64fbc028b0fcd32f6f3b6a707265726f6c6c5f6d731901f4",
+      "input": {
+        "hold_ms": 4000,
+        "mode": "activated",
+        "preroll_ms": 500,
+        "t": "listen",
+        "threshold": -12.345678901234
+      },
+      "name": "threshold-as-f64"
+    },
+    {
+      "expect": {
+        "state": "idle",
+        "t": "talk-state"
+      },
+      "hex": "a361746a74616c6b2d7374617465626279f66573746174656469646c65",
+      "input": {
+        "by": null,
+        "state": "idle",
+        "t": "talk-state"
+      },
+      "name": "optional-key-null"
+    },
+    {
+      "expect": {
+        "reason": "overheated",
+        "t": "close"
+      },
+      "hex": "a2617465636c6f736566726561736f6e6a6f766572686561746564",
+      "input": {
+        "reason": "overheated",
+        "t": "close"
+      },
+      "name": "close-unknown-reason"
+    }
+  ],
+  "description": "LWP/1 control messages (protocol.md §7) in RFC 8949 core deterministic encoding: definite lengths, shortest integers and floats, keys sorted by encoded bytes. 'message' is the CBOR map in JSON form; JSON numbers with a fraction or exponent are CBOR floats.",
+  "invalid": [
+    {
+      "hex": "a1646f70656ef5",
+      "input": {
+        "open": true
+      },
+      "name": "missing-t"
+    },
+    {
+      "hex": "a1617401",
+      "input": {
+        "t": 1
+      },
+      "name": "t-not-text"
+    },
+    {
+      "hex": "a16174686163746976697479",
+      "input": {
+        "t": "activity"
+      },
+      "name": "missing-required-key"
+    },
+    {
+      "hex": "a26174686163746976697479646f70656e01",
+      "input": {
+        "open": 1,
+        "t": "activity"
+      },
+      "name": "wrong-type-bool"
+    },
+    {
+      "hex": "a261746c617564696f2d636f6e66696765636f6465636132",
+      "input": {
+        "codec": "2",
+        "t": "audio-config"
+      },
+      "name": "wrong-type-uint"
+    },
+    {
+      "hex": "a261746c617564696f2d636f6e66696765636f64656321",
+      "input": {
+        "codec": -2,
+        "t": "audio-config"
+      },
+      "name": "negative-uint"
+    },
+    {
+      "hex": "a261746c617564696f2d636f6e66696765636f646563190100",
+      "input": {
+        "codec": 256,
+        "t": "audio-config"
+      },
+      "name": "codec-over-255"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f64656961637469766174656467686f6c645f6d73190fa0697468726573686f6c6438316a707265726f6c6c5f6d731901f4",
+      "input": {
+        "hold_ms": 4000,
+        "mode": "activated",
+        "preroll_ms": 500,
+        "t": "listen",
+        "threshold": -50
+      },
+      "name": "threshold-int"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f64656961637469766174656467686f6c645f6d73190fa0697468726573686f6c64f938006a707265726f6c6c5f6d731901f4",
+      "input": {
+        "hold_ms": 4000,
+        "mode": "activated",
+        "preroll_ms": 500,
+        "t": "listen",
+        "threshold": 0.5
+      },
+      "name": "threshold-above-0"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f64656961637469766174656467686f6c645f6d73190fa0697468726573686f6c64f9d5a86a707265726f6c6c5f6d731901f4",
+      "input": {
+        "hold_ms": 4000,
+        "mode": "activated",
+        "preroll_ms": 500,
+        "t": "listen",
+        "threshold": -90.5
+      },
+      "name": "threshold-below-90"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f64656961637469766174656467686f6c645f6d7319ea61697468726573686f6c64f9d2406a707265726f6c6c5f6d731901f4",
+      "input": {
+        "hold_ms": 60001,
+        "mode": "activated",
+        "preroll_ms": 500,
+        "t": "listen",
+        "threshold": -50.0
+      },
+      "name": "hold-too-long"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f64656961637469766174656467686f6c645f6d73190fa0697468726573686f6c64f9d2406a707265726f6c6c5f6d731907d1",
+      "input": {
+        "hold_ms": 4000,
+        "mode": "activated",
+        "preroll_ms": 2001,
+        "t": "listen",
+        "threshold": -50.0
+      },
+      "name": "preroll-too-long"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f6465646c6f756467686f6c645f6d73190fa0697468726573686f6c64f9d2406a707265726f6c6c5f6d731901f4",
+      "input": {
+        "hold_ms": 4000,
+        "mode": "loud",
+        "preroll_ms": 500,
+        "t": "listen",
+        "threshold": -50.0
+      },
+      "name": "bad-mode"
+    },
+    {
+      "hex": "a761746568656c6c6f636170706161646361707380646e616d657841787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787878787864726f6c656773746174696f6e65617564696f810265766964656f80",
+      "input": {
+        "app": "a",
+        "audio": [
+          2
+        ],
+        "caps": [],
+        "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "role": "station",
+        "t": "hello",
+        "video": []
+      },
+      "name": "name-65-bytes"
+    },
+    {
+      "hex": "a761746568656c6c6f636170706161646361707380646e616d65617864726f6c656673657276657265617564696f810265766964656f80",
+      "input": {
+        "app": "a",
+        "audio": [
+          2
+        ],
+        "caps": [],
+        "name": "x",
+        "role": "server",
+        "t": "hello",
+        "video": []
+      },
+      "name": "bad-role"
+    },
+    {
+      "hex": "a7617466737461747573646e616d6561786663616d657261f46674616c6b6572f667626174746572791865686368617267696e67f6696c697374656e65727301",
+      "input": {
+        "battery": 101,
+        "camera": false,
+        "charging": null,
+        "listeners": 1,
+        "name": "x",
+        "t": "status",
+        "talker": null
+      },
+      "name": "battery-over-100"
+    },
+    {
+      "hex": "a6617466737461747573646e616d6561786663616d657261f46762617474657279f6686368617267696e67f6696c697374656e65727301",
+      "input": {
+        "battery": null,
+        "camera": false,
+        "charging": null,
+        "listeners": 1,
+        "name": "x",
+        "t": "status"
+      },
+      "name": "status-missing-nullable"
+    },
+    {
+      "hex": "a26174667061697265646a73746174696f6e5f696463414243",
+      "input": {
+        "station_id": "ABC",
+        "t": "paired"
+      },
+      "name": "bad-station-id"
+    },
+    {
+      "hex": "8261746568656c6c6f",
+      "input": [
+        "t",
+        "hello"
+      ],
+      "name": "not-a-map"
+    },
+    {
+      "hex": "a2617466756e70616972617466756e70616972",
+      "name": "duplicate-key"
+    },
+    {
+      "hex": "a2617466",
+      "name": "truncated"
+    }
+  ],
+  "vectors": [
+    {
+      "hex": "a761746568656c6c6f636170706a6c756c6c2f302e312e3064636170738565617564696f63766f786474616c6b65766964656f6762617474657279646e616d65674e75727365727964726f6c656773746174696f6e65617564696f82010265766964656f8101",
+      "message": {
+        "app": "lull/0.1.0",
+        "audio": [
+          1,
+          2
+        ],
+        "caps": [
+          "audio",
+          "vox",
+          "talk",
+          "video",
+          "battery"
+        ],
+        "name": "Nursery",
+        "role": "station",
+        "t": "hello",
+        "video": [
+          1
+        ]
+      },
+      "name": "hello-station"
+    },
+    {
+      "hex": "a761746568656c6c6f636170706e6c756c6c2d7765622f302e312e3064636170738265617564696f65766964656f646e616d656e4b69746368656e207461626c657464726f6c65686c697374656e657265617564696f810265766964656f80",
+      "message": {
+        "app": "lull-web/0.1.0",
+        "audio": [
+          2
+        ],
+        "caps": [
+          "audio",
+          "video"
+        ],
+        "name": "Kitchen tablet",
+        "role": "listener",
+        "t": "hello",
+        "video": []
+      },
+      "name": "hello-listener"
+    },
+    {
+      "hex": "a261746c617564696f2d636f6e66696765636f64656302",
+      "message": {
+        "codec": 2,
+        "t": "audio-config"
+      },
+      "name": "audio-config"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f64656961637469766174656467686f6c645f6d73190fa0697468726573686f6c64f9d2406a707265726f6c6c5f6d731901f4",
+      "message": {
+        "hold_ms": 4000,
+        "mode": "activated",
+        "preroll_ms": 500,
+        "t": "listen",
+        "threshold": -50.0
+      },
+      "name": "listen-defaults"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f64656a636f6e74696e756f757367686f6c645f6d7319ea60697468726573686f6c64f9d5a06a707265726f6c6c5f6d7300",
+      "message": {
+        "hold_ms": 60000,
+        "mode": "continuous",
+        "preroll_ms": 0,
+        "t": "listen",
+        "threshold": -90.0
+      },
+      "name": "listen-continuous"
+    },
+    {
+      "hex": "a56174666c697374656e646d6f64656961637469766174656467686f6c645f6d731909c4697468726573686f6c64fac22933336a707265726f6c6c5f6d731907d0",
+      "message": {
+        "hold_ms": 2500,
+        "mode": "activated",
+        "preroll_ms": 2000,
+        "t": "listen",
+        "threshold": -42.29999923706055
+      },
+      "name": "listen-f32-threshold"
+    },
+    {
+      "hex": "a36174656c6576656c6464626673f9d3f0646f70656ef4",
+      "message": {
+        "dbfs": -63.5,
+        "open": false,
+        "t": "level"
+      },
+      "name": "level"
+    },
+    {
+      "hex": "a26174686163746976697479646f70656ef5",
+      "message": {
+        "open": true,
+        "t": "activity"
+      },
+      "name": "activity-open"
+    },
+    {
+      "hex": "a7617466737461747573646e616d65674e7572736572796663616d657261f56674616c6b65726344616467626174746572790e686368617267696e67f4696c697374656e65727303",
+      "message": {
+        "battery": 14,
+        "camera": true,
+        "charging": false,
+        "listeners": 3,
+        "name": "Nursery",
+        "t": "status",
+        "talker": "Dad"
+      },
+      "name": "status-full"
+    },
+    {
+      "hex": "a7617466737461747573646e616d65674e7572736572796663616d657261f46674616c6b6572f66762617474657279f6686368617267696e67f6696c697374656e65727301",
+      "message": {
+        "battery": null,
+        "camera": false,
+        "charging": null,
+        "listeners": 1,
+        "name": "Nursery",
+        "t": "status",
+        "talker": null
+      },
+      "name": "status-nulls"
+    },
+    {
+      "hex": "a561746b766964656f2d7374617274656d61785f681901e0656d61785f7719028066636f646563738101676d61785f6670730a",
+      "message": {
+        "codecs": [
+          1
+        ],
+        "max_fps": 10,
+        "max_h": 480,
+        "max_w": 640,
+        "t": "video-start"
+      },
+      "name": "video-start"
+    },
+    {
+      "hex": "a161746a766964656f2d73746f70",
+      "message": {
+        "t": "video-stop"
+      },
+      "name": "video-stop"
+    },
+    {
+      "hex": "a361746d766964656f2d6f7074696f6e73656e69676874f56663616d6572616566726f6e74",
+      "message": {
+        "camera": "front",
+        "night": true,
+        "t": "video-options"
+      },
+      "name": "video-options"
+    },
+    {
+      "hex": "a661681901e061746b766964656f2d73746174656177190280636670730a65636f646563016573746174656973747265616d696e67",
+      "message": {
+        "codec": 1,
+        "fps": 10,
+        "h": 480,
+        "state": "streaming",
+        "t": "video-state",
+        "w": 640
+      },
+      "name": "video-state-streaming"
+    },
+    {
+      "hex": "a261746b766964656f2d73746174656573746174656864697361626c6564",
+      "message": {
+        "state": "disabled",
+        "t": "video-state"
+      },
+      "name": "video-state-disabled"
+    },
+    {
+      "hex": "a161746c74616c6b2d72657175657374",
+      "message": {
+        "t": "talk-request"
+      },
+      "name": "talk-request"
+    },
+    {
+      "hex": "a161746c74616c6b2d72656c65617365",
+      "message": {
+        "t": "talk-release"
+      },
+      "name": "talk-release"
+    },
+    {
+      "hex": "a261746a74616c6b2d7374617465657374617465676772616e746564",
+      "message": {
+        "state": "granted",
+        "t": "talk-state"
+      },
+      "name": "talk-state-granted"
+    },
+    {
+      "hex": "a361746a74616c6b2d7374617465626279634d756d6573746174656462757379",
+      "message": {
+        "by": "Mum",
+        "state": "busy",
+        "t": "talk-state"
+      },
+      "name": "talk-state-busy"
+    },
+    {
+      "hex": "a26174667061697265646a73746174696f6e5f6964706d667267677a64666d7a747771326c6b",
+      "message": {
+        "station_id": "mfrggzdfmztwq2lk",
+        "t": "paired"
+      },
+      "name": "paired"
+    },
+    {
+      "hex": "a1617466756e70616972",
+      "message": {
+        "t": "unpair"
+      },
+      "name": "unpair"
+    },
+    {
+      "hex": "a2617465636c6f736566726561736f6e677265766f6b6564",
+      "message": {
+        "reason": "revoked",
+        "t": "close"
+      },
+      "name": "close-revoked"
+    },
+    {
+      "hex": "a3617465636c6f73656664657461696c781e756e6578706563746564207265636f7264206265666f72652068656c6c6f66726561736f6e6e70726f746f636f6c2d6572726f72",
+      "message": {
+        "detail": "unexpected record before hello",
+        "reason": "protocol-error",
+        "t": "close"
+      },
+      "name": "close-protocol-error"
+    }
+  ]
+}
