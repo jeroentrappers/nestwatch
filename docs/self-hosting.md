@@ -1,12 +1,9 @@
 # Self-hosting the Nestwatch relay server
 
-> **Status: the relay server is being finalized.** `nestwatch-server`
-> (`tools/nestwatch-server`) and relay support in the apps are in
-> development. This guide follows the deployment profile of
-> [specs/rendezvous.md §8](../specs/rendezvous.md#8-deployment-profile) so
-> you can prepare a host; command-line option names below are provisional.
-> Check `nestwatch-server --help` of the version you install and update this
-> page when the server lands.
+> **Status:** `nestwatch-server` (`tools/nestwatch-server`) is available;
+> relay support in the station and listener apps is being integrated. Run
+> `nestwatch-server --help` for every option and its environment variable
+> (`NESTWATCH_SERVER_*`); a TOML file can be passed with `--config`.
 
 The relay is optional. Stations and listeners work on the home network and
 over your own VPN without it. It helps on networks where devices cannot reach
@@ -78,12 +75,17 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-# Provisional options: HTTP for the reverse proxy on loopback, STUN on UDP 3478,
-# state in the directory systemd creates below.
+# HTTP for the reverse proxy on loopback, STUN on UDP 3478, state in the
+# directory systemd creates below. --trust-proxy takes the client address from
+# the loopback proxy's X-Real-IP / X-Forwarded-For so per-address limits work.
 ExecStart=/usr/local/bin/nestwatch-server \
-    --listen 127.0.0.1:8480 \
+    --http 127.0.0.1:8740 \
     --stun 0.0.0.0:3478 \
-    --state-dir ${STATE_DIRECTORY}
+    --trust-proxy true \
+    --check-origin true \
+    --state-dir ${STATE_DIRECTORY} \
+    --site-dir /var/www/nestwatch/site \
+    --app-dir /var/www/nestwatch/app
 DynamicUser=yes
 StateDirectory=nestwatch-server
 StateDirectoryMode=0700
@@ -139,7 +141,7 @@ Caddy obtains certificates and passes WebSocket upgrades automatically.
 ```caddyfile
 relay.example.org {
 	handle /nwr/1 {
-		reverse_proxy 127.0.0.1:8480 {
+		reverse_proxy 127.0.0.1:8740 {
 			# Long-lived relay pipes: never cut them on config reloads.
 			stream_close_delay 24h
 		}
@@ -185,11 +187,12 @@ server {
 
     location = /nwr/1 {
         access_log off;
-        proxy_pass http://127.0.0.1:8480;
+        proxy_pass http://127.0.0.1:8740;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection $connection_upgrade;
         proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_buffering off;
