@@ -21,7 +21,7 @@ pub use device_id::DeviceId;
 pub use discovery::StationTxt;
 pub use endpoint::{Endpoint, Host};
 pub use frame::{FrameDecoder, FrameError};
-pub use invite::{Invitation, InviteError};
+pub use invite::{Invitation, InviteError, RelayRef};
 pub use preface::{ListenerPreface, Mode, PrefaceError, StationPreface, Status};
 pub use record::{AudioHeader, Record, RecordError, VideoHeader};
 pub use video::{Reassembler, VideoError, VideoFrame};

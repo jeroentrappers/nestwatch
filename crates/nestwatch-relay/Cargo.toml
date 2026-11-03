@@ -1,0 +1,54 @@
+[package]
+name = "nestwatch-relay"
+description = "Nestwatch rendezvous and relay client (NWR/1): messages, mailbox identity, STUN binding, station registration, relayed and direct (QUIC) links"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["native", "direct"]
+## Native client on tokio: station registration, relayed connect, STUN.
+native = [
+    "dep:tokio",
+    "dep:tokio-tungstenite",
+    "dep:tokio-rustls",
+    "dep:rustls",
+    "dep:webpki-roots",
+    "dep:futures-util",
+]
+## Hole punching and the direct QUIC transport (rendezvous.md §5.2).
+direct = ["native", "dep:quinn", "dep:rcgen"]
+## Browser listener (wasm32): relayed connect over the browser WebSocket.
+web = ["dep:gloo-timers", "dep:futures-util"]
+
+[dependencies]
+nestwatch-net = { path = "../nestwatch-net" }
+nestwatch-proto = { path = "../nestwatch-proto" }
+base64 = { version = "0.22.1", default-features = false, features = ["alloc"] }
+getrandom = "0.3.4"
+minicbor = { version = "2.3.1", features = ["alloc"] }
+sha2 = "0.10"
+thiserror = "2"
+
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"], optional = true }
+gloo-timers = { version = "0.3", features = ["futures"], optional = true }
+quinn = { version = "0.11.12", default-features = false, features = ["runtime-tokio", "rustls-ring"], optional = true }
+rcgen = { version = "0.14", default-features = false, features = ["crypto", "ring"], optional = true }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"], optional = true }
+tokio = { version = "1", features = ["net", "rt", "time", "sync", "macros", "io-util"], optional = true }
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"], optional = true }
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["handshake"], optional = true }
+webpki-roots = { version = "1", optional = true }
+
+[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
+getrandom = { version = "0.3.4", features = ["wasm_js"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "net", "io-util"] }
+nestwatch-crypto = { path = "../nestwatch-crypto" }
+nestwatch-session = { path = "../nestwatch-session" }
+
+[lints]
+workspace = true

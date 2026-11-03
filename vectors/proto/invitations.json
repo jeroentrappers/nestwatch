@@ -1,5 +1,5 @@
 {
-  "description": "Invitation URIs (protocol.md §3.5). Keys and tokens are base64url without padding in the URI; hex here. Percent-encoding leaves only RFC 3986 unreserved characters unescaped.",
+  "description": "Invitation URIs (protocol.md §3.5) with the optional relay parameters r and m (rendezvous.md §3.2, OPEN-QUESTIONS RELAY-1). Keys, tokens and mailbox IDs are base64url without padding in the URI; hex here. Percent-encoding leaves only RFC 3986 unreserved characters unescaped.",
   "invalid": [
     {
       "name": "wrong-scheme",
@@ -32,6 +32,22 @@
     {
       "name": "bad-endpoint",
       "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&a=fd7a%3A%3A1%3A47100"
+    },
+    {
+      "name": "relay-without-mailbox",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&r=https%3A%2F%2Fnestwatch.appmire.be"
+    },
+    {
+      "name": "mailbox-without-relay",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&m=PD0-P0BBQkNERUZHSElKSw"
+    },
+    {
+      "name": "relay-with-path",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&r=https%3A%2F%2Fnestwatch.appmire.be%2Fnwr%2F1&m=PD0-P0BBQkNERUZHSElKSw"
+    },
+    {
+      "name": "short-mailbox",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&r=https%3A%2F%2Fnestwatch.appmire.be&m=AAAA"
     }
   ],
   "parse_only": [
@@ -95,6 +111,26 @@
       },
       "name": "more-than-8-endpoints",
       "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&a=10.0.0.1%3A47100&a=10.0.0.2%3A47100&a=10.0.0.3%3A47100&a=10.0.0.4%3A47100"
+    },
+    {
+      "invitation": {
+        "endpoints": [
+          "nursery.tail1234.ts.net:47100",
+          "100.101.102.103:47100",
+          "[fd7a:115c:a1e0::7]:47100",
+          "192.168.1.20:47100",
+          "[2001:db8::20]:47100"
+        ],
+        "name": "Baby's room",
+        "relay": {
+          "mailbox": "3c5b7a99b8d7f61534537291b0cfee0d",
+          "server": "https://nestwatch.appmire.be"
+        },
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "relay-origin-normalised",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&r=HTTPS%3A%2F%2FNestwatch.Appmire.BE%2F&m=PFt6mbjX9hU0U3KRsM_uDQ"
     }
   ],
   "vectors": [
@@ -141,6 +177,28 @@
       "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Chambre%20de%20Zo%C3%A9%20%F0%9F%8D%BC&a=10.0.0.5%3A47101",
       "web_origin": "http://192.168.1.20:47180",
       "web_url": "http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3DChambre%2520de%2520Zo%25C3%25A9%2520%25F0%259F%258D%25BC%26a%3D10.0.0.5%253A47101"
+    },
+    {
+      "invitation": {
+        "endpoints": [
+          "nursery.tail1234.ts.net:47100",
+          "100.101.102.103:47100",
+          "[fd7a:115c:a1e0::7]:47100",
+          "192.168.1.20:47100",
+          "[2001:db8::20]:47100"
+        ],
+        "name": "Baby's room",
+        "relay": {
+          "mailbox": "3c5b7a99b8d7f61534537291b0cfee0d",
+          "server": "https://nestwatch.appmire.be"
+        },
+        "station_key": "11304f6e8daccbea0928476685a4c3e201203f5e7d9cbbdaf91837567594b3d2",
+        "token": "a5c4e30221405f7e9dbcdbfa19385776"
+      },
+      "name": "relay",
+      "uri": "nestwatch://invite?v=1&s=ETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I&t=pcTjAiFAX36dvNv6GThXdg&n=Baby%27s%20room&a=nursery.tail1234.ts.net%3A47100&a=100.101.102.103%3A47100&a=%5Bfd7a%3A115c%3Aa1e0%3A%3A7%5D%3A47100&a=192.168.1.20%3A47100&a=%5B2001%3Adb8%3A%3A20%5D%3A47100&r=https%3A%2F%2Fnestwatch.appmire.be&m=PFt6mbjX9hU0U3KRsM_uDQ",
+      "web_origin": "http://192.168.1.20:47180",
+      "web_url": "http://192.168.1.20:47180/#nestwatch%3A%2F%2Finvite%3Fv%3D1%26s%3DETBPbo2sy-oJKEdmhaTD4gEgP159nLva-Rg3VnWUs9I%26t%3DpcTjAiFAX36dvNv6GThXdg%26n%3DBaby%2527s%2520room%26a%3Dnursery.tail1234.ts.net%253A47100%26a%3D100.101.102.103%253A47100%26a%3D%255Bfd7a%253A115c%253Aa1e0%253A%253A7%255D%253A47100%26a%3D192.168.1.20%253A47100%26a%3D%255B2001%253Adb8%253A%253A20%255D%253A47100%26r%3Dhttps%253A%252F%252Fnestwatch.appmire.be%26m%3DPFt6mbjX9hU0U3KRsM_uDQ"
     }
   ]
 }

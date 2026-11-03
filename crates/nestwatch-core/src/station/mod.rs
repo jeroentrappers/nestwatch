@@ -845,6 +845,8 @@ impl StationEngine {
                 .take(nestwatch_proto::invite::MAX_INVITE_ENDPOINTS)
                 .cloned()
                 .collect(),
+            // The engine does not register with a relay server yet.
+            relay: None,
         };
         let invite_uri = invitation
             .to_uri()

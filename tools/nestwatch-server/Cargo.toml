@@ -1,0 +1,49 @@
+[package]
+name = "nestwatch-server"
+description = "Nestwatch rendezvous and relay server (NWR/1) with STUN, serving the landing page, browser listener and downloads"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "nestwatch-server"
+path = "src/main.rs"
+
+[dependencies]
+nestwatch-relay = { path = "../../crates/nestwatch-relay", default-features = false }
+nestwatch-net = { path = "../../crates/nestwatch-net" }
+bytes = "1"
+clap = { version = "4.6", features = ["derive", "env"] }
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+getrandom = "0.3.4"
+http-body-util = "0.1"
+hyper = { version = "1.8", features = ["http1", "server"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+percent-encoding = "2.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+thiserror = "2"
+time = "0.3"
+tokio = { version = "1", features = ["rt-multi-thread", "net", "time", "sync", "macros", "fs", "io-util", "signal"] }
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["handshake"] }
+toml = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "env-filter", "ansi"] }
+
+[dev-dependencies]
+nestwatch-relay = { path = "../../crates/nestwatch-relay" }
+nestwatch-crypto = { path = "../../crates/nestwatch-crypto" }
+nestwatch-proto = { path = "../../crates/nestwatch-proto" }
+nestwatch-session = { path = "../../crates/nestwatch-session" }
+minicbor = { version = "2.3.1", features = ["alloc"] }
+tempfile = "3"
+tokio-tungstenite = { version = "0.28", default-features = false, features = ["connect", "handshake"] }
+
+[lints]
+workspace = true

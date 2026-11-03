@@ -32,6 +32,6 @@ pub mod web;
 pub mod ws_client;
 
 #[cfg(not(target_arch = "wasm32"))]
-pub use link::{StreamLink, StreamReader, StreamWriter};
+pub use link::{StreamLink, StreamReader, StreamWriter, websocket_config};
 #[cfg(not(target_arch = "wasm32"))]
 pub use listen::{BindScope, ListenConfig, StationListener};
