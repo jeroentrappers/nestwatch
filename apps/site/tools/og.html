@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Template for the Open Graph images; render-images.mjs fills in the text. -->
+<html lang="en" data-theme="night">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../../design/nestwatch.css">
+<style>
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body { background: radial-gradient(900px 500px at 85% 10%, rgba(179,166,255,.12), transparent 60%),
+                      radial-gradient(700px 500px at 0% 100%, rgba(244,189,126,.10), transparent 60%), var(--ink-0); }
+  .og { display: grid; grid-template-columns: 1fr 360px; gap: 40px; padding: 64px 72px; height: 100%; box-sizing: border-box; }
+  .text { display: flex; flex-direction: column; justify-content: center; gap: 28px; }
+  .brand { font-size: 40px; gap: 16px; }
+  .brand img { width: 72px; height: 72px; }
+  h1 { font-size: 58px; line-height: 1.08; letter-spacing: -0.02em; }
+  .pill { font-size: 20px; padding: 8px 16px; gap: 10px; }
+  .pill::before { width: 10px; height: 10px; }
+  .row { gap: 12px; }
+  .url { font-size: 22px; color: var(--text-2); }
+  .phone { align-self: start; margin-top: -8px; }
+  .phone img { width: 330px; border-radius: 44px; display: block; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+</style>
+</head>
+<body>
+<div class="og">
+  <div class="text">
+    <span class="brand"><img src="../../../design/logo.svg" alt=""> Nestwatch</span>
+    <h1 id="title"></h1>
+    <div class="row wrap" id="pills"></div>
+    <span class="url">nestwatch.appmire.be</span>
+  </div>
+  <div class="phone"><img src="../img/station-night.png" alt=""></div>
+</div>
+</body>
+</html>

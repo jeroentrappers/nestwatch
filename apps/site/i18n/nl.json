@@ -1,0 +1,533 @@
+{
+  "_comment": "Nederlandse teksten van de Nestwatch-website. Zelfde structuur als en.json (build.py controleert dat).",
+  "meta": { "og_locale": "nl_BE" },
+  "ui": {
+    "site_name": "Nestwatch: een babyfoon die privé blijft",
+    "skip": "Naar de inhoud",
+    "nav_label": "Hoofdmenu",
+    "footer_nav_label": "Site",
+    "menu": "Menu",
+    "nav": {
+      "home": "Home",
+      "download": "Downloaden",
+      "privacy": "Privacy",
+      "self-hosting": "Zelf hosten",
+      "about": "Open source",
+      "faq": "Vragen"
+    },
+    "theme_to_day": "Naar het dagthema",
+    "theme_to_night": "Naar het nachtthema",
+    "lang_short": "NL",
+    "lang_aria": "Deze site in het Nederlands",
+    "toc": "Op deze pagina",
+    "coming_soon": "Binnenkort",
+    "in_development": "In ontwikkeling",
+    "disclaimer_title": "Geen medisch hulpmiddel.",
+    "disclaimer": "Nestwatch is geen medisch hulpmiddel en vervangt geen toezicht. Ga altijd zelf bij je kind kijken. Het bewaakt geen ademhaling, beweging of gezondheid.",
+    "footer_tagline": "Een privé babyfoon die lokaal werkt, op de toestellen die je al hebt.",
+    "footer_license": "Vrije software onder de <a href=\"{repo}/blob/main/LICENSE\">GNU AGPL v3.0 of later</a>.",
+    "footer_source": "Broncode op GitHub",
+    "footer_privacy": "Deze website zet geen cookies, laadt niets van andere servers en heeft geen statistieken.",
+    "og_alt": "Het Nestwatch-logo, een honingkleurige maansikkel met twee lavendelkleurige geluidsgolven, en de woorden: een privé babyfoon voor al je toestellen.",
+    "not_found": {
+      "title": "Deze pagina bestaat niet",
+      "body": "De link is misschien oud, of de pagina is verhuisd.",
+      "home": "Naar de startpagina"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "Een privé babyfoon voor al je toestellen",
+      "og_title": "Nestwatch: een privé babyfoon voor al je toestellen",
+      "description": "Nestwatch maakt van telefoons, tablets en computers een babyfoon. Geluid en beeld gaan rechtstreeks tussen je eigen toestellen, end-to-end versleuteld. Geen account, geen cloud, open source.",
+      "hero": {
+        "pills": ["Geen account", "End-to-end versleuteld", "Open source"],
+        "title": "Een babyfoon die thuis blijft.",
+        "lead": "Nestwatch maakt van de telefoons, tablets en computers die je al hebt een babyfoon. Geluid en beeld gaan rechtstreeks van het ene toestel naar het andere, end-to-end versleuteld. Je maakt geen account aan en er zit geen cloud tussen.",
+        "cta_download": "Nestwatch downloaden",
+        "cta_how": "Zo werkt het",
+        "note": "Nu voor Linux, macOS, Windows en Android, en luisteren kan ook in de browser. iPhone en iPad komen eraan. De apps zijn voorlopig in het Engels.",
+        "shot_alt": "Nestwatch-luisteraar op een computer: drie zendertegels. Kinderkamer heeft geluid en een live camerabeeld, Leo's kamer is stil, bij Oma wordt opnieuw verbonden. Een zijpaneel toont de luisterinstellingen met een grafiek van het geluidsniveau en de drempel.",
+        "shot_caption": "De luisteraar op een computer, met drie zenders (ontwerpvoorbeeld)."
+      },
+      "promise": {
+        "heading": "Privé van bij het ontwerp",
+        "intro": "Een babyfoon hoort en ziet de meest private kamer van je huis. Nestwatch is zo gebouwd dat wat hij hoort tussen je eigen toestellen blijft.",
+        "items": [
+          {
+            "icon": "home",
+            "tone": "sage",
+            "title": "Je toestellen praten met elkaar",
+            "body": "Zenders en luisteraars verbinden rechtstreeks op je thuisnetwerk of via een VPN die je zelf beheert. Er is geen Nestwatch-account en geen server ertussen."
+          },
+          {
+            "icon": "lock",
+            "tone": "lavender",
+            "title": "End-to-end versleuteld",
+            "body": "Elke verbinding is versleuteld en geauthenticeerd met het Noise Protocol Framework. Alleen toestellen die je gekoppeld hebt, kunnen via een zender horen, kijken of praten."
+          },
+          {
+            "icon": "eye-off",
+            "tone": "honey",
+            "title": "Niets verzameld",
+            "body": "Geen statistieken, geen crashrapporten, geen updatecontroles, geen opnames. Geluid en beeld worden nooit bewaard, en logs bevatten nooit geluid of beelden."
+          }
+        ]
+      },
+      "how": {
+        "heading": "Zo werkt het",
+        "intro": "Elke telefoon, tablet of computer kan zender of luisteraar zijn. In de browser kun je luisteren.",
+        "steps": [
+          {
+            "title": "Zet een zender klaar",
+            "body": ["Leg een toestel bij je kind en kies <strong>This device watches</strong>. Het luistert naar de kamer en toont het geluidsniveau in een ring. Het scherm kan bijna zwart gedimd worden terwijl het blijft waken."]
+          },
+          {
+            "title": "Koppel een luisteraar",
+            "body": ["Tik op de zender op <strong>Pair a listener</strong>. Scan de QR-code, open de link of typ de code van 10 tekens. Koppel je met de code, dan tonen beide schermen hetzelfde getal, zodat je kunt nagaan dat niemand ertussen zit. Koppelen staat hooguit 10 minuten open."]
+          },
+          {
+            "title": "Luisteren, praten, kijken",
+            "body": ["De luisteraar speelt de kamer af wanneer er geluid is, waarschuwt je, laat je praten zolang je de knop vasthoudt, en zet de camera alleen aan als je erom vraagt. Gekoppelde toestellen verbinden vanzelf opnieuw, zonder code."]
+          }
+        ]
+      },
+      "features": {
+        "heading": "Alles wat een babyfoon moet kunnen, niets wat hij niet hoort te doen",
+        "intro": "",
+        "items": [
+          {
+            "icon": "wave",
+            "tone": "coral",
+            "title": "Geluidsactivering met jouw drempel",
+            "body": "De zender stuurt alleen geluid zolang de kamer luider is dan de drempel die je kiest, met een korte voorloop zodat het begin van een huiltje nooit wegvalt. Een grafiek van het geluidsniveau van de laatste minuut helpt je de drempel net boven het achtergrondgeluid te zetten. Liever alles horen? Kies altijd aan."
+          },
+          {
+            "icon": "talk",
+            "tone": "lavender",
+            "title": "Terugpraten",
+            "body": "Houd de knop vast om via de luidspreker van de zender te praten. Er praat één luisteraar tegelijk, en de anderen zien wie. De zender toont wanneer iemand praat."
+          },
+          {
+            "icon": "camera",
+            "tone": "honey",
+            "title": "Camera op vraag",
+            "body": "De camera staat uit zolang niemand kijkt. Open het beeld op een luisteraar en de zender toont duidelijk dat hij beeld stuurt. Een nachtvriendelijk grijs beeld helpt in een donkere kamer. Geluid gaat altijd voor; het beeld past zich aan de verbinding aan."
+          },
+          {
+            "icon": "grid",
+            "tone": "sage",
+            "title": "Meerdere zenders en luisteraars",
+            "body": "Volg tot 8 zenders tegelijk, samen in één rustig overzicht, met volume, dempen en solo per zender. Een zender bedient tot 8 luisteraars, zodat beide ouders en de grootouders kunnen meeluisteren."
+          },
+          {
+            "icon": "bell",
+            "tone": "amber",
+            "title": "Meldingen, ook als het geluid gedempt is",
+            "body": "Je krijgt een melding wanneer een stille kamer geluid maakt, wanneer een zender langer dan 20 seconden onbereikbaar is, en wanneer de batterij van een zender bijna leeg is. Een zender dempen dempt nooit zijn meldingen."
+          },
+          {
+            "icon": "moon",
+            "tone": "honey",
+            "title": "Rustig om 3 uur 's nachts",
+            "body": "Warme kleuren die niet verblinden, een nacht- en een dagthema, en een gedimd zenderscherm. Elke status heeft een woord naast zijn kleur, nooit kleur alleen."
+          }
+        ]
+      },
+      "screens": {
+        "heading": "Op je telefoon",
+        "intro": "Dezelfde schermen op elk platform, volgens het Nestwatch-ontwerp.",
+        "items": [
+          { "image": "station", "title": "Zender", "caption": "Geluidsniveau, wie luistert en of de camera aanstaat.", "alt": "Zenderscherm op een telefoon (Engelstalig ontwerp): de zender Nursery met een niveauring op min 56 decibel, stil, twee verbonden luisteraars en de camera aan voor mama, en knoppen om een luisteraar te koppelen of het scherm te dimmen." },
+          { "image": "pairing", "title": "Luisteraar koppelen", "caption": "QR-code, link of code van 10 tekens.", "alt": "Koppelscherm op een telefoon (Engelstalig ontwerp): een QR-code, de koppelcode 7KQ2M-X9RTA en de melding dat koppelen nog 9 minuten openstaat voor tot 8 toestellen." },
+          { "image": "add-station", "title": "Zender toevoegen", "caption": "Zenders in de buurt, de code en een getal om te vergelijken.", "alt": "Zender toevoegen op een telefoon (Engelstalig ontwerp): zenders in de buurt, de ingevulde koppelcode en het controlegetal 042 917 om met de zender te vergelijken." },
+          { "image": "listener-phone", "title": "Luisteraar", "caption": "Alle zenders in één lijst, met praten via een knop.", "alt": "Luisteraar op een telefoon (Engelstalig ontwerp): de zenders Nursery, stil, en Leo's room, waar papa praat, elk met een niveaumeter en knoppen om te dempen en de camera te openen." }
+        ],
+        "note": "De schermen zijn ontwerpvoorbeelden met verzonnen namen, in het Engels; op deze site staan geen echte camerabeelden."
+      },
+      "networks": {
+        "heading": "Thuis, en onderweg via je eigen VPN",
+        "intro": "",
+        "items": [
+          {
+            "icon": "wifi",
+            "tone": "sage",
+            "title": "Op je wifi",
+            "body": "Luisteraars vinden zenders op het thuisnetwerk vanzelf (mDNS). Elke tegel toont welke weg hij gebruikt, en luisteraars verbinden opnieuw na een netwerkwissel, met elk adres dat eerder werkte."
+          },
+          {
+            "icon": "shield",
+            "tone": "lavender",
+            "title": "Via je eigen VPN",
+            "body": "Gebruik je al Tailscale of WireGuard? Uitnodigingen bevatten de VPN-adressen en -namen van de zender, en je kunt een adres ook zelf intypen. Luister mee bij de grootouders, zonder Nestwatch-server."
+          }
+        ]
+      },
+      "relay": {
+        "heading": "Voor lastige netwerken: een optionele relay",
+        "intro": "Sommige netwerken blokkeren rechtstreekse verbindingen: mobiele data achter carrier-grade NAT, gastwifi die toestellen van elkaar afschermt, firewalls die alleen HTTPS doorlaten. Daarvoor krijgt Nestwatch een optionele relayserver die twee toestellen elkaar laat vinden, een rechtstreekse verbinding tussen beide probeert te openen en, alleen als dat niet lukt, de versleutelde stroom doorgeeft. Hij staat uit tot je hem aanzet, en je kunt je eigen server draaien.",
+        "can_heading": "Wat de beheerder van een relay kan zien",
+        "can": [
+          "dat een zender online is, en zijn publieke IP-adres",
+          "welke IP-adressen ermee verbinden, en wanneer",
+          "hoeveel bytes er stromen, wat kan verraden wanneer er geluid is (kies altijd-aan-luisteren op verbindingen via de relay om dat te verbergen)"
+        ],
+        "cannot_heading": "Wat hij niet kan zien of doen",
+        "cannot": [
+          "geluid horen, beeld zien of besturingsberichten lezen: die zijn end-to-end versleuteld tussen je toestellen",
+          "toestelnamen, koppelcodes of sleutels te weten komen; uitnodigingen gaan nooit via de server",
+          "zich voordoen als je zender of verkeer wijzigen: de handshake tussen je toestellen zou mislukken"
+        ],
+        "more_privacy": "Meer over privacy",
+        "more_selfhost": "Je eigen relay draaien"
+      },
+      "cta": {
+        "heading": "Probeer Nestwatch op de toestellen die je hebt",
+        "body": "Gratis en open source. Gebruik een oude telefoon of laptop als zender, en je eigen telefoon als luisteraar.",
+        "download": "Downloaden",
+        "source": "Bekijk de broncode"
+      }
+    },
+    "download": {
+      "title": "Nestwatch downloaden",
+      "lead": "Installeer Nestwatch op twee toestellen: één als zender bij je kind, één als luisteraar. Elke app op een toestel kan allebei.",
+      "description": "Download Nestwatch voor Linux (.deb, .rpm, .tar.gz), macOS (.dmg), Windows (.msi) en Android (.apk), of luister in de browser.",
+      "notice": [
+        "Bij elke release op <a href=\"{latest}\">GitHub Releases</a> horen kant-en-klare bestanden; de knoppen hieronder halen de bestanden van de nieuwste release. Nestwatch is nieuw: is er nog geen release, of ontbreekt een bestand, <a href=\"#source\">bouw het dan zelf</a>."
+      ],
+      "requirements_heading": "Vereisten",
+      "all_releases": "Alle releases en releasenotes",
+      "platforms": [
+        {
+          "key": "linux",
+          "name": "Linux",
+          "status": "",
+          "roles": "Zender en luisteraar, desktop-app.",
+          "requirements": [
+            "x86_64 of aarch64",
+            "WebKitGTK 4.1 en GTK 3 (Debian 12, Ubuntu 22.04, Fedora 37 of nieuwer)",
+            "PipeWire of PulseAudio met <code>pulseaudio-utils</code> voor geluid"
+          ],
+          "notes": [
+            "<strong>.deb</strong> voor Debian en Ubuntu, <strong>.rpm</strong> voor Fedora en andere RPM-distributies, <strong>.tar.gz</strong> voor de rest: pak uit en start <code>bin/nestwatch-desktop</code>. De pakketten bevatten ook <code>nestwatch-station</code>, een zender zonder venster voor een reservecomputer."
+          ]
+        },
+        {
+          "key": "macos",
+          "name": "macOS",
+          "status": "",
+          "roles": "Zender en luisteraar, desktop-app.",
+          "requirements": ["macOS 12 Monterey of nieuwer", "Apple silicon of Intel (één universele app)"],
+          "notes": [
+            "De app is nog niet door Apple ondertekend, dus macOS blokkeert hem de eerste keer. Sleep Nestwatch naar Apps, open hem één keer, ga dan naar <strong>Systeeminstellingen → Privacy en beveiliging</strong> en kies <strong>Open toch</strong>. Op macOS 14 en ouder kun je ook met Control ingedrukt op de app klikken en <strong>Open</strong> kiezen."
+          ]
+        },
+        {
+          "key": "windows",
+          "name": "Windows",
+          "status": "",
+          "roles": "Zender en luisteraar, desktop-app.",
+          "requirements": ["Windows 10 21H2 of nieuwer, of Windows 11", "x86_64", "Microsoft Edge WebView2 (zit in Windows 11 en een bijgewerkte Windows 10)"],
+          "notes": [
+            "Het installatieprogramma is nog niet ondertekend, dus SmartScreen kan waarschuwen. Kies <strong>Meer informatie → Toch uitvoeren</strong> als het bestand van de releasepagina komt en de controlesom klopt."
+          ]
+        },
+        {
+          "key": "android",
+          "name": "Android",
+          "status": "",
+          "roles": "Zender en luisteraar, app voor telefoon en tablet.",
+          "requirements": ["Android 6.0 of nieuwer", "arm64, armv7 of x86_64"],
+          "notes": [
+            "Open het gedownloade bestand en sta je browser of bestandsbeheerder toe apps te installeren als daarom gevraagd wordt. Releases die zonder de ondertekeningssleutel van het project gebouwd zijn, zeggen dat in hun naam (<code>…-testkey.apk</code>); verwijder zo'n versie voor je een correct ondertekende installeert.",
+            "Een Android-zender biedt de browserluisteraar nog niet aan; gebruik daarvoor een computer als zender."
+          ]
+        },
+        {
+          "key": "browser",
+          "name": "Browser",
+          "status": "",
+          "roles": "Alleen luisteraar, niets te installeren.",
+          "requirements": ["Chrome of Edge 113, Firefox 128, Safari 17 of nieuwer", "Terugpraten vraagt een HTTPS-adres"],
+          "notes": [
+            "Elke computer met een Nestwatch-zender biedt de browserluisteraar aan op je netwerk: open het webadres dat de zender toont bij het koppelen. Een kopie op <code>/app/</code> van deze site verbindt via de relay zodra die beschikbaar is.",
+            "Het pakket hieronder is dezelfde browserluisteraar als statische bestanden, voor zenders en zelf gehoste relays."
+          ]
+        },
+        {
+          "key": "ios",
+          "name": "iPhone en iPad",
+          "status": "",
+          "roles": "Zender en luisteraar.",
+          "requirements": ["iOS 15 of nieuwer (gepland)"],
+          "notes": [
+            "De iOS-app is gepland, op dezelfde kern als de andere apps, en is nog niet beschikbaar."
+          ]
+        }
+      ],
+      "verify": {
+        "heading": "Controleer je download",
+        "body": ["Bij elke release hoort een bestand <code>SHA256SUMS</code>. Zet het naast de gedownloade bestanden en voer uit:"],
+        "code": "sha256sum --check --ignore-missing SHA256SUMS"
+      },
+      "source": {
+        "heading": "Zelf bouwen",
+        "body": ["Nestwatch is geschreven in Rust. Met een recente Rust-toolchain (en op Linux de WebKitGTK-ontwikkelpakketten uit <a href=\"{repo}/blob/main/apps/desktop/README.md\">apps/desktop</a>):"],
+        "code": "git clone https://github.com/jeroentrappers/nestwatch\ncd nestwatch\napps/web/build.sh                         # browserluisteraar die de zender aanbiedt\ncargo run --release -p nestwatch-desktop  # desktop-app"
+      }
+    },
+    "privacy": {
+      "title": "Privacy",
+      "lead": "Kort gezegd: wat Nestwatch hoort en ziet, gaat van je zender naar je luisteraars en nergens anders heen.",
+      "description": "Hoe Nestwatch je thuis privé houdt: geen cloud, geen account, end-to-end versleuteling, geen opnames, en precies wat een optionele relayserver wel en niet kan zien.",
+      "sections": [
+        {
+          "id": "summary",
+          "heading": "In gewone woorden",
+          "pill": "",
+          "list": [
+            "<strong>Geen account, geen cloud.</strong> Nestwatch heeft geen registratie en geen bedrijfsserver waar je geluid of beeld langs gaat.",
+            "<strong>Alleen je eigen toestellen.</strong> De apps praten alleen met je eigen toestellen, plus een relayserver als, en alleen als, je er een aanzet.",
+            "<strong>End-to-end versleuteld.</strong> Alles tussen zender en luisteraar is versleuteld en geauthenticeerd, ook op je eigen wifi.",
+            "<strong>Geen opnames.</strong> Nestwatch neemt nooit geluid of beeld op en houdt er geen geschiedenis van bij.",
+            "<strong>Niet gevolgd.</strong> Geen statistieken, geen reclame, geen crashrapporten, geen updatecontroles, geen lettertypes of scripts van het internet."
+          ]
+        },
+        {
+          "id": "pairing",
+          "heading": "Wie kan meeluisteren",
+          "pill": "",
+          "body": [
+            "Een luisteraar kan een zender pas volgen nadat je ze gekoppeld hebt. Koppelen lukt alleen zolang het koppelscherm op de zender openstaat: hooguit 10 minuten, tot 8 toestellen, en na 5 foute codes sluit het.",
+            "Koppel je met de code, dan tonen beide toestellen hetzelfde getal. Verschillen de getallen, dan zit er misschien iemand tussen: kies <strong>Different</strong> en probeer opnieuw.",
+            "Elke luisteraar heeft zijn eigen sleutel. Op de zender zie je elke vertrouwde luisteraar en kun je er op elk moment een verwijderen; die wordt meteen losgekoppeld en daarna geweigerd, zonder gevolgen voor de anderen."
+          ]
+        },
+        {
+          "id": "encryption",
+          "heading": "Hoe het beschermd is",
+          "pill": "",
+          "body": [
+            "Verbindingen gebruiken het <a href=\"https://noiseprotocol.org/\">Noise Protocol Framework</a>: beide toestellen bewijzen wie ze zijn met hun eigen sleutels, elke sessie krijgt nieuwe sleutels, en berichten die gewijzigd, herhaald of van volgorde veranderd worden, beëindigen de sessie.",
+            "Sleutels blijven op het toestel dat ze maakte, in de sleutelopslag van het systeem waar die bestaat (Android Keystore, macOS-sleutelhanger, Windows Referentiebeheer, de Secret Service op Linux). Ze worden nooit geëxporteerd, gelogd of in back-ups gezet. Een nieuwe telefoon betekent opnieuw koppelen."
+          ]
+        },
+        {
+          "id": "camera",
+          "heading": "Camera en microfoon",
+          "pill": "",
+          "body": [
+            "De camera van de zender start alleen wanneer een luisteraar het camerabeeld opent, en stopt wanneer de laatste het sluit. Zolang hij beeld stuurt, toont de zender dat onmiskenbaar, en hij toont altijd hoeveel luisteraars verbonden zijn en of er iemand praat.",
+            "Apps vragen pas toestemming voor microfoon en camera wanneer een functie die voor het eerst nodig heeft, en leggen uit waarom. Je kunt camera en terugpraten op een zender helemaal uitschakelen."
+          ]
+        },
+        {
+          "id": "browser",
+          "heading": "De browserluisteraar",
+          "pill": "",
+          "body": [
+            "De browserluisteraar komt van je eigen zender en laadt niets van elders. Zijn sleutel en instellingen blijven in de opslag van die browser voor het adres van de zender. Over gewone HTTP is het gesprek nog altijd end-to-end versleuteld; het HTTPS-adres van de zender beschermt bovendien de app zelf en is nodig om terug te praten. Controleer dat de vingerafdruk van het certificaat overeenkomt met die op de zender."
+          ]
+        },
+        {
+          "id": "relay",
+          "heading": "Als je een relay aanzet",
+          "pill": "In ontwikkeling",
+          "body": [
+            "De optionele relay is bedoeld voor netwerken waarop je toestellen elkaar niet rechtstreeks bereiken. Hij staat standaard uit; een zender gebruikt hem pas nadat je hem aanzet en de server kiest. Het project wil er een draaien op <code>nestwatch.appmire.be</code>, en je kunt <a href=\"{link:self-hosting}\">je eigen relay draaien</a>."
+          ],
+          "table": {
+            "head": ["", "De beheerder van de relay"],
+            "rows": [
+              ["Kan te weten komen", "Dat een zender online is; zijn publieke IP-adres; welke IP-adressen ermee verbinden en wanneer; hoeveel bytes er stromen."],
+              ["Kan niet te weten komen", "Geluid, beeld, besturingsberichten, toestelnamen, koppelcodes of sleutels. Alles na de eerste bytes is versleuteld tussen je toestellen, en uitnodigingen gaan nooit via de server."],
+              ["Kan niet", "Zich voordoen als je zender, of wijzigen wat er verstuurd wordt: de handshake tussen de toestellen mislukt en de sessie sluit."]
+            ]
+          },
+          "after": [
+            "Het aantal bytes kan verraden wanneer er geluid is, omdat geluidsactivering alleen dan geluid stuurt. Op verbindingen via de relay kun je altijd-aan-luisteren kiezen om dat te verbergen. Toestellen via de relay blijven proberen over te schakelen op een rechtstreekse verbinding. De server bewaart geen opnames, logt geen mailbox-ID's of inhoud, en bewaart IP-adressen alleen zo lang als misbruikbescherming nodig heeft, hooguit 24 uur."
+          ]
+        },
+        {
+          "id": "website",
+          "heading": "Deze website",
+          "pill": "",
+          "body": [
+            "Deze site bestaat uit gewone statische pagina's. Hij zet geen cookies, heeft geen statistieken of trackers, en laadt geen lettertypes of scripts van andere servers. Het enige wat hij onthoudt, is je keuze voor het nacht- of dagthema, opgeslagen in je eigen browser."
+          ]
+        },
+        {
+          "id": "more",
+          "heading": "De details",
+          "pill": "",
+          "body": [
+            "Het volledige dreigingsmodel en de regels staan in de specificaties (Engels): <a href=\"{repo}/blob/main/specs/security.md\">security.md</a> en <a href=\"{repo}/blob/main/specs/rendezvous.md#7-privacy-and-security\">rendezvous.md §7</a>."
+          ]
+        }
+      ]
+    },
+    "self-hosting": {
+      "title": "Je eigen relay draaien",
+      "lead": "De relayserver is één programma zonder database. Heb je een kleine Linux-server met een domeinnaam, dan kun je je eigen relay draaien en je toestellen ernaar laten wijzen.",
+      "description": "Zo host je de optionele Nestwatch-relayserver zelf: één programma achter nginx of Caddy, HTTPS met WebSocket op /nwr/1, UDP 3478 en een systemd-unit.",
+      "sections": [
+        {
+          "id": "status",
+          "heading": "Stand van zaken",
+          "pill": "In ontwikkeling",
+          "body": [
+            "De relayserver (<code>nestwatch-server</code>) en de relay-ondersteuning in de apps worden afgewerkt. Deze pagina beschrijft de geplande installatie zodat je je kunt voorbereiden; details zoals namen van opties kunnen nog veranderen. De volledige, actuele handleiding is <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a> (Engels)."
+          ]
+        },
+        {
+          "id": "what",
+          "heading": "Wat hij doet",
+          "pill": "",
+          "body": [
+            "De server helpt een luisteraar een zender te bereiken zonder zijn adres te kennen, helpt beide een rechtstreekse verbinding door hun routers te openen, en geeft de versleutelde stroom door wanneer geen rechtstreekse weg werkt. Hij ziet alleen versleutelde gegevens: de handshake tussen de toestellen loopt er end-to-end doorheen. Hij biedt ook deze website en de browserluisteraar aan op zijn eigen HTTPS-adres."
+          ]
+        },
+        {
+          "id": "needs",
+          "heading": "Wat je nodig hebt",
+          "pill": "",
+          "list": [
+            "Een Linux-server die bereikbaar is vanaf het internet, met een domeinnaam",
+            "Een reverse proxy voor HTTPS (nginx of Caddy) die WebSocket-upgrades op <code>/nwr/1</code> doorgeeft",
+            "Open poorten in de firewall: <strong>TCP 443</strong> (HTTPS) en <strong>UDP 3478</strong> (adresdetectie voor rechtstreekse verbindingen)",
+            "Eén map voor de toestand (de server bewaart er gehashte mailboxgeheimen en verkeerstellers); geen database"
+          ]
+        },
+        {
+          "id": "setup",
+          "heading": "Installatie in het kort",
+          "pill": "",
+          "list": [
+            "Download <code>nestwatch-server-linux-x86_64</code> bij de <a href=\"{latest}\">nieuwste release</a> (zodra beschikbaar) en installeer het als <code>/usr/local/bin/nestwatch-server</code>.",
+            "Maak een systeemgebruiker en een map voor de toestand aan, bijvoorbeeld <code>/var/lib/nestwatch-server</code>.",
+            "Start hem met systemd: hij luistert op een lokale HTTP-poort voor de reverse proxy en rechtstreeks op UDP 3478.",
+            "Stel nginx of Caddy in voor je domein, stuur alles door naar die lokale poort en upgrade WebSocket-verbindingen op <code>/nwr/1</code>.",
+            "Zet op elke zender <strong>Reachable through a relay server</strong> aan en vul het adres van je server in, bijvoorbeeld <code>https://relay.example.org</code>."
+          ],
+          "code": "# Caddy (Caddyfile): HTTPS-certificaten en WebSocket-upgrades gaan automatisch\nrelay.example.org {\n\treverse_proxy 127.0.0.1:8480\n}",
+          "after": [
+            "De configuratie voor nginx, de systemd-unit en de firewallregels staan in <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
+          ]
+        },
+        {
+          "id": "limits",
+          "heading": "Limieten en logs",
+          "pill": "",
+          "body": [
+            "De server beperkt hoeveel één zender en één IP-adres kunnen gebruiken (gelijktijdige verbindingen, een snelheid per verbinding en een maandelijks verkeersbudget), zodat één gezin hem niet kan uitputten. Hij logt alleen totalen, nooit inhoud, en bewaart IP-adressen alleen zo lang als misbruikbescherming nodig heeft, hooguit 24 uur."
+          ]
+        }
+      ]
+    },
+    "about": {
+      "title": "Open source",
+      "lead": "Nestwatch is vrije software. Je kunt elke regel lezen, het zelf bouwen en het delen.",
+      "description": "Nestwatch is open source onder de GNU AGPL v3.0 of later: een Rust-kern met Dioxus-desktop-apps, een browserluisteraar in wasm en een Android-app in Jetpack Compose.",
+      "sections": [
+        {
+          "id": "license",
+          "heading": "Licentie",
+          "pill": "",
+          "body": [
+            "Nestwatch valt onder de <a href=\"{repo}/blob/main/LICENSE\">GNU Affero General Public License v3.0 of later</a>. Je mag het gebruiken, bestuderen, aanpassen en delen; verspreid je een aangepaste versie of bied je die als dienst aan anderen aan, dan deel je je wijzigingen onder dezelfde licentie.",
+            "De AGPL botst met de regels van de Apple App Store. Voor een iOS-release wil de auteursrechthebbende een uitdrukkelijke bijkomende toestemming geven voor verspreiding via app-winkels, of iOS-versies op een andere manier verspreiden."
+          ]
+        },
+        {
+          "id": "inside",
+          "heading": "Wat erin zit",
+          "pill": "",
+          "table": {
+            "head": ["Onderdeel", "Gebouwd met", "Stand"],
+            "rows": [
+              ["Kern: protocol, versleuteling, geluid, sessies", "Rust", "Eerste versie"],
+              ["Desktop-apps voor Linux, macOS, Windows", "Rust en Dioxus", "Eerste versie"],
+              ["Browserluisteraar", "Rust gecompileerd naar WebAssembly, Dioxus", "Eerste versie"],
+              ["Android-app", "Kotlin en Jetpack Compose op de Rust-kern (UniFFI)", "Eerste versie"],
+              ["App voor iPhone en iPad", "SwiftUI op de Rust-kern", "Gepland"],
+              ["Relayserver", "Rust", "In ontwikkeling"]
+            ]
+          },
+          "after": [
+            "Het gedrag van elke app komt uit één set <a href=\"{repo}/tree/main/specs\">specificaties</a> (Engels): de productvereisten, het netwerkprotocol, het beveiligingsmodel en de platformregels. De code volgt de specificaties, en gedragswijzigingen gaan eerst via de specificaties."
+          ]
+        },
+        {
+          "id": "contribute",
+          "heading": "Bijdragen",
+          "pill": "",
+          "list": [
+            "Meld bugs en ideeën in <a href=\"{repo}/issues\">GitHub Issues</a>. Voeg nooit opnames of beelden van je huis toe.",
+            "Lees de <a href=\"{repo}/tree/main/specs\">specificaties</a> voor je gedrag verandert; vereisten hebben vaste ID's zoals <code>FR-PAIR-3</code> waarnaar tests en issues verwijzen.",
+            "Pull requests worden gecontroleerd met rustfmt, clippy en de tests, en elke app wordt gebouwd op Linux, macOS, Windows en Android.",
+            "Vertalingen zijn welkom: de website bewaart alle teksten in één bestand per taal."
+          ]
+        },
+        {
+          "id": "name",
+          "heading": "Waarom Nestwatch",
+          "pill": "",
+          "body": [
+            "Veel verbonden babyfoons sturen het geluid uit de kinderkamer via de servers van een bedrijf, en blijven alleen werken zolang dat bedrijf dat wil. Nestwatch gebruikt de toestellen die je al hebt, houdt alles daartussen, en wordt in het openbaar gebouwd zodat het gecontroleerd kan worden en blijft werken."
+          ]
+        }
+      ]
+    },
+    "faq": {
+      "title": "Vragen en antwoorden",
+      "lead": "",
+      "description": "Antwoorden op veelgestelde vragen over Nestwatch: internet, aantal toestellen, batterij, de browserluisteraar, iPhone en veiligheid.",
+      "items": [
+        {
+          "q": "Heeft Nestwatch internet nodig?",
+          "a": ["Nee. Op je thuisnetwerk praten zender en luisteraars rechtstreeks met elkaar. Wil je van elders luisteren, verbind je toestellen dan met je eigen VPN, zoals Tailscale of WireGuard. Een optionele relayserver voor netwerken waar dat niet lukt, is in ontwikkeling."]
+        },
+        {
+          "q": "Moet ik een account aanmaken?",
+          "a": ["Nee. Er zijn geen accounts. Toestellen vertrouwen elkaar nadat je ze één keer gekoppeld hebt."]
+        },
+        {
+          "q": "Hoeveel toestellen kan ik gebruiken?",
+          "a": ["Een zender bedient tot 8 luisteraars, en een luisteraar kan tot 8 zenders tegelijk volgen, bijvoorbeeld één per kinderkamer."]
+        },
+        {
+          "q": "Kan ik een oude telefoon of laptop als zender gebruiken?",
+          "a": ["Ja, daar is Nestwatch voor gemaakt. Laat hem aan de lader: een zender luistert voortdurend. Android-zenders blijven werken met het scherm uit; computers gaan niet slapen zolang een zender draait (het scherm mag wel uitgaan)."]
+        },
+        {
+          "q": "Maakt hij me wakker voor elk klein geluidje?",
+          "a": ["Dat kies je zelf. Met geluidsactivering stuurt de zender alleen geluid zolang de kamer luider is dan je drempel; een grafiek van de laatste minuut toont waar het achtergrondgeluid zit. Je kunt ook altijd meeluisteren en toch een melding krijgen wanneer er geluid begint."]
+        },
+        {
+          "q": "Kan ik in een webbrowser luisteren?",
+          "a": ["Ja, op een computer, tablet of telefoon op hetzelfde netwerk als een zender op een desktop of laptop. Open het webadres dat de zender toont bij het koppelen. Gebruik het HTTPS-adres van de zender om terug te praten."]
+        },
+        {
+          "q": "Is er een iPhone-app?",
+          "a": ["Nog niet. De app voor iPhone en iPad is gepland. Tot dan kan een iPhone in Safari luisteren naar een computer die de zender draait."]
+        },
+        {
+          "q": "Staat de camera altijd aan?",
+          "a": ["Nee. De camera start alleen zolang een luisteraar het camerabeeld open heeft, en de zender toont dat hij aanstaat. Je kunt de camera in de zenderinstellingen helemaal uitschakelen."]
+        },
+        {
+          "q": "Worden geluid of beeld opgenomen?",
+          "a": ["Nee. Nestwatch heeft geen opnames of geschiedenis. Geluid en beeld worden alleen live afgespeeld op je luisteraars."]
+        },
+        {
+          "q": "Controleert het de ademhaling of gezondheid van mijn baby?",
+          "a": ["Nee. Nestwatch is geen medisch hulpmiddel en vervangt geen toezicht. Je kunt de kamer horen, zien en erheen praten, meer niet."]
+        },
+        {
+          "q": "Wat kost het?",
+          "a": ["Niets. Nestwatch is gratis en open source software onder de GNU AGPL."]
+        }
+      ]
+    }
+  }
+}

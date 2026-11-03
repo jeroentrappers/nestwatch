@@ -1,0 +1,533 @@
+{
+  "_comment": "English strings of the Nestwatch website. nl.json must keep the same structure (build.py checks it). {link:<page>}, {repo}, {latest} and {base} are expanded at build time.",
+  "meta": { "og_locale": "en_GB" },
+  "ui": {
+    "site_name": "Nestwatch: a private baby monitor",
+    "skip": "Skip to content",
+    "nav_label": "Main",
+    "footer_nav_label": "Site",
+    "menu": "Menu",
+    "nav": {
+      "home": "Home",
+      "download": "Download",
+      "privacy": "Privacy",
+      "self-hosting": "Self-hosting",
+      "about": "Open source",
+      "faq": "FAQ"
+    },
+    "theme_to_day": "Switch to the day theme",
+    "theme_to_night": "Switch to the night theme",
+    "lang_short": "EN",
+    "lang_aria": "This site in English",
+    "toc": "On this page",
+    "coming_soon": "Coming soon",
+    "in_development": "In development",
+    "disclaimer_title": "Not a medical device.",
+    "disclaimer": "Nestwatch is not a medical device and does not replace supervision. Always check on your child in person. It does not monitor breathing, movement or health.",
+    "footer_tagline": "A private, local-first baby monitor for the devices you already own.",
+    "footer_license": "Free software under the <a href=\"{repo}/blob/main/LICENSE\">GNU AGPL v3.0 or later</a>.",
+    "footer_source": "Source code on GitHub",
+    "footer_privacy": "This website sets no cookies, loads nothing from other servers and has no analytics.",
+    "og_alt": "The Nestwatch logo, a honey crescent with two lavender sound waves, and the words: a private baby monitor for every device you own.",
+    "not_found": {
+      "title": "This page is not here",
+      "body": "The link may be old, or the page has moved.",
+      "home": "Go to the home page"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "A private baby monitor for every device you own",
+      "og_title": "Nestwatch: a private baby monitor for every device you own",
+      "description": "Nestwatch turns phones, tablets and computers into a baby monitor. Sound and video go directly between your own devices, end-to-end encrypted. No account, no cloud, open source.",
+      "hero": {
+        "pills": ["No account", "End-to-end encrypted", "Open source"],
+        "title": "A baby monitor that stays in your home.",
+        "lead": "Nestwatch turns the phones, tablets and computers you already own into a baby monitor. Sound and video travel directly from one of your devices to another, end-to-end encrypted. There is no account to make and no cloud in between.",
+        "cta_download": "Download Nestwatch",
+        "cta_how": "How it works",
+        "note": "Linux, macOS, Windows and Android today, plus a listener in the browser. iPhone and iPad are coming.",
+        "shot_alt": "Nestwatch listener on a computer: three station tiles. Nursery shows sound with a live camera view, Leo's room is quiet, Grandma's is reconnecting. A side panel shows the listening settings with a room-level chart and threshold.",
+        "shot_caption": "The listener on a computer, following three stations (design preview)."
+      },
+      "promise": {
+        "heading": "Private by design",
+        "intro": "A baby monitor hears and sees the most private room of your home. Nestwatch is built so that what it hears stays between your devices.",
+        "items": [
+          {
+            "icon": "home",
+            "tone": "sage",
+            "title": "Your devices talk to each other",
+            "body": "Stations and listeners connect directly on your home network or over a VPN you run yourself. There is no Nestwatch account and no server in the middle."
+          },
+          {
+            "icon": "lock",
+            "tone": "lavender",
+            "title": "End-to-end encrypted",
+            "body": "Every connection is encrypted and authenticated with the Noise Protocol Framework. Only devices you paired can hear, see or talk through a station."
+          },
+          {
+            "icon": "eye-off",
+            "tone": "honey",
+            "title": "Nothing collected",
+            "body": "No analytics, no crash uploads, no update checks, no recordings. Audio and video are never stored, and logs never contain sound or pictures."
+          }
+        ]
+      },
+      "how": {
+        "heading": "How it works",
+        "intro": "Any phone, tablet or computer can be a station or a listener. The browser can listen.",
+        "steps": [
+          {
+            "title": "Set up a station",
+            "body": ["Put a device near your child and choose <strong>This device watches</strong>. It listens to the room and shows its sound level in a ring. The screen can be dimmed to near-black while it keeps monitoring."]
+          },
+          {
+            "title": "Pair a listener",
+            "body": ["On the station, tap <strong>Pair a listener</strong>. Scan the QR code, open the link, or type the 10-character code. When pairing by code, both screens show the same number so you can check nobody is in between. Pairing stays open for at most 10 minutes."]
+          },
+          {
+            "title": "Listen, talk, look",
+            "body": ["The listener plays the room when there is sound, alerts you, lets you hold to talk, and opens the camera only when you ask. Paired devices reconnect on their own, without a code."]
+          }
+        ]
+      },
+      "features": {
+        "heading": "Everything a baby monitor needs, nothing it should not do",
+        "intro": "",
+        "items": [
+          {
+            "icon": "wave",
+            "tone": "coral",
+            "title": "Sound activation with your threshold",
+            "body": "The station sends audio only while the room is louder than the threshold you choose, with a short pre-roll so the start of a cry is never cut off. A chart of the last minute of room level helps you place the threshold just above the background noise. Prefer to hear everything? Switch to always on."
+          },
+          {
+            "icon": "talk",
+            "tone": "lavender",
+            "title": "Talk-back",
+            "body": "Hold to talk through the station's speaker. One listener talks at a time, and the others see who it is. The station shows when someone is talking."
+          },
+          {
+            "icon": "camera",
+            "tone": "honey",
+            "title": "Camera on demand",
+            "body": "The camera is off whenever nobody is looking. Open the view from a listener and the station shows a clear indicator while it sends. A night-friendly grey image helps in a dark room. Sound always comes first; video adapts to the connection."
+          },
+          {
+            "icon": "grid",
+            "tone": "sage",
+            "title": "Several stations and listeners",
+            "body": "Follow up to 8 stations at once, mixed into one calm view, with volume, mute and solo per station. A station serves up to 8 listeners, so both parents and the grandparents can listen."
+          },
+          {
+            "icon": "bell",
+            "tone": "amber",
+            "title": "Alerts that work while muted",
+            "body": "Get an alert when a quiet room starts to sound, when a station has been unreachable for more than 20 seconds, and when a station's battery is low. Muting a station never mutes its alerts."
+          },
+          {
+            "icon": "moon",
+            "tone": "honey",
+            "title": "Calm at 3 a.m.",
+            "body": "Warm, low-glare colours, a night and a day theme, and a dimmed station screen. Every status has a word next to its colour, never colour alone."
+          }
+        ]
+      },
+      "screens": {
+        "heading": "On your phone",
+        "intro": "The same screens on every platform, following the Nestwatch design.",
+        "items": [
+          { "image": "station", "title": "Station", "caption": "Room level, who is listening and whether the camera is on.", "alt": "Station screen on a phone: the station Nursery with a level ring at minus 56 decibels, quiet, two listeners connected and the camera on for Mum, and buttons to pair a listener or dim the screen." },
+          { "image": "pairing", "title": "Pair a listener", "caption": "QR code, link or 10-character code.", "alt": "Pairing sheet on a phone: a QR code, the pairing code 7KQ2M-X9RTA, and the note that pairing is open for 9 minutes for up to 8 devices." },
+          { "image": "add-station", "title": "Add a station", "caption": "Nearby stations, the code, and a number to compare.", "alt": "Add a station on a phone: nearby stations, the pairing code entered, and the verification number 042 917 to compare with the station." },
+          { "image": "listener-phone", "title": "Listener", "caption": "Every station in one list, with hold to talk.", "alt": "Listener on a phone: the stations Nursery, quiet, and Leo's room, where Dad is talking, each with a level meter, mute and camera buttons." }
+        ],
+        "note": "Screens shown are design previews with example names; there are no real camera images on this site."
+      },
+      "networks": {
+        "heading": "At home, and away over your own VPN",
+        "intro": "",
+        "items": [
+          {
+            "icon": "wifi",
+            "tone": "sage",
+            "title": "On your Wi-Fi",
+            "body": "Listeners find stations on the home network by themselves (mDNS). Each tile shows which path it uses, and listeners reconnect after network changes, trying every address that worked before."
+          },
+          {
+            "icon": "shield",
+            "tone": "lavender",
+            "title": "Over your own VPN",
+            "body": "Already use Tailscale or WireGuard? Invitations include the station's VPN addresses and names, and you can type an address by hand. Listen from the grandparents' house without any Nestwatch server."
+          }
+        ]
+      },
+      "relay": {
+        "heading": "For difficult networks: an optional relay",
+        "intro": "Some networks block direct connections: mobile data behind carrier-grade NAT, guest Wi-Fi that isolates devices, firewalls that only allow HTTPS. For those, Nestwatch is getting an optional relay server that helps two devices find each other, tries to open a direct path between them and, only when that fails, forwards the encrypted stream. It is off until you turn it on, and you can run your own.",
+        "can_heading": "What a relay operator could see",
+        "can": [
+          "that a station is online, and its public IP address",
+          "which IP addresses connect to it, and when",
+          "how many bytes flow, which can hint at when there is sound (choose always-on listening on relayed connections to hide this)"
+        ],
+        "cannot_heading": "What it cannot see or do",
+        "cannot": [
+          "hear audio, see video or read control messages: they are encrypted end to end between your devices",
+          "learn device names, pairing codes or keys; invitations never pass through it",
+          "pretend to be your station or alter traffic: the devices' own handshake would fail"
+        ],
+        "more_privacy": "Privacy details",
+        "more_selfhost": "Run your own relay"
+      },
+      "cta": {
+        "heading": "Try Nestwatch on the devices you have",
+        "body": "Free and open source. Use an old phone or laptop as the station, and your phone as the listener.",
+        "download": "Download",
+        "source": "View the source"
+      }
+    },
+    "download": {
+      "title": "Download Nestwatch",
+      "lead": "Install Nestwatch on two devices: one as the station near your child, one as the listener. Every native app can do both.",
+      "description": "Download Nestwatch for Linux (.deb, .rpm, .tar.gz), macOS (.dmg), Windows (.msi) and Android (.apk), or listen in the browser.",
+      "notice": [
+        "Builds are attached to every release on <a href=\"{latest}\">GitHub Releases</a>; the buttons below fetch the files of the latest release. Nestwatch is new: if a release has not been published yet, or a file is missing, <a href=\"#source\">build from source</a>."
+      ],
+      "requirements_heading": "Requirements",
+      "all_releases": "All releases and release notes",
+      "platforms": [
+        {
+          "key": "linux",
+          "name": "Linux",
+          "status": "",
+          "roles": "Station and listener, desktop app.",
+          "requirements": [
+            "x86_64 or aarch64",
+            "WebKitGTK 4.1 and GTK 3 (Debian 12, Ubuntu 22.04, Fedora 37 or newer)",
+            "PipeWire or PulseAudio with <code>pulseaudio-utils</code> for sound"
+          ],
+          "notes": [
+            "<strong>.deb</strong> for Debian and Ubuntu, <strong>.rpm</strong> for Fedora and other RPM-based distributions, <strong>.tar.gz</strong> for everything else: unpack it and run <code>bin/nestwatch-desktop</code>. The packages also contain <code>nestwatch-station</code>, a station without a window for a spare computer."
+          ]
+        },
+        {
+          "key": "macos",
+          "name": "macOS",
+          "status": "",
+          "roles": "Station and listener, desktop app.",
+          "requirements": ["macOS 12 Monterey or newer", "Apple silicon or Intel (one universal app)"],
+          "notes": [
+            "The app is not yet signed by Apple, so macOS blocks it the first time. Drag Nestwatch to Applications, open it once, then go to <strong>System Settings → Privacy &amp; Security</strong> and choose <strong>Open Anyway</strong>. On macOS 14 and older you can instead Control-click the app and choose <strong>Open</strong>."
+          ]
+        },
+        {
+          "key": "windows",
+          "name": "Windows",
+          "status": "",
+          "roles": "Station and listener, desktop app.",
+          "requirements": ["Windows 10 21H2 or newer, or Windows 11", "x86_64", "Microsoft Edge WebView2 (included in Windows 11 and current Windows 10)"],
+          "notes": [
+            "The installer is not yet code-signed, so SmartScreen may warn you. Choose <strong>More info → Run anyway</strong> if the file came from the release page and its checksum matches."
+          ]
+        },
+        {
+          "key": "android",
+          "name": "Android",
+          "status": "",
+          "roles": "Station and listener, phone and tablet app.",
+          "requirements": ["Android 6.0 or newer", "arm64, armv7 or x86_64"],
+          "notes": [
+            "Open the downloaded file and allow your browser or file manager to install apps when asked. Releases built without the project's signing key carry a name that says so (<code>…-testkey.apk</code>); uninstall such a build before installing a properly signed one.",
+            "An Android station does not serve the browser listener yet; use a computer as the station for that."
+          ]
+        },
+        {
+          "key": "browser",
+          "name": "Browser",
+          "status": "",
+          "roles": "Listener only, no installation.",
+          "requirements": ["Chrome or Edge 113, Firefox 128, Safari 17 or newer", "Talk-back needs an HTTPS address"],
+          "notes": [
+            "Every computer running a Nestwatch station serves the browser listener on your network: open the web address shown on the station's pairing screen. A hosted copy at <code>/app/</code> on this site will connect through the relay once it is available.",
+            "The bundle below is the same browser listener as static files, for stations and self-hosted relays."
+          ]
+        },
+        {
+          "key": "ios",
+          "name": "iPhone and iPad",
+          "status": "",
+          "roles": "Station and listener.",
+          "requirements": ["iOS 15 or newer (planned)"],
+          "notes": [
+            "The iOS app is planned on the same core as the other apps and is not available yet."
+          ]
+        }
+      ],
+      "verify": {
+        "heading": "Check your download",
+        "body": ["Each release has a <code>SHA256SUMS</code> file. Put it next to the files you downloaded and run:"],
+        "code": "sha256sum --check --ignore-missing SHA256SUMS"
+      },
+      "source": {
+        "heading": "Build from source",
+        "body": ["Nestwatch is written in Rust. With a current Rust toolchain (and on Linux the WebKitGTK development packages listed in <a href=\"{repo}/blob/main/apps/desktop/README.md\">apps/desktop</a>):"],
+        "code": "git clone https://github.com/jeroentrappers/nestwatch\ncd nestwatch\napps/web/build.sh                         # browser listener the station serves\ncargo run --release -p nestwatch-desktop  # desktop app"
+      }
+    },
+    "privacy": {
+      "title": "Privacy",
+      "lead": "The short version: what Nestwatch hears and sees goes from your station to your listeners and nowhere else.",
+      "description": "How Nestwatch keeps your home private: no cloud, no account, end-to-end encryption, no recordings, and exactly what an optional relay server can and cannot see.",
+      "sections": [
+        {
+          "id": "summary",
+          "heading": "In plain words",
+          "pill": "",
+          "list": [
+            "<strong>No account, no cloud.</strong> Nestwatch has no sign-up and no company server that your audio or video passes through.",
+            "<strong>Only your devices.</strong> The apps talk only to your own devices, plus a relay server if, and only if, you turn one on.",
+            "<strong>Encrypted end to end.</strong> Everything between a station and a listener is encrypted and authenticated, also on your own Wi-Fi.",
+            "<strong>No recordings.</strong> Nestwatch never records audio or video, and keeps no history of either.",
+            "<strong>No tracking.</strong> No analytics, no advertising, no crash reports, no update checks, no fonts or scripts loaded from the internet."
+          ]
+        },
+        {
+          "id": "pairing",
+          "heading": "Who can listen",
+          "pill": "",
+          "body": [
+            "A listener can only follow a station after you paired them. Pairing works only while you have the pairing screen open on the station: at most 10 minutes, up to 8 devices, and after 5 wrong codes it closes.",
+            "When you pair by code, both devices show the same number. If the numbers differ, someone may be in between: choose <strong>Different</strong> and try again.",
+            "Every listener has its own key. On the station you see every trusted listener and can remove one at any time; it is disconnected immediately and refused afterwards, without affecting the others."
+          ]
+        },
+        {
+          "id": "encryption",
+          "heading": "How it is protected",
+          "pill": "",
+          "body": [
+            "Connections use the <a href=\"https://noiseprotocol.org/\">Noise Protocol Framework</a>: both devices prove who they are with their own keys, every session gets fresh keys, and messages that are changed, replayed or reordered end the session.",
+            "Keys stay on the device that made them, in the system's key store where there is one (Android Keystore, macOS Keychain, Windows Credential Manager, the Secret Service on Linux). They are never exported, logged or put in backups. A new phone means pairing again."
+          ]
+        },
+        {
+          "id": "camera",
+          "heading": "Camera and microphone",
+          "pill": "",
+          "body": [
+            "The station's camera starts only when a listener opens the camera view, and stops when the last one closes it. While it sends, the station shows an unmistakable indicator, and it always shows how many listeners are connected and whether someone is talking.",
+            "Apps ask for microphone and camera permission only when a feature first needs it, and explain why. You can switch the camera and talk-back off entirely on a station."
+          ]
+        },
+        {
+          "id": "browser",
+          "heading": "The browser listener",
+          "pill": "",
+          "body": [
+            "The browser listener is served by your own station and loads nothing from anywhere else. Its key and settings stay in that browser's storage for the station's address. Over plain HTTP the conversation is still end-to-end encrypted; the station's HTTPS address also protects the app itself and is needed for talk-back. Check that the certificate fingerprint matches the one the station shows."
+          ]
+        },
+        {
+          "id": "relay",
+          "heading": "If you turn on a relay",
+          "pill": "In development",
+          "body": [
+            "The optional relay is for networks where your devices cannot reach each other directly. It is off by default; a station uses it only after you enable it and choose the server. The project plans to run one at <code>nestwatch.appmire.be</code>, and you can <a href=\"{link:self-hosting}\">run your own</a>."
+          ],
+          "table": {
+            "head": ["", "The relay operator"],
+            "rows": [
+              ["Can learn", "That a station is online; its public IP address; which IP addresses connect to it and when; how many bytes flow."],
+              ["Cannot learn", "Audio, video, control messages, device names, pairing codes or keys. Everything after the first few bytes is encrypted between your devices, and invitations never pass through the server."],
+              ["Cannot do", "Pretend to be your station, or change what is sent: the devices' handshake fails and the session closes."]
+            ]
+          },
+          "after": [
+            "Byte counts can reveal when there is sound, because sound activation sends audio only then. On relayed connections you can choose always-on listening to hide this. Relayed devices keep trying to switch to a direct path. The server keeps no recordings, does not log mailbox IDs or contents, and keeps IP addresses only as long as abuse protection needs, at most 24 hours."
+          ]
+        },
+        {
+          "id": "website",
+          "heading": "This website",
+          "pill": "",
+          "body": [
+            "This site is plain static pages. It sets no cookies, has no analytics or trackers, and loads no fonts or scripts from other servers. The only thing it remembers is your choice of night or day theme, stored in your own browser."
+          ]
+        },
+        {
+          "id": "more",
+          "heading": "The details",
+          "pill": "",
+          "body": [
+            "The full threat model and rules are in the specifications: <a href=\"{repo}/blob/main/specs/security.md\">security.md</a> and <a href=\"{repo}/blob/main/specs/rendezvous.md#7-privacy-and-security\">rendezvous.md §7</a>."
+          ]
+        }
+      ]
+    },
+    "self-hosting": {
+      "title": "Run your own relay",
+      "lead": "The relay server is a single program with no database. If you have a small Linux server with a domain name, you can run your own and point your devices at it.",
+      "description": "How to self-host the optional Nestwatch relay server: a single binary behind nginx or Caddy, HTTPS with WebSocket on /nwr/1, UDP 3478, and a systemd unit.",
+      "sections": [
+        {
+          "id": "status",
+          "heading": "Status",
+          "pill": "In development",
+          "body": [
+            "The relay server (<code>nestwatch-server</code>) and relay support in the apps are being finalized. This page describes the planned deployment so you can prepare; details such as option names may still change. The full, current guide is <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
+          ]
+        },
+        {
+          "id": "what",
+          "heading": "What it does",
+          "pill": "",
+          "body": [
+            "The server helps a listener reach a station without knowing its address, helps both open a direct connection through their routers, and forwards the encrypted stream when no direct path works. It only ever sees encrypted data: the devices' own handshake runs end to end through it. It also serves this website and the browser listener from its own HTTPS address."
+          ]
+        },
+        {
+          "id": "needs",
+          "heading": "What you need",
+          "pill": "",
+          "list": [
+            "A Linux server reachable from the internet, with a domain name",
+            "A reverse proxy for HTTPS (nginx or Caddy) that passes WebSocket upgrades on <code>/nwr/1</code>",
+            "Open firewall ports: <strong>TCP 443</strong> (HTTPS) and <strong>UDP 3478</strong> (address discovery for direct connections)",
+            "One directory for state (the server keeps hashed mailbox secrets and transfer counters there); no database"
+          ]
+        },
+        {
+          "id": "setup",
+          "heading": "Setup in short",
+          "pill": "",
+          "list": [
+            "Download <code>nestwatch-server-linux-x86_64</code> from the <a href=\"{latest}\">latest release</a> (when available) and install it as <code>/usr/local/bin/nestwatch-server</code>.",
+            "Create a system user and a state directory, for example <code>/var/lib/nestwatch-server</code>.",
+            "Run it with systemd: it listens on a local HTTP port for the reverse proxy and directly on UDP 3478.",
+            "Configure nginx or Caddy for your domain, forwarding everything to that local port and upgrading WebSocket connections on <code>/nwr/1</code>.",
+            "On each station, turn on <strong>Reachable through a relay server</strong> and enter your server's address, for example <code>https://relay.example.org</code>."
+          ],
+          "code": "# Caddy (Caddyfile): HTTPS certificates and WebSocket upgrades are automatic\nrelay.example.org {\n\treverse_proxy 127.0.0.1:8480\n}",
+          "after": [
+            "Configuration for nginx, the systemd unit and the firewall rules are in <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
+          ]
+        },
+        {
+          "id": "limits",
+          "heading": "Limits and logging",
+          "pill": "",
+          "body": [
+            "The server limits how much one station and one IP address can use (concurrent connections, a rate per connection and a monthly transfer budget), so one household cannot exhaust it. It logs only totals, never contents, and keeps IP addresses only as long as abuse protection needs, at most 24 hours."
+          ]
+        }
+      ]
+    },
+    "about": {
+      "title": "Open source",
+      "lead": "Nestwatch is free software. You can read every line, build it yourself, and share it.",
+      "description": "Nestwatch is open source under the GNU AGPL v3.0 or later: a Rust core with Dioxus desktop apps, a wasm browser listener and a Jetpack Compose Android app.",
+      "sections": [
+        {
+          "id": "license",
+          "heading": "License",
+          "pill": "",
+          "body": [
+            "Nestwatch is licensed under the <a href=\"{repo}/blob/main/LICENSE\">GNU Affero General Public License v3.0 or later</a>. You may use, study, change and share it; if you distribute a changed version or run it as a service for others, you share your changes under the same license.",
+            "The AGPL conflicts with Apple App Store rules. Before an iOS release, the copyright holder intends to grant an explicit additional permission for app-store distribution, or to distribute iOS builds another way."
+          ]
+        },
+        {
+          "id": "inside",
+          "heading": "What is inside",
+          "pill": "",
+          "table": {
+            "head": ["Part", "Built with", "State"],
+            "rows": [
+              ["Core: protocol, encryption, audio, sessions", "Rust", "First version"],
+              ["Desktop apps for Linux, macOS, Windows", "Rust and Dioxus", "First version"],
+              ["Browser listener", "Rust compiled to WebAssembly, Dioxus", "First version"],
+              ["Android app", "Kotlin and Jetpack Compose on the Rust core (UniFFI)", "First version"],
+              ["iPhone and iPad app", "SwiftUI on the Rust core", "Planned"],
+              ["Relay server", "Rust", "In development"]
+            ]
+          },
+          "after": [
+            "The behaviour of every app comes from one set of <a href=\"{repo}/tree/main/specs\">specifications</a>: the product requirements, the wire protocol, the security model and the platform rules. Code follows the specs, and changes to behaviour go through the specs first."
+          ]
+        },
+        {
+          "id": "contribute",
+          "heading": "Contributing",
+          "pill": "",
+          "list": [
+            "Report bugs and ideas in <a href=\"{repo}/issues\">GitHub Issues</a>. Please never attach recordings or pictures of your home.",
+            "Read the <a href=\"{repo}/tree/main/specs\">specs</a> before changing behaviour; requirements carry stable IDs such as <code>FR-PAIR-3</code> that tests and issues refer to.",
+            "Pull requests are checked with rustfmt, clippy and the tests, and every app is built on Linux, macOS, Windows and Android.",
+            "Translations are welcome: the website keeps every string in one file per language."
+          ]
+        },
+        {
+          "id": "name",
+          "heading": "Why Nestwatch",
+          "pill": "",
+          "body": [
+            "Many connected baby monitors send the sound of your child's room through a company's servers, and depend on that company to keep working. Nestwatch uses the devices you already have, keeps everything between them, and is built in the open so that it can be checked and keep working."
+          ]
+        }
+      ]
+    },
+    "faq": {
+      "title": "Questions and answers",
+      "lead": "",
+      "description": "Answers to common questions about Nestwatch: internet access, number of devices, battery, the browser listener, iPhone support and safety.",
+      "items": [
+        {
+          "q": "Does Nestwatch need the internet?",
+          "a": ["No. On your home network the station and listeners talk directly to each other. To listen from somewhere else, connect your devices with your own VPN such as Tailscale or WireGuard. An optional relay server for networks where that is not possible is in development."]
+        },
+        {
+          "q": "Do I need to create an account?",
+          "a": ["No. There are no accounts. Devices trust each other after you pair them once."]
+        },
+        {
+          "q": "How many devices can I use?",
+          "a": ["A station serves up to 8 listeners, and a listener can follow up to 8 stations at the same time, for example one per child's room."]
+        },
+        {
+          "q": "Can I use an old phone or laptop as the station?",
+          "a": ["Yes, that is what Nestwatch is for. Keep it on the charger: a station listens all the time. Android stations keep running with the screen off; computers stay awake while a station runs (the display may still turn off)."]
+        },
+        {
+          "q": "Will it wake me for every little sound?",
+          "a": ["You choose. With sound activation, the station sends audio only while the room is louder than your threshold; a chart of the last minute shows where the background noise is. You can also listen all the time and still get an alert when sound starts."]
+        },
+        {
+          "q": "Can I listen in a web browser?",
+          "a": ["Yes, on a computer, tablet or phone on the same network as a desktop or laptop station. Open the web address the station shows when you pair. For talk-back, use the station's HTTPS address."]
+        },
+        {
+          "q": "Is there an iPhone app?",
+          "a": ["Not yet. The iPhone and iPad app is planned. Until then, an iPhone can listen in Safari to a computer that runs the station."]
+        },
+        {
+          "q": "Is the camera always on?",
+          "a": ["No. The camera starts only while a listener has the camera view open, and the station shows that it is on. You can turn the camera off completely in the station settings."]
+        },
+        {
+          "q": "Is audio or video recorded?",
+          "a": ["No. Nestwatch has no recording or history. Sound and pictures are only played live on your listeners."]
+        },
+        {
+          "q": "Does it check my baby's breathing or health?",
+          "a": ["No. Nestwatch is not a medical device and does not replace supervision. It lets you hear, see and talk to the room, nothing more."]
+        },
+        {
+          "q": "What does it cost?",
+          "a": ["Nothing. Nestwatch is free and open source software under the GNU AGPL."]
+        }
+      ]
+    }
+  }
+}
