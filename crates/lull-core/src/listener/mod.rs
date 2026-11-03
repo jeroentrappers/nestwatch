@@ -1035,6 +1035,32 @@ impl ListenerEngine {
         Ok(())
     }
 
+    /// Adds or updates a station found by the platform's own DNS-SD service
+    /// (Android NSD, Apple Bonjour) instead of the built-in browser, which
+    /// is then off ([`ListenerConfig::discovery`] `false`). It has the
+    /// same effect as an mDNS result: it is listed in
+    /// [`ListenerState::discovered`], used for code pairing and tried first
+    /// when reconnecting (CORE-10).
+    #[cfg(feature = "native")]
+    pub fn add_discovered(&self, station: lull_net::mdns::DiscoveredStation) {
+        let mut g = self.shared.lock();
+        if let Some(rt) = g.stations.get(station.txt.id.as_str()) {
+            rt.wake.notify_waiters();
+        }
+        g.discovered.insert(station.fullname.clone(), station);
+        self.shared.publish(&mut g);
+    }
+
+    /// Removes a station added with [`add_discovered`](Self::add_discovered)
+    /// by its full DNS-SD name.
+    #[cfg(feature = "native")]
+    pub fn remove_discovered(&self, fullname: &str) {
+        let mut g = self.shared.lock();
+        if g.discovered.remove(fullname).is_some() {
+            self.shared.publish(&mut g);
+        }
+    }
+
     // ----- per-station settings -------------------------------------------
 
     fn update_settings(
