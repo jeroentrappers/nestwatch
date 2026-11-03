@@ -95,6 +95,7 @@ fun StationSettingsScreen(onBack: () -> Unit, onSwitchRole: () -> Unit) {
                 )
                 s.battery?.let { Caption(stringResource(R.string.battery_here, it.toInt())) }
             }
+            RelayCard(s)
             TrustedListeners(s.deviceId)
             if (s.endpoints.isNotEmpty()) {
                 NestwatchCard {

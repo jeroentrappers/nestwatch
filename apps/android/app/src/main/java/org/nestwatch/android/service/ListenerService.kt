@@ -23,6 +23,7 @@ import org.nestwatch.android.audio.MicCapture
 import org.nestwatch.android.audio.SpeakerPlayback
 import org.nestwatch.android.core.Nestwatch
 import org.nestwatch.android.platform.KeepAwake
+import org.nestwatch.android.platform.NetworkWatch
 import org.nestwatch.android.platform.Notifications
 import org.nestwatch.android.platform.NsdBrowser
 import org.nestwatch.ffi.AlertKind
@@ -42,6 +43,7 @@ class ListenerService : LifecycleService() {
     private var playback: SpeakerPlayback? = null
     private var talkMic: MicCapture? = null
     private var browser: NsdBrowser? = null
+    private var network: NetworkWatch? = null
     private var lastNote: String? = null
 
     override fun onCreate() {
@@ -67,6 +69,7 @@ class ListenerService : LifecycleService() {
             onFound = { s -> runCatching { l.addDiscovered(s) } },
             onLost = { name -> runCatching { l.removeDiscovered(name) } },
         ).also { it.start() }
+        network = NetworkWatch(this) { runCatching { l.networkChanged() } }.also { it.start() }
         lifecycleScope.launch { Nestwatch.listenerEvents.collect { onEvent(l, it) } }
         lifecycleScope.launch {
             Nestwatch.listenerState.collect { s ->
@@ -143,6 +146,7 @@ class ListenerService : LifecycleService() {
         playback?.stop()
         talkMic?.stop()
         browser?.stop()
+        network?.stop()
         if (::awake.isInitialized) awake.release()
         super.onDestroy()
     }

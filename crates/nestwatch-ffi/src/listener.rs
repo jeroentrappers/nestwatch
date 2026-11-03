@@ -693,6 +693,13 @@ impl Listener {
         media::i16_to_le(&out)
     }
 
+    /// Tells the engine the device's network changed (Android
+    /// `ConnectivityManager` callback): reconnects retry at once and
+    /// relayed sessions try a direct path again (rendezvous.md §5.2).
+    pub fn network_changed(&self) {
+        self.engine.network_changed();
+    }
+
     /// Reports a station found by the platform's DNS-SD browser.
     pub fn add_discovered(&self, service: DiscoveredService) -> Result<(), NestwatchError> {
         let txt = nestwatch_proto::StationTxt::from_pairs(
