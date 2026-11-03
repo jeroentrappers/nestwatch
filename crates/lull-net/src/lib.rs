@@ -24,6 +24,10 @@ pub mod dial;
 #[cfg(not(target_arch = "wasm32"))]
 pub mod listen;
 #[cfg(not(target_arch = "wasm32"))]
+pub mod local;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod mdns;
+#[cfg(not(target_arch = "wasm32"))]
 pub mod web;
 pub mod ws_client;
 
