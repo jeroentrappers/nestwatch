@@ -144,6 +144,7 @@ async fn relay_only_invitation_then_direct_without_audio_gap() {
             }
         })
     };
+    let mut events = listener.events();
     let r = listener.pair_invitation(&info.invite_uri).await.unwrap();
     let id = r.station_id.clone();
     listener
@@ -209,6 +210,13 @@ async fn relay_only_invitation_then_direct_without_audio_gap() {
     feeding.store(false, std::sync::atomic::Ordering::Relaxed);
     feeder.await.unwrap();
 
+    // The switch is seamless: no disconnection on the listener.
+    while let Ok(e) = events.try_recv() {
+        assert!(
+            !matches!(e, nestwatch_core::listener::ListenerEvent::Disconnected { .. }),
+            "{e:?}"
+        );
+    }
     let samples = samples.lock().unwrap().clone();
     // -20 dBFS RMS is ~3277; silence (and concealment fades) far below.
     let audible = |rms: f32| rms > 500.0;

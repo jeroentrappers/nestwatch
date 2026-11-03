@@ -455,6 +455,8 @@ pub(crate) struct Rt {
     /// The previous session's buffer after a path switch, played until the
     /// new one yields its first decoded frame (rendezvous.md §5.2 item 4).
     pub draining: Option<JitterBuffer>,
+    /// A direct session that replaces the relayed one is being set up.
+    pub upgrading: bool,
     pub codec: Option<CodecId>,
     pub level: Option<f32>,
     pub open: bool,
@@ -488,6 +490,7 @@ impl Rt {
             cmd: None,
             jitter: None,
             draining: None,
+            upgrading: false,
             codec: None,
             level: None,
             open: false,

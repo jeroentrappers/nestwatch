@@ -593,38 +593,21 @@ impl Ctx<'_> {
                 .stations
                 .get(&id)
                 .is_some_and(|rt| rt.cmd.as_ref().is_some_and(|(s, _)| *s == self.serial));
-            if ours && let Some(rt) = g.stations.get_mut(&id) {
+            let handover = matches!(self.out.close, Some(CloseReason::Replaced))
+                && self.out.live
+                && g.stations.get(&id).is_some_and(|rt| rt.upgrading);
+            if ours
+                && handover
+                && let Some(rt) = g.stations.get_mut(&id)
+            {
+                // The station already switched to the direct session that is
+                // still finishing its setup here (§5.2 item 4): stay live and
+                // keep the buffered audio playing.
                 rt.cmd = None;
-                rt.jitter = None;
-                rt.draining = None;
-                rt.codec = None;
-                rt.open = false;
-                rt.path = None;
-                rt.route = None;
-                rt.rtt_ms = None;
-                rt.talk = TalkView::Idle;
-                rt.video = if rt.video_req.is_some() {
-                    VideoView::Requested
-                } else {
-                    VideoView::Off
-                };
-                rt.alerts.on_down(now);
-                if rt.following {
-                    rt.status = ConnStatus::Reconnecting {
-                        attempt: 1,
-                        tried: Vec::new(),
-                    };
-                }
-                shared.stop_talk_capture(&mut g, &id);
-                shared.apply_mixer(&mut g, &id);
-                shared.emit_after_publish(
-                    &mut g,
-                    ListenerEvent::Disconnected {
-                        station_id: id,
-                        reason: reason.clone(),
-                    },
-                );
+                rt.draining = rt.jitter.take();
                 shared.publish(&mut g);
+            } else if ours {
+                detach(shared, &mut g, &id, now, reason.clone());
             }
         }
         if let Some(r) = self.reply.take() {
@@ -636,6 +619,45 @@ impl Ctx<'_> {
         }
         self.out
     }
+}
+
+/// The station's live session is gone: reset its runtime state and report
+/// the disconnection.
+pub(super) fn detach(shared: &Shared, g: &mut Inner, id: &str, now: u64, reason: String) {
+    let Some(rt) = g.stations.get_mut(id) else {
+        return;
+    };
+    rt.cmd = None;
+    rt.jitter = None;
+    rt.draining = None;
+    rt.codec = None;
+    rt.open = false;
+    rt.path = None;
+    rt.route = None;
+    rt.rtt_ms = None;
+    rt.talk = TalkView::Idle;
+    rt.video = if rt.video_req.is_some() {
+        VideoView::Requested
+    } else {
+        VideoView::Off
+    };
+    rt.alerts.on_down(now);
+    if rt.following {
+        rt.status = ConnStatus::Reconnecting {
+            attempt: 1,
+            tried: Vec::new(),
+        };
+    }
+    shared.stop_talk_capture(g, id);
+    shared.apply_mixer(g, id);
+    shared.emit_after_publish(
+        g,
+        ListenerEvent::Disconnected {
+            station_id: id.to_owned(),
+            reason,
+        },
+    );
+    shared.publish(g);
 }
 
 fn status_name(s: Status) -> &'static str {
@@ -888,7 +910,7 @@ pub(crate) async fn follow_loop(shared: Arc<Shared>, id: String, gen_: u64) {
             .lock()
             .stations
             .get(&id)
-            .is_some_and(|rt| rt.cmd.is_some());
+            .is_some_and(|rt| rt.cmd.is_some() || rt.upgrading);
         if busy {
             let notified = wake.notified();
             tokio::select! {

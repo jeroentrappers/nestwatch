@@ -102,6 +102,25 @@ mod native {
         pub relay: RelayRef,
     }
 
+    /// Marks the direct session's setup. When it ends with the station
+    /// left without a session (the station dropped the relayed one but the
+    /// direct one failed), report the disconnection and wake the reconnect
+    /// loop.
+    fn set_upgrading(shared: &Shared, id: &str, on: bool) {
+        let now = shared.now();
+        let mut g = shared.lock();
+        let Some(rt) = g.stations.get_mut(id) else {
+            return;
+        };
+        rt.upgrading = on;
+        if !on {
+            rt.wake.notify_waiters();
+            if rt.cmd.is_none() && rt.following && rt.status == super::super::ConnStatus::Live {
+                super::super::follow::detach(shared, &mut g, id, now, "direct path failed".into());
+            }
+        }
+    }
+
     /// Whether the relayed session `serial` still serves station `id`.
     fn current(shared: &Shared, id: &str, serial: u64) -> bool {
         let g = shared.lock();
@@ -143,18 +162,20 @@ mod native {
                     return;
                 }
                 let mode = ListenerMode::Trusted { station: key };
+                set_upgrading(&shared, &id, true);
                 run_session(
                     &shared,
                     dialed,
                     route,
                     label,
                     mode,
-                    Some(id),
+                    Some(id.clone()),
                     None,
                     Vec::new(),
                     Some(relayed),
                 )
                 .await;
+                set_upgrading(&shared, &id, false);
                 // The reconnect loop takes over when the direct session ends.
                 return;
             }
