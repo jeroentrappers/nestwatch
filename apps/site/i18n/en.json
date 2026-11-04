@@ -167,7 +167,7 @@
       },
       "relay": {
         "heading": "For difficult networks: an optional relay",
-        "intro": "Some networks block direct connections: mobile data behind carrier-grade NAT, guest Wi-Fi that isolates devices, firewalls that only allow HTTPS. For those, Nestwatch is getting an optional relay server that helps two devices find each other, tries to open a direct path between them and, only when that fails, forwards the encrypted stream. It is off until you turn it on, and you can run your own.",
+        "intro": "Some networks block direct connections: mobile data behind carrier-grade NAT, guest Wi-Fi that isolates devices, firewalls that only allow HTTPS. For those, Nestwatch has an optional relay server that helps two devices find each other, tries to open a direct path between them and, only when that fails, forwards the encrypted stream. It is off until you turn it on, and you can run your own.",
         "can_heading": "What a relay operator could see",
         "can": [
           "that a station is online, and its public IP address",
@@ -334,9 +334,9 @@
         {
           "id": "relay",
           "heading": "If you turn on a relay",
-          "pill": "In development",
+          "pill": "",
           "body": [
-            "The optional relay is for networks where your devices cannot reach each other directly. It is off by default; a station uses it only after you enable it and choose the server. The project plans to run one at <code>nestwatch.appmire.be</code>, and you can <a href=\"{link:self-hosting}\">run your own</a>."
+            "The optional relay is for networks where your devices cannot reach each other directly. It is off by default; a station uses it only after you enable it and choose the server. The project runs one at <code>nestwatch.appmire.be</code>, and you can <a href=\"{link:self-hosting}\">run your own</a>."
           ],
           "table": {
             "head": ["", "The relay operator"],
@@ -376,9 +376,9 @@
         {
           "id": "status",
           "heading": "Status",
-          "pill": "In development",
+          "pill": "",
           "body": [
-            "The relay server (<code>nestwatch-server</code>) and relay support in the apps are being finalized. This page describes the planned deployment so you can prepare; details such as option names may still change. The full, current guide is <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
+            "The relay server (<code>nestwatch-server</code>) ships with every release since 0.1.0, and the apps support it. The full, current guide is <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
           ]
         },
         {
@@ -405,7 +405,7 @@
           "heading": "Setup in short",
           "pill": "",
           "list": [
-            "Download <code>nestwatch-server-linux-x86_64</code> from the <a href=\"{latest}\">latest release</a> (when available) and install it as <code>/usr/local/bin/nestwatch-server</code>.",
+            "Download <code>nestwatch-server-linux-x86_64</code> from the <a href=\"{latest}\">latest release</a> and install it as <code>/usr/local/bin/nestwatch-server</code>.",
             "Create a system user and a state directory, for example <code>/var/lib/nestwatch-server</code>.",
             "Run it with systemd: it listens on a local HTTP port for the reverse proxy and directly on UDP 3478.",
             "Configure nginx or Caddy for your domain: forward <code>/nwr/1</code> to that local port with WebSocket upgrades, and serve the static website and browser listener (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>) for everything else.",
@@ -452,7 +452,7 @@
               ["Browser listener", "Rust compiled to WebAssembly, Dioxus", "First version"],
               ["Android app", "Kotlin and Jetpack Compose on the Rust core (UniFFI)", "First version"],
               ["iPhone and iPad app", "SwiftUI on the Rust core", "Planned"],
-              ["Relay server", "Rust", "In development"]
+              ["Relay server", "Rust", "First version"]
             ]
           },
           "after": [
@@ -487,7 +487,7 @@
       "items": [
         {
           "q": "Does Nestwatch need the internet?",
-          "a": ["No. On your home network the station and listeners talk directly to each other. To listen from somewhere else, connect your devices with your own VPN such as Tailscale or WireGuard. An optional relay server for networks where that is not possible is in development."]
+          "a": ["No. On your home network the station and listeners talk directly to each other. To listen from somewhere else, connect your devices with your own VPN such as Tailscale or WireGuard. Or switch on the optional relay on the station; it works on networks where a VPN is not possible."]
         },
         {
           "q": "Do I need to create an account?",

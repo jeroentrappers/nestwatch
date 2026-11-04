@@ -338,7 +338,7 @@ def home(s, lang):
 </div>
 <p class="center"><a class="btn ghost" href="{page_path(lang, "privacy")}#relay">{rl["more_privacy"]}</a>
 <a class="btn ghost" href="{page_path(lang, "self-hosting")}">{rl["more_selfhost"]}</a></p>"""
-    relay = section("relay", f'{rl["heading"]} {pill(s["ui"]["in_development"], "warn")}', relay_body, rl["intro"])
+    relay = section("relay", rl["heading"], relay_body, rl["intro"])
 
     cta = p["cta"]
     final = f"""<section class="band" aria-labelledby="cta-h"><div class="page"><div class="card cta">

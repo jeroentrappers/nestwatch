@@ -167,7 +167,7 @@
       },
       "relay": {
         "heading": "Voor lastige netwerken: een optionele relay",
-        "intro": "Sommige netwerken blokkeren rechtstreekse verbindingen: mobiele data achter carrier-grade NAT, gastwifi die toestellen van elkaar afschermt, firewalls die alleen HTTPS doorlaten. Daarvoor krijgt Nestwatch een optionele relayserver die twee toestellen elkaar laat vinden, een rechtstreekse verbinding tussen beide probeert te openen en, alleen als dat niet lukt, de versleutelde stroom doorgeeft. Hij staat uit tot je hem aanzet, en je kunt je eigen server draaien.",
+        "intro": "Sommige netwerken blokkeren rechtstreekse verbindingen: mobiele data achter carrier-grade NAT, gastwifi die toestellen van elkaar afschermt, firewalls die alleen HTTPS doorlaten. Daarvoor heeft Nestwatch een optionele relayserver die twee toestellen elkaar laat vinden, een rechtstreekse verbinding tussen beide probeert te openen en, alleen als dat niet lukt, de versleutelde stroom doorgeeft. Hij staat uit tot je hem aanzet, en je kunt je eigen server draaien.",
         "can_heading": "Wat de beheerder van een relay kan zien",
         "can": [
           "dat een zender online is, en zijn publieke IP-adres",
@@ -334,9 +334,9 @@
         {
           "id": "relay",
           "heading": "Als je een relay aanzet",
-          "pill": "In ontwikkeling",
+          "pill": "",
           "body": [
-            "De optionele relay is bedoeld voor netwerken waarop je toestellen elkaar niet rechtstreeks bereiken. Hij staat standaard uit; een zender gebruikt hem pas nadat je hem aanzet en de server kiest. Het project wil er een draaien op <code>nestwatch.appmire.be</code>, en je kunt <a href=\"{link:self-hosting}\">je eigen relay draaien</a>."
+            "De optionele relay is bedoeld voor netwerken waarop je toestellen elkaar niet rechtstreeks bereiken. Hij staat standaard uit; een zender gebruikt hem pas nadat je hem aanzet en de server kiest. Het project draait er een op <code>nestwatch.appmire.be</code>, en je kunt <a href=\"{link:self-hosting}\">je eigen relay draaien</a>."
           ],
           "table": {
             "head": ["", "De beheerder van de relay"],
@@ -376,9 +376,9 @@
         {
           "id": "status",
           "heading": "Stand van zaken",
-          "pill": "In ontwikkeling",
+          "pill": "",
           "body": [
-            "De relayserver (<code>nestwatch-server</code>) en de relay-ondersteuning in de apps worden afgewerkt. Deze pagina beschrijft de geplande installatie zodat je je kunt voorbereiden; details zoals namen van opties kunnen nog veranderen. De volledige, actuele handleiding is <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a> (Engels)."
+            "De relayserver (<code>nestwatch-server</code>) zit sinds 0.1.0 bij elke release, en de apps ondersteunen hem. De volledige, actuele handleiding is <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a> (Engels)."
           ]
         },
         {
@@ -405,7 +405,7 @@
           "heading": "Installatie in het kort",
           "pill": "",
           "list": [
-            "Download <code>nestwatch-server-linux-x86_64</code> bij de <a href=\"{latest}\">nieuwste release</a> (zodra beschikbaar) en installeer het als <code>/usr/local/bin/nestwatch-server</code>.",
+            "Download <code>nestwatch-server-linux-x86_64</code> bij de <a href=\"{latest}\">nieuwste release</a> en installeer het als <code>/usr/local/bin/nestwatch-server</code>.",
             "Maak een systeemgebruiker en een map voor de toestand aan, bijvoorbeeld <code>/var/lib/nestwatch-server</code>.",
             "Start hem met systemd: hij luistert op een lokale HTTP-poort voor de reverse proxy en rechtstreeks op UDP 3478.",
             "Stel nginx of Caddy in voor je domein: stuur <code>/nwr/1</code> met WebSocket-upgrade door naar die lokale poort, en bied voor de rest de statische website en browserluisteraar aan (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>).",
@@ -452,7 +452,7 @@
               ["Browserluisteraar", "Rust gecompileerd naar WebAssembly, Dioxus", "Eerste versie"],
               ["Android-app", "Kotlin en Jetpack Compose op de Rust-kern (UniFFI)", "Eerste versie"],
               ["App voor iPhone en iPad", "SwiftUI op de Rust-kern", "Gepland"],
-              ["Relayserver", "Rust", "In ontwikkeling"]
+              ["Relayserver", "Rust", "Eerste versie"]
             ]
           },
           "after": [
@@ -487,7 +487,7 @@
       "items": [
         {
           "q": "Heeft Nestwatch internet nodig?",
-          "a": ["Nee. Op je thuisnetwerk praten zender en luisteraars rechtstreeks met elkaar. Wil je van elders luisteren, verbind je toestellen dan met je eigen VPN, zoals Tailscale of WireGuard. Een optionele relayserver voor netwerken waar dat niet lukt, is in ontwikkeling."]
+          "a": ["Nee. Op je thuisnetwerk praten zender en luisteraars rechtstreeks met elkaar. Wil je van elders luisteren, verbind je toestellen dan met je eigen VPN, zoals Tailscale of WireGuard. Of zet de optionele relay aan op de zender; die werkt ook op netwerken waar een VPN niet lukt."]
         },
         {
           "q": "Moet ik een account aanmaken?",
