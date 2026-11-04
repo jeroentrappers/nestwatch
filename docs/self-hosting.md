@@ -27,6 +27,12 @@ There are two ways to run it:
   browser listener and the website, for linux/amd64 and linux/arm64.
 - **The binary with systemd** behind your own nginx or Caddy (sections 1–8).
 
+Either way, the server answers everything on its HTTP port: `/nwr/1`, the
+website at `/` and the browser app at `/app/`, with the security headers
+those pages need (the app's Permissions-Policy allows the microphone and the
+camera, which the browser station uses). The reverse proxy only terminates
+TLS and forwards every request to it.
+
 ## Docker Compose
 
 The image `ghcr.io/jeroentrappers/nestwatch-server` (tags `latest`, `0.1`,
@@ -89,7 +95,8 @@ checkout.
 |------|----------|
 | `/usr/local/bin/nestwatch-server` | the server binary (`nestwatch-server-linux-x86_64` from a release) |
 | `/var/lib/nestwatch-server/` | state: mailbox secret hashes, transfer counters (owned by the service user, created by systemd) |
-| `/var/www/nestwatch/` | static files served by the proxy: the website (`nestwatch-site.tar.gz`) with the browser listener (`nestwatch-web.tar.gz`) in `app/` |
+| `/var/www/nestwatch/site/` | the website (`nestwatch-site.tar.gz`), served by `nestwatch-server` at `/` |
+| `/var/www/nestwatch/app/` | the browser app (`nestwatch-web.tar.gz`), served by `nestwatch-server` at `/app/` |
 
 ```sh
 # Binary
@@ -98,19 +105,24 @@ curl -fLO https://github.com/jeroentrappers/nestwatch/releases/latest/download/S
 sha256sum --check --ignore-missing SHA256SUMS
 sudo install -m 0755 nestwatch-server-linux-x86_64 /usr/local/bin/nestwatch-server
 
-# Static files: website at /, browser listener at /app/
+# Website at /, browser app at /app/
 curl -fLO https://github.com/jeroentrappers/nestwatch/releases/latest/download/nestwatch-site.tar.gz
 curl -fLO https://github.com/jeroentrappers/nestwatch/releases/latest/download/nestwatch-web.tar.gz
-sudo mkdir -p /var/www/nestwatch
-sudo tar -C /var/www/nestwatch --strip-components=1 -xzf nestwatch-site.tar.gz
-sudo mkdir -p /var/www/nestwatch/app
+sudo mkdir -p /var/www/nestwatch/site /var/www/nestwatch/app
+sudo tar -C /var/www/nestwatch/site --strip-components=1 -xzf nestwatch-site.tar.gz
 sudo tar -C /var/www/nestwatch/app --strip-components=1 -xzf nestwatch-web.tar.gz
 ```
 
-Serving the website is optional; the relay only needs `/nwr/1`. A browser
-listener loaded from the relay's HTTPS origin connects to stations through
-the relay only (FR-RV-5), and talk-back works there because the origin is a
-secure context.
+Both are optional; the relay itself only needs `/nwr/1`. Without the
+website, replace `--site-dir` with `--no-site` and `/` redirects to `/app/`.
+Without either, devices still use the relay, but there is no browser app.
+
+The browser app served from the relay's HTTPS origin is the listener and
+the browser station of rendezvous.md FR-RV-5 and FR-RV-7: it reaches
+stations through that server only, and talk-back, the microphone and the
+camera work because the origin is a secure context. Visitors trust that
+origin to deliver the app unchanged, so serve only release files you
+checked against `SHA256SUMS`.
 
 ## 3. systemd unit
 
@@ -126,7 +138,8 @@ Wants=network-online.target
 [Service]
 # HTTP for the reverse proxy on loopback, STUN on UDP 3478, state in the
 # directory systemd creates below. --trust-proxy takes the client address from
-# the loopback proxy's X-Real-IP / X-Forwarded-For so per-address limits work.
+# X-Real-IP / X-Forwarded-For when the request comes from --trusted-proxies
+# (default: loopback), so per-address limits work behind the local proxy.
 ExecStart=/usr/local/bin/nestwatch-server \
     --http 127.0.0.1:8740 \
     --stun 0.0.0.0:3478 \
@@ -178,9 +191,12 @@ off for `/nwr/1`.
 
 ## 4. Reverse proxy
 
-The rendezvous endpoint is `wss://<host>/nwr/1`. Relay pipes are long-lived
-(up to 24 h, idle timeout 60 s with 20 s pings), so the proxy must not time
-them out early.
+Forward every request to `127.0.0.1:8740`. The rendezvous endpoint is
+`wss://<host>/nwr/1`; relay pipes are long-lived (up to 24 h, idle timeout
+60 s with 20 s pings), so the proxy must pass WebSocket upgrades and not time
+them out early. Let the server's own headers through: a proxy that serves the
+static files itself drops the app's Permissions-Policy and CSP, and the
+browser station then cannot use the camera.
 
 ### 4.1 Caddy
 
@@ -189,21 +205,11 @@ Caddy obtains certificates and passes WebSocket upgrades automatically.
 
 ```caddyfile
 relay.example.org {
-	handle /nwr/1 {
-		reverse_proxy 127.0.0.1:8740 {
-			# Long-lived relay pipes: never cut them on config reloads.
-			stream_close_delay 24h
-		}
+	reverse_proxy 127.0.0.1:8740 {
+		# Long-lived relay pipes: never cut them on config reloads.
+		stream_close_delay 24h
 	}
-	handle {
-		root * /var/www/nestwatch
-		file_server
-	}
-	header {
-		Strict-Transport-Security "max-age=31536000"
-		X-Content-Type-Options nosniff
-		Referrer-Policy no-referrer
-	}
+	header Strict-Transport-Security "max-age=31536000"
 }
 ```
 
@@ -227,12 +233,6 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/relay.example.org/privkey.pem;
 
     add_header Strict-Transport-Security "max-age=31536000" always;
-    add_header X-Content-Type-Options nosniff always;
-    add_header Referrer-Policy no-referrer always;
-
-    root /var/www/nestwatch;
-    index index.html;
-    error_page 404 /404.html;
 
     location = /nwr/1 {
         access_log off;
@@ -249,8 +249,13 @@ server {
         proxy_send_timeout 120s;
     }
 
+    # Website, browser app and their security headers come from the server.
     location / {
-        try_files $uri $uri/ =404;
+        proxy_pass http://127.0.0.1:8740;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 
@@ -292,21 +297,36 @@ curl -si --http1.1 -H 'Connection: Upgrade' -H 'Upgrade: websocket' \
 
 # UDP 3478 is open (from another machine; needs a STUN client such as stunclient)
 stunclient relay.example.org 3478
+
+# The server is up, and the app carries its headers
+curl -s https://relay.example.org/healthz
+curl -sI https://relay.example.org/app/ | grep -i permissions-policy
 ```
 
 ## 7. Point your devices at it
 
 On each station, enable **Reachable through a relay server** and enter
-`https://relay.example.org` (FR-RV-1, FR-RV-6). Invitations created
+`https://relay.example.org` (FR-RV-1, FR-RV-6); the apps fill in the
+project's server, `https://nestwatch.appmire.be`, until you change it.
+Headless stations take `nestwatch station --relay https://relay.example.org`
+or `NESTWATCH_RELAY=https://relay.example.org`. Invitations created
 afterwards carry the server and the station's mailbox; listeners paired
 before need a new invitation. Listeners use the relay only when direct
 endpoints fail, and keep trying to switch to a direct path.
 
+The browser app is at `https://relay.example.org/app/`. Open it to listen
+from any browser, or choose **Use this device as a station** there for a
+browser station, which is reachable through this server only.
+
 ## 8. Limits
 
-The server enforces, and should make configurable (rendezvous.md §4.3): at
-most 16 concurrent relay pipes per mailbox and 4 per client IP, 2 Mbit/s per
-pipe and a monthly transfer budget per mailbox, a 60 s idle timeout and 24 h
-pipe lifetime, and connection-rate limits per IP for `connect` and
-`register`. Audio needs less than 0.1 Mbit/s; relayed video defaults to
-320×240.
+The server enforces (rendezvous.md §4.3) at most 16 concurrent relay pipes
+per mailbox and 4 per client IP, 2 Mbit/s per pipe and a monthly transfer
+budget per mailbox, a 60 s idle timeout and 24 h pipe lifetime, and
+connection-rate limits per IP for `connect`, `register` and STUN. Each limit
+has an option (`--pipes-per-mailbox`, `--pipes-per-ip`, `--pipe-rate-bps`,
+`--monthly-bytes`, `--idle-timeout`, `--pipe-lifetime`,
+`--register-per-minute`, `--connect-per-minute`, `--stun-per-second`,
+`--max-connections`, `--max-connections-per-ip`) and a matching
+`NESTWATCH_SERVER_*` variable. Audio needs less than 0.1 Mbit/s; relayed
+video defaults to 320×240.

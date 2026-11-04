@@ -41,11 +41,11 @@
     "home": {
       "title": "A private baby monitor for every device you own",
       "og_title": "Nestwatch: a private baby monitor for every device you own",
-      "description": "Nestwatch turns phones, tablets and computers into a baby monitor. Sound and video go directly between your own devices, end-to-end encrypted. No account, no cloud, open source.",
+      "description": "Nestwatch turns phones, tablets and computers into a baby monitor. Sound and video go directly between your own devices, or through an optional relay that only passes on encrypted data. No account, no cloud, open source.",
       "hero": {
         "pills": ["No account", "End-to-end encrypted", "Open source"],
         "title": "A baby monitor that stays in your home.",
-        "lead": "Nestwatch turns the phones, tablets and computers you already own into a baby monitor. Sound and video travel directly from one of your devices to another, end-to-end encrypted. There is no account to make and no cloud in between.",
+        "lead": "Nestwatch turns the phones, tablets and computers you already own into a baby monitor. Sound and video travel directly from one of your devices to another, end-to-end encrypted. There is no account to make and no cloud in between. Away from home, an optional relay passes on the stream without being able to read it.",
         "cta_app": "Open the web app",
         "cta_download": "Download the apps",
         "note": "Listen in any browser, nothing to install. Apps for Linux, macOS, Windows and Android; the iPhone and iPad app can be built from source.",
@@ -60,7 +60,7 @@
             "icon": "home",
             "tone": "sage",
             "title": "Your devices talk to each other",
-            "body": "Stations and listeners connect directly on your home network or over a VPN you run yourself. There is no Nestwatch account and no server in the middle."
+            "body": "Stations and listeners connect directly on your home network or over a VPN you run yourself. There is no Nestwatch account. If you switch on the optional relay, it only passes on data it cannot read."
           },
           {
             "icon": "lock",
@@ -148,7 +148,7 @@
         "note": "Screens shown are design previews with example names; there are no real camera images on this site."
       },
       "networks": {
-        "heading": "At home, and away over your own VPN",
+        "heading": "At home, and away",
         "intro": "",
         "items": [
           {
@@ -166,8 +166,8 @@
         ]
       },
       "relay": {
-        "heading": "For difficult networks: an optional relay",
-        "intro": "Some networks block direct connections: mobile data behind carrier-grade NAT, guest Wi-Fi that isolates devices, firewalls that only allow HTTPS. For those, Nestwatch has an optional relay server that helps two devices find each other, tries to open a direct path between them and, only when that fails, forwards the encrypted stream. It is off until you turn it on, and you can run your own.",
+        "heading": "From anywhere: the optional relay",
+        "intro": "Many networks block direct connections: mobile data behind carrier-grade NAT, guest Wi-Fi that isolates devices, firewalls that only allow HTTPS. For those, Nestwatch has an optional relay server that helps two devices find each other, tries to open a direct path between them and, only when that fails, forwards the encrypted stream. Switch on <em>Reachable through a relay server</em> on the station. The project runs one at <code>nestwatch.appmire.be</code>, which the web app on this site uses, and you can run your own.",
         "can_heading": "What a relay operator could see",
         "can": [
           "that a station is online, and its public IP address",
@@ -242,7 +242,7 @@
           "requirements": ["Android 6.0 or newer", "arm64, armv7 or x86_64"],
           "notes": [
             "Open the downloaded file and allow your browser or file manager to install apps when asked. Releases built without the project's signing key carry a name that says so (<code>…-testkey.apk</code>); uninstall such a build before installing a properly signed one.",
-            "An Android station does not serve the browser listener yet; use a computer as the station for that."
+            "An Android station does not serve the browser listener itself. To listen in a browser, switch on the relay on the station and use the web app on this site."
           ]
         },
         {
@@ -290,7 +290,7 @@
           "heading": "In plain words",
           "pill": "",
           "list": [
-            "<strong>No account, no cloud.</strong> Nestwatch has no sign-up and no company server that your audio or video passes through.",
+            "<strong>No account, no cloud.</strong> Nestwatch has no sign-up and no cloud service. The optional relay, if you switch it on, passes on only encrypted data it cannot read.",
             "<strong>Only your devices.</strong> The apps talk only to your own devices, plus a relay server if, and only if, you turn one on.",
             "<strong>Encrypted end to end.</strong> Everything between a station and a listener is encrypted and authenticated, also on your own Wi-Fi.",
             "<strong>No recordings.</strong> Nestwatch never records audio or video, and keeps no history of either.",
@@ -330,7 +330,9 @@
           "heading": "The browser listener",
           "pill": "",
           "body": [
-            "The browser listener is served by your own station and loads nothing from anywhere else. Its key and settings stay in that browser's storage for the station's address. Over plain HTTP the conversation is still end-to-end encrypted; the station's HTTPS address also protects the app itself and is needed for talk-back. Check that the certificate fingerprint matches the one the station shows."
+            "The browser app comes either from your own station or from a relay server, such as this site at <code>/app/</code>. It loads nothing from anywhere else. Its keys and settings stay in that browser's storage, for that address only.",
+            "From a station: over plain HTTP the conversation is still end-to-end encrypted; the station's HTTPS address also protects the app itself and is needed for talk-back. Check that the certificate fingerprint matches the one the station shows.",
+            "From a relay server: the app reaches your stations through that server only, still end-to-end encrypted. You trust the server to deliver the genuine app, as you trust any website. If you would rather not, use a station's own copy or <a href=\"{link:self-hosting}\">run your own server</a>. A browser station works this way too, and keeps its keys in the browser."
           ]
         },
         {
@@ -338,7 +340,7 @@
           "heading": "If you turn on a relay",
           "pill": "",
           "body": [
-            "The optional relay is for networks where your devices cannot reach each other directly. It is off by default; a station uses it only after you enable it and choose the server. The project runs one at <code>nestwatch.appmire.be</code>, and you can <a href=\"{link:self-hosting}\">run your own</a>."
+            "The optional relay is for networks where your devices cannot reach each other directly. It is off by default: a station uses it only after you switch it on, with the project's server at <code>nestwatch.appmire.be</code> filled in or an address of your own. You can <a href=\"{link:self-hosting}\">run your own</a>. A browser station always uses the relay of the site it was opened from."
           ],
           "table": {
             "head": ["", "The relay operator"],
@@ -397,7 +399,7 @@
           "pill": "",
           "list": [
             "A Linux server reachable from the internet, with a domain name",
-            "A reverse proxy for HTTPS (nginx or Caddy) that passes WebSocket upgrades on <code>/nwr/1</code>",
+            "A reverse proxy for HTTPS that passes WebSocket upgrades on <code>/nwr/1</code>; the Docker Compose setup includes Caddy",
             "Open firewall ports: <strong>TCP 443</strong> (HTTPS) and <strong>UDP 3478</strong> (address discovery for direct connections)",
             "One directory for state (the server keeps hashed mailbox secrets and transfer counters there); no database"
           ]
@@ -424,12 +426,21 @@
             "Download <code>nestwatch-server-linux-x86_64</code> from the <a href=\"{latest}\">latest release</a> and install it as <code>/usr/local/bin/nestwatch-server</code>.",
             "Create a system user and a state directory, for example <code>/var/lib/nestwatch-server</code>.",
             "Run it with systemd: it listens on a local HTTP port for the reverse proxy and directly on UDP 3478.",
-            "Configure nginx or Caddy for your domain: forward everything to that local port, with WebSocket upgrades for <code>/nwr/1</code>. Unpack the website and browser listener (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>) and pass their directories to the server, which serves them.",
-            "On each station, turn on <strong>Reachable through a relay server</strong> and enter your server's address, for example <code>https://relay.example.org</code>."
+            "Configure nginx or Caddy for your domain: forward everything to that local port, with WebSocket upgrades for <code>/nwr/1</code>. Unpack the website and browser listener (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>) and pass their directories to the server, which serves them with the right security headers.",
+            "Open <strong>UDP 3478</strong> and TCP 80 and 443 in your firewall."
           ],
           "code": "# Caddyfile: HTTPS certificates and WebSocket upgrades are automatic;\n# nestwatch-server serves /nwr/1, the website and the browser listener\nrelay.example.org {\n\treverse_proxy 127.0.0.1:8740\n}",
           "after": [
             "Configuration for nginx, the systemd unit and the firewall rules are in <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
+          ]
+        },
+        {
+          "id": "use",
+          "heading": "Use your server",
+          "pill": "",
+          "list": [
+            "On each station, turn on <strong>Reachable through a relay server</strong> and enter your server's address, for example <code>https://relay.example.org</code>. Then pair the listeners again: new invitations carry the server.",
+            "Your own web app is at <code>https://relay.example.org/app/</code>, for listening in a browser or for using a browser as the station."
           ]
         },
         {
@@ -445,7 +456,7 @@
     "about": {
       "title": "Open source",
       "lead": "Nestwatch is free software. You can read every line, build it yourself, and share it.",
-      "description": "Nestwatch is open source under the GNU AGPL v3.0 or later: a Rust core with Dioxus desktop apps, a wasm browser listener and a Jetpack Compose Android app.",
+      "description": "Nestwatch is open source under the GNU AGPL v3.0 or later: a Rust core with Dioxus desktop apps, a wasm browser app, Android and iOS apps, and a relay server.",
       "sections": [
         {
           "id": "license",
@@ -465,10 +476,10 @@
             "rows": [
               ["Core: protocol, encryption, audio, sessions", "Rust", "First version"],
               ["Desktop apps for Linux, macOS, Windows", "Rust and Dioxus", "First version"],
-              ["Browser listener", "Rust compiled to WebAssembly, Dioxus", "First version"],
+              ["Browser app: listener, and station through the relay", "Rust compiled to WebAssembly, Dioxus", "First version"],
               ["Android app", "Kotlin and Jetpack Compose on the Rust core (UniFFI)", "First version"],
               ["iPhone and iPad app", "SwiftUI on the Rust core", "First version, build from source"],
-              ["Relay server", "Rust", "First version"]
+              ["Relay server", "Rust; binary and container image", "First version"]
             ]
           },
           "after": [
@@ -499,11 +510,15 @@
     "faq": {
       "title": "Questions and answers",
       "lead": "",
-      "description": "Answers to common questions about Nestwatch: internet access, number of devices, battery, the browser listener, iPhone support and safety.",
+      "description": "Answers to common questions about Nestwatch: internet access, the relay, number of devices, battery, the browser, iPhone support and safety.",
       "items": [
         {
           "q": "Does Nestwatch need the internet?",
           "a": ["No. On your home network the station and listeners talk directly to each other. To listen from somewhere else, connect your devices with your own VPN such as Tailscale or WireGuard. Or switch on the optional relay on the station; it works on networks where a VPN is not possible."]
+        },
+        {
+          "q": "What is the relay, and do I have to use it?",
+          "a": ["No, it is optional and off until you switch it on. The relay server helps a listener find a station from anywhere, tries to set up a direct connection between them, and passes on the stream when that fails. Everything stays end-to-end encrypted between your devices, so the server cannot hear or see anything. It can see that a station is online, which addresses connect and how much data flows.", "The project runs one at <code>nestwatch.appmire.be</code> for free, and the web app on this site uses it. You can also <a href=\"{link:self-hosting}\">run your own</a> with Docker Compose or a single program."]
         },
         {
           "q": "Do I need to create an account?",

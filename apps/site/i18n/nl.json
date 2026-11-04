@@ -41,11 +41,11 @@
     "home": {
       "title": "Een privé babyfoon voor al je toestellen",
       "og_title": "Nestwatch: een privé babyfoon voor al je toestellen",
-      "description": "Nestwatch maakt van telefoons, tablets en computers een babyfoon. Geluid en beeld gaan rechtstreeks tussen je eigen toestellen, end-to-end versleuteld. Geen account, geen cloud, open source.",
+      "description": "Nestwatch maakt van telefoons, tablets en computers een babyfoon. Geluid en beeld gaan rechtstreeks tussen je eigen toestellen, of via een optionele relay die alleen versleutelde gegevens doorgeeft. Geen account, geen cloud, open source.",
       "hero": {
         "pills": ["Geen account", "End-to-end versleuteld", "Open source"],
         "title": "Een babyfoon die thuis blijft.",
-        "lead": "Nestwatch maakt van de telefoons, tablets en computers die je al hebt een babyfoon. Geluid en beeld gaan rechtstreeks van het ene toestel naar het andere, end-to-end versleuteld. Je maakt geen account aan en er zit geen cloud tussen.",
+        "lead": "Nestwatch maakt van de telefoons, tablets en computers die je al hebt een babyfoon. Geluid en beeld gaan rechtstreeks van het ene toestel naar het andere, end-to-end versleuteld. Je maakt geen account aan en er zit geen cloud tussen. Ben je niet thuis, dan kan een optionele relay de stroom doorgeven zonder hem te kunnen lezen.",
         "cta_app": "Open de web-app",
         "cta_download": "Download de apps",
         "note": "Luister in elke browser, niets te installeren. Apps voor Linux, macOS, Windows en Android; de app voor iPhone en iPad kun je zelf bouwen uit de broncode. De apps zijn voorlopig in het Engels.",
@@ -60,7 +60,7 @@
             "icon": "home",
             "tone": "sage",
             "title": "Je toestellen praten met elkaar",
-            "body": "Zenders en luisteraars verbinden rechtstreeks op je thuisnetwerk of via een VPN die je zelf beheert. Er is geen Nestwatch-account en geen server ertussen."
+            "body": "Zenders en luisteraars verbinden rechtstreeks op je thuisnetwerk of via een VPN die je zelf beheert. Er is geen Nestwatch-account. Zet je de optionele relay aan, dan geeft die alleen gegevens door die hij niet kan lezen."
           },
           {
             "icon": "lock",
@@ -148,7 +148,7 @@
         "note": "De schermen zijn ontwerpvoorbeelden met verzonnen namen, in het Engels; op deze site staan geen echte camerabeelden."
       },
       "networks": {
-        "heading": "Thuis, en onderweg via je eigen VPN",
+        "heading": "Thuis, en onderweg",
         "intro": "",
         "items": [
           {
@@ -166,8 +166,8 @@
         ]
       },
       "relay": {
-        "heading": "Voor lastige netwerken: een optionele relay",
-        "intro": "Sommige netwerken blokkeren rechtstreekse verbindingen: mobiele data achter carrier-grade NAT, gastwifi die toestellen van elkaar afschermt, firewalls die alleen HTTPS doorlaten. Daarvoor heeft Nestwatch een optionele relayserver die twee toestellen elkaar laat vinden, een rechtstreekse verbinding tussen beide probeert te openen en, alleen als dat niet lukt, de versleutelde stroom doorgeeft. Hij staat uit tot je hem aanzet, en je kunt je eigen server draaien.",
+        "heading": "Van overal: de optionele relay",
+        "intro": "Veel netwerken blokkeren rechtstreekse verbindingen: mobiele data achter carrier-grade NAT, gastwifi die toestellen van elkaar afschermt, firewalls die alleen HTTPS doorlaten. Daarvoor heeft Nestwatch een optionele relayserver die twee toestellen elkaar laat vinden, een rechtstreekse verbinding tussen beide probeert te openen en, alleen als dat niet lukt, de versleutelde stroom doorgeeft. Zet <em>Reachable through a relay server</em> aan op de zender. Het project draait er een op <code>nestwatch.appmire.be</code>, die de web-app op deze site gebruikt, en je kunt je eigen server draaien.",
         "can_heading": "Wat de beheerder van een relay kan zien",
         "can": [
           "dat een zender online is, en zijn publieke IP-adres",
@@ -242,7 +242,7 @@
           "requirements": ["Android 6.0 of nieuwer", "arm64, armv7 of x86_64"],
           "notes": [
             "Open het gedownloade bestand en sta je browser of bestandsbeheerder toe apps te installeren als daarom gevraagd wordt. Releases die zonder de ondertekeningssleutel van het project gebouwd zijn, zeggen dat in hun naam (<code>…-testkey.apk</code>); verwijder zo'n versie voor je een correct ondertekende installeert.",
-            "Een Android-zender biedt de browserluisteraar nog niet aan; gebruik daarvoor een computer als zender."
+            "Een Android-zender biedt de browserluisteraar zelf niet aan. Wil je in een browser luisteren, zet dan de relay aan op de zender en gebruik de web-app op deze site."
           ]
         },
         {
@@ -290,7 +290,7 @@
           "heading": "In gewone woorden",
           "pill": "",
           "list": [
-            "<strong>Geen account, geen cloud.</strong> Nestwatch heeft geen registratie en geen bedrijfsserver waar je geluid of beeld langs gaat.",
+            "<strong>Geen account, geen cloud.</strong> Nestwatch heeft geen registratie en geen clouddienst. De optionele relay geeft, als je hem aanzet, alleen versleutelde gegevens door die hij niet kan lezen.",
             "<strong>Alleen je eigen toestellen.</strong> De apps praten alleen met je eigen toestellen, plus een relayserver als, en alleen als, je er een aanzet.",
             "<strong>End-to-end versleuteld.</strong> Alles tussen zender en luisteraar is versleuteld en geauthenticeerd, ook op je eigen wifi.",
             "<strong>Geen opnames.</strong> Nestwatch neemt nooit geluid of beeld op en houdt er geen geschiedenis van bij.",
@@ -330,7 +330,9 @@
           "heading": "De browserluisteraar",
           "pill": "",
           "body": [
-            "De browserluisteraar komt van je eigen zender en laadt niets van elders. Zijn sleutel en instellingen blijven in de opslag van die browser voor het adres van de zender. Over gewone HTTP is het gesprek nog altijd end-to-end versleuteld; het HTTPS-adres van de zender beschermt bovendien de app zelf en is nodig om terug te praten. Controleer dat de vingerafdruk van het certificaat overeenkomt met die op de zender."
+            "De browser-app komt van je eigen zender of van een relayserver, zoals deze site op <code>/app/</code>. Hij laadt niets van elders. Zijn sleutels en instellingen blijven in de opslag van die browser, alleen voor dat adres.",
+            "Van een zender: over gewone HTTP is het gesprek nog altijd end-to-end versleuteld; het HTTPS-adres van de zender beschermt bovendien de app zelf en is nodig om terug te praten. Controleer dat de vingerafdruk van het certificaat overeenkomt met die op de zender.",
+            "Van een relayserver: de app bereikt je zenders alleen via die server, nog altijd end-to-end versleuteld. Je vertrouwt erop dat de server de echte app aflevert, zoals bij elke website. Wil je dat liever niet, gebruik dan de kopie van een zender of <a href=\"{link:self-hosting}\">draai je eigen server</a>. Een browserzender werkt ook zo, en bewaart zijn sleutels in de browser."
           ]
         },
         {
@@ -338,7 +340,7 @@
           "heading": "Als je een relay aanzet",
           "pill": "",
           "body": [
-            "De optionele relay is bedoeld voor netwerken waarop je toestellen elkaar niet rechtstreeks bereiken. Hij staat standaard uit; een zender gebruikt hem pas nadat je hem aanzet en de server kiest. Het project draait er een op <code>nestwatch.appmire.be</code>, en je kunt <a href=\"{link:self-hosting}\">je eigen relay draaien</a>."
+            "De optionele relay is bedoeld voor netwerken waarop je toestellen elkaar niet rechtstreeks bereiken. Hij staat standaard uit: een zender gebruikt hem pas nadat je hem aanzet, met de server van het project op <code>nestwatch.appmire.be</code> ingevuld of een eigen adres. Je kunt <a href=\"{link:self-hosting}\">je eigen relay draaien</a>. Een browserzender gebruikt altijd de relay van de site waarop je hem opende."
           ],
           "table": {
             "head": ["", "De beheerder van de relay"],
@@ -397,7 +399,7 @@
           "pill": "",
           "list": [
             "Een Linux-server die bereikbaar is vanaf het internet, met een domeinnaam",
-            "Een reverse proxy voor HTTPS (nginx of Caddy) die WebSocket-upgrades op <code>/nwr/1</code> doorgeeft",
+            "Een reverse proxy voor HTTPS die WebSocket-upgrades op <code>/nwr/1</code> doorgeeft; de opstelling met Docker Compose bevat Caddy",
             "Open poorten in de firewall: <strong>TCP 443</strong> (HTTPS) en <strong>UDP 3478</strong> (adresdetectie voor rechtstreekse verbindingen)",
             "Eén map voor de toestand (de server bewaart er gehashte mailboxgeheimen en verkeerstellers); geen database"
           ]
@@ -424,12 +426,21 @@
             "Download <code>nestwatch-server-linux-x86_64</code> bij de <a href=\"{latest}\">nieuwste release</a> en installeer het als <code>/usr/local/bin/nestwatch-server</code>.",
             "Maak een systeemgebruiker en een map voor de toestand aan, bijvoorbeeld <code>/var/lib/nestwatch-server</code>.",
             "Start hem met systemd: hij luistert op een lokale HTTP-poort voor de reverse proxy en rechtstreeks op UDP 3478.",
-            "Stel nginx of Caddy in voor je domein: stuur alles door naar die lokale poort, met WebSocket-upgrade voor <code>/nwr/1</code>. Pak de website en browserluisteraar uit (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>) en geef hun mappen aan de server, die ze aanbiedt.",
-            "Zet op elke zender <strong>Reachable through a relay server</strong> aan en vul het adres van je server in, bijvoorbeeld <code>https://relay.example.org</code>."
+            "Stel nginx of Caddy in voor je domein: stuur alles door naar die lokale poort, met WebSocket-upgrade voor <code>/nwr/1</code>. Pak de website en browserluisteraar uit (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>) en geef hun mappen aan de server, die ze aanbiedt met de juiste beveiligingsheaders.",
+            "Open <strong>UDP 3478</strong> en TCP 80 en 443 in je firewall."
           ],
           "code": "# Caddyfile: HTTPS-certificaten en WebSocket-upgrades gaan automatisch;\n# nestwatch-server bedient /nwr/1, de website en de browserluisteraar\nrelay.example.org {\n\treverse_proxy 127.0.0.1:8740\n}",
           "after": [
             "De configuratie voor nginx, de systemd-unit en de firewallregels staan in <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
+          ]
+        },
+        {
+          "id": "use",
+          "heading": "Je server gebruiken",
+          "pill": "",
+          "list": [
+            "Zet op elke zender <strong>Reachable through a relay server</strong> aan en vul het adres van je server in, bijvoorbeeld <code>https://relay.example.org</code>. Koppel de luisteraars daarna opnieuw: nieuwe uitnodigingen bevatten de server.",
+            "Je eigen web-app staat op <code>https://relay.example.org/app/</code>, om in een browser te luisteren of een browser als zender te gebruiken."
           ]
         },
         {
@@ -445,7 +456,7 @@
     "about": {
       "title": "Open source",
       "lead": "Nestwatch is vrije software. Je kunt elke regel lezen, het zelf bouwen en het delen.",
-      "description": "Nestwatch is open source onder de GNU AGPL v3.0 of later: een Rust-kern met Dioxus-desktop-apps, een browserluisteraar in wasm en een Android-app in Jetpack Compose.",
+      "description": "Nestwatch is open source onder de GNU AGPL v3.0 of later: een Rust-kern met Dioxus-desktop-apps, een browser-app in wasm, apps voor Android en iOS, en een relayserver.",
       "sections": [
         {
           "id": "license",
@@ -465,10 +476,10 @@
             "rows": [
               ["Kern: protocol, versleuteling, geluid, sessies", "Rust", "Eerste versie"],
               ["Desktop-apps voor Linux, macOS, Windows", "Rust en Dioxus", "Eerste versie"],
-              ["Browserluisteraar", "Rust gecompileerd naar WebAssembly, Dioxus", "Eerste versie"],
+              ["Browser-app: luisteraar, en zender via de relay", "Rust gecompileerd naar WebAssembly, Dioxus", "Eerste versie"],
               ["Android-app", "Kotlin en Jetpack Compose op de Rust-kern (UniFFI)", "Eerste versie"],
               ["App voor iPhone en iPad", "SwiftUI op de Rust-kern", "Eerste versie, zelf bouwen"],
-              ["Relayserver", "Rust", "Eerste versie"]
+              ["Relayserver", "Rust; programma en container-image", "Eerste versie"]
             ]
           },
           "after": [
@@ -499,11 +510,15 @@
     "faq": {
       "title": "Vragen en antwoorden",
       "lead": "",
-      "description": "Antwoorden op veelgestelde vragen over Nestwatch: internet, aantal toestellen, batterij, de browserluisteraar, iPhone en veiligheid.",
+      "description": "Antwoorden op veelgestelde vragen over Nestwatch: internet, de relay, aantal toestellen, batterij, de browser, iPhone en veiligheid.",
       "items": [
         {
           "q": "Heeft Nestwatch internet nodig?",
           "a": ["Nee. Op je thuisnetwerk praten zender en luisteraars rechtstreeks met elkaar. Wil je van elders luisteren, verbind je toestellen dan met je eigen VPN, zoals Tailscale of WireGuard. Of zet de optionele relay aan op de zender; die werkt ook op netwerken waar een VPN niet lukt."]
+        },
+        {
+          "q": "Wat is de relay, en moet ik hem gebruiken?",
+          "a": ["Nee, hij is optioneel en staat uit tot je hem aanzet. De relayserver helpt een luisteraar een zender van overal te vinden, probeert een rechtstreekse verbinding tussen beide op te zetten en geeft de stroom door als dat niet lukt. Alles blijft end-to-end versleuteld tussen je toestellen, dus de server kan niets horen of zien. Hij ziet wel dat een zender online is, welke adressen verbinden en hoeveel gegevens er gaan.", "Het project draait er gratis een op <code>nestwatch.appmire.be</code>, en de web-app op deze site gebruikt die. Je kunt ook <a href=\"{link:self-hosting}\">je eigen relay draaien</a>, met Docker Compose of als één programma."]
         },
         {
           "q": "Moet ik een account aanmaken?",

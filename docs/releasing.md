@@ -156,7 +156,9 @@ meant for users.
 
 ## 5. After publishing
 
-- Deploy `nestwatch-site.tar.gz` to `https://nestwatch.appmire.be/` (and
-  `nestwatch-web.tar.gz` to `/app/` once the relay is live), see
-  [self-hosting.md](self-hosting.md) §2 for the layout.
+- Update `https://nestwatch.appmire.be/`: the relay server binary, the
+  website (`nestwatch-site.tar.gz`, at `/`) and the browser app
+  (`nestwatch-web.tar.gz`, at `/app/`), laid out as in
+  [self-hosting.md](self-hosting.md) §2. Check `/healthz`, and that
+  `/app/` sends `Permissions-Policy: camera=(self), …`.
 - Check the download buttons on `/download/` resolve.

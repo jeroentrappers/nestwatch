@@ -12,25 +12,32 @@ A private, local-first baby monitor for every device you own.
   cry is never cut off.
 - **Talk-back** and an **on-demand camera** that is off whenever nobody looks.
 - **No cloud, no account**: devices talk directly on your home network or
-  over your own VPN (Tailscale, WireGuard). End-to-end encrypted with the
-  Noise Protocol Framework.
+  over your own VPN (Tailscale, WireGuard). Away from home without a VPN, an
+  optional relay server passes on the encrypted stream: the project's at
+  `nestwatch.appmire.be`, or [your own](docs/self-hosting.md) with Docker
+  Compose or a single binary. End-to-end encrypted with the Noise Protocol
+  Framework either way.
 
 Nestwatch is not a medical device and does not replace supervision.
 
 ## Status
 
-Specification phase. Start with [specs/](specs/README.md).
+First release, 0.1.0: apps on
+[GitHub Releases](https://github.com/jeroentrappers/nestwatch/releases), the
+web app at <https://nestwatch.appmire.be/app/>, the relay server as a binary
+and as the container image `ghcr.io/jeroentrappers/nestwatch-server`.
+Behaviour is defined in [specs/](specs/README.md).
 
 | Step | State |
 |------|-------|
 | Specifications | first version |
 | Design system | done (`design/`) |
-| Rust core | planned |
+| Rust core (`crates/`) | first version |
 | Desktop apps (Dioxus) and browser listener (wasm) | first version (`apps/`) |
 | UniFFI bindings for Kotlin and Swift (`crates/nestwatch-ffi`) | first version |
 | Android app (Compose) | first version (`apps/android`) |
-| Rendezvous and relay client (`crates/nestwatch-relay`) and server (`tools/nestwatch-server`) | first version; used by the engines, the CLI, the desktop, browser and Android apps |
-| iOS / iPadOS app (SwiftUI) on the Rust core | first version (`apps/ios`) |
+| Rendezvous and relay client (`crates/nestwatch-relay`) and server (`tools/nestwatch-server`) | first version; used by every app and the CLI; [self-hosting](docs/self-hosting.md) |
+| iOS / iPadOS app (SwiftUI) on the Rust core | first version (`apps/ios`), build from source |
 
 ## License
 
