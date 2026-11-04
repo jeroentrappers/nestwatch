@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Checks every push and pull request: formatting, lints and tests of the
 # default workspace members, the browser listener (wasm), the desktop app on
-# Linux, macOS and Windows, the Android app and the website.
+# Linux, macOS and Windows, the Android app, the iOS app and the website.
 name: CI
 
 on:
@@ -165,6 +165,41 @@ jobs:
           name: nestwatch-android-debug
           path: apps/android/app/build/outputs/apk/debug/*.apk
           retention-days: 7
+
+  ios:
+    name: iOS app
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install the toolchain from rust-toolchain.toml
+        run: rustup toolchain install && rustup show
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: cargo-ios-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: cargo-ios-${{ runner.os }}-
+      - name: Build the Rust core (XCFramework, Swift bindings)
+        env:
+          NESTWATCH_IOS_SIM_X86: "0"
+        run: apps/ios/build-rust.sh
+      - name: Unit tests on a simulator
+        working-directory: apps/ios
+        run: |
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          d = json.load(sys.stdin)["devices"]
+          print(next(x["udid"] for r, xs in sorted(d.items(), reverse=True) if "iOS" in r for x in xs if x["name"].startswith("iPhone")))')
+          xcodebuild -project Nestwatch.xcodeproj -scheme Nestwatch -destination "id=$udid" \
+            -derivedDataPath build/DerivedData -only-testing:NestwatchTests test
+      - name: Device build (unsigned)
+        working-directory: apps/ios
+        run: |
+          xcodebuild -project Nestwatch.xcodeproj -scheme Nestwatch -sdk iphoneos -destination generic/platform=iOS \
+            -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
 
   site:
     name: Website
