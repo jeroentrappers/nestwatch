@@ -244,9 +244,11 @@ impl Backend for DemoBackend {
     fn capabilities(&self) -> Capabilities {
         Capabilities {
             platform: self.platform,
-            station: self.platform == Platform::Desktop,
+            station: true,
             discovery: self.platform == Platform::Desktop,
             talk: true,
+            relay_only: self.platform == Platform::Web,
+            relay_server_fixed: false,
         }
     }
 

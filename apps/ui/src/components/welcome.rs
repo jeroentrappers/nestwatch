@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use super::app::Nav;
 use super::common::Logo;
 use crate::backend::BackendHandle;
-use crate::model::Role;
+use crate::model::{Platform, Role};
 use crate::strings as s;
 
 /// First launch.
@@ -29,6 +29,10 @@ pub fn Welcome() -> Element {
         }
     };
     let choose2 = choose.clone();
+    let choose3 = choose.clone();
+    // The browser station is the exception (product.md §3.10): listening
+    // stays the main path, the station a secondary choice.
+    let cards = caps.station && caps.platform == Platform::Desktop;
     rsx! {
         main { class: "page welcome stack",
             div { class: "stack hero-brand",
@@ -39,7 +43,7 @@ pub fn Welcome() -> Element {
             div { class: "card disclaimer", role: "note",
                 p { "{s::DISCLAIMER}" }
             }
-            if caps.station {
+            if cards {
                 div { class: "role-choice",
                     button {
                         class: "card role-card",
@@ -62,6 +66,17 @@ pub fn Welcome() -> Element {
                     r#type: "button",
                     onclick: move |_| choose(Role::Listener),
                     "{s::DISCLAIMER_ACCEPT}"
+                }
+                if caps.station {
+                    div { class: "stack-s web-station-entry",
+                        button {
+                            class: "btn ghost block",
+                            r#type: "button",
+                            onclick: move |_| choose3(Role::Station),
+                            "{s::STATION_USE_THIS_DEVICE}"
+                        }
+                        p { class: "caption", "{s::ROLE_STATION_HINT_WEB}" }
+                    }
                 }
             }
         }

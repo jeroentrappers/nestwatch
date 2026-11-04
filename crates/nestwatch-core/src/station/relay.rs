@@ -9,14 +9,19 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use nestwatch_proto::RelayRef;
+#[cfg(feature = "native")]
+use nestwatch_relay::Candidate;
+#[cfg(feature = "native")]
 use nestwatch_relay::direct::{PunchRole, punch_direct};
+#[cfg(any(feature = "native", target_arch = "wasm32"))]
 use nestwatch_relay::{
-    Candidate, IncomingRequest, MailboxIdentity, RegistrationConfig, RegistrationStatus,
-    RelayConfig, RelayServer, StationRegistration,
+    IncomingRequest, RegistrationConfig, RegistrationStatus, StationRegistration,
 };
+use nestwatch_relay::{MailboxIdentity, RelayConfig, RelayServer};
 use tokio::sync::watch;
 
 use super::{Inner, Shared, StationError, session, stopped};
+use crate::rt;
 use crate::storage::{Storage, StorageError};
 use crate::types::Transport;
 
@@ -157,7 +162,7 @@ impl Shared {
         let (stop, stop_rx) = watch::channel(false);
         g.relay_task = Some(RelayTask { stop });
         g.relay_status = RelayStatus::Connecting;
-        tokio::spawn(run(
+        rt::spawn(run(
             self.clone(),
             server,
             identity,
@@ -203,6 +208,7 @@ impl Shared {
     }
 }
 
+#[cfg(any(feature = "native", target_arch = "wasm32"))]
 fn status_of(s: RegistrationStatus) -> Option<RelayStatus> {
     Some(match s {
         RegistrationStatus::Connecting => RelayStatus::Connecting,
@@ -219,7 +225,27 @@ fn status_of(s: RegistrationStatus) -> Option<RelayStatus> {
     })
 }
 
+/// Without a native or browser client (`web` built for a native target,
+/// e.g. `cargo check`) there is no registration.
+#[cfg(not(any(feature = "native", target_arch = "wasm32")))]
+async fn run(
+    shared: Arc<Shared>,
+    _server: RelayServer,
+    _identity: MailboxIdentity,
+    _stop: watch::Receiver<bool>,
+    generation: u64,
+) {
+    shared.set_relay_status(
+        generation,
+        RelayStatus::Error {
+            message: "the relay needs the browser WebSocket".into(),
+            permanent: true,
+        },
+    );
+}
+
 /// The registration task: status updates and one task per listener request.
+#[cfg(any(feature = "native", target_arch = "wasm32"))]
 async fn run(
     shared: Arc<Shared>,
     server: RelayServer,
@@ -239,7 +265,7 @@ async fn run(
         tokio::select! {
             r = reg.next_request() => match r {
                 Some(req) => {
-                    tokio::spawn(serve(shared.clone(), relay.clone(), req));
+                    rt::spawn(serve(shared.clone(), relay.clone(), req));
                 }
                 None => break,
             },
@@ -262,6 +288,7 @@ async fn run(
 /// The listener's address as the server saw it (informational, RELAY-6);
 /// used for the session list and the pairing rate limit, since the relay
 /// pipe's own peer is the server.
+#[cfg(any(feature = "native", target_arch = "wasm32"))]
 fn observed_addr(observed: Option<&str>) -> Option<SocketAddr> {
     let o = observed?;
     o.parse::<SocketAddr>()
@@ -269,10 +296,22 @@ fn observed_addr(observed: Option<&str>) -> Option<SocketAddr> {
         .or_else(|| o.parse::<IpAddr>().ok().map(|ip| SocketAddr::new(ip, 0)))
 }
 
+/// One listener request in the browser (§4.2, FR-RV-7): `accept` without
+/// candidates (no direct path exists) and serve the relay pipe.
+#[cfg(all(not(feature = "native"), target_arch = "wasm32"))]
+async fn serve(shared: Arc<Shared>, _relay: Arc<RelayConfig>, req: IncomingRequest) {
+    let Ok(incoming) = req.accept(&[]).await else {
+        return;
+    };
+    let peer = observed_addr(incoming.peer.observed.as_deref());
+    session::run_as(shared, incoming.link, Transport::Relayed, peer).await;
+}
+
 /// One listener request (§4.2): STUN from a fresh punch socket, `accept`
 /// with its server-reflexive and local candidates (plus the station's TCP
 /// endpoints), serve the relay pipe as a session, and punch the direct path
 /// in parallel (§5.2), serving it as another session once it forms.
+#[cfg(feature = "native")]
 async fn serve(shared: Arc<Shared>, relay: Arc<RelayConfig>, req: IncomingRequest) {
     let opts = shared.cfg.relay.clone();
     let wants_direct = opts.direct && req.peer().candidates.iter().any(|c| c.udp().is_some());

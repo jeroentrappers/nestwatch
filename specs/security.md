@@ -64,7 +64,7 @@ knows the station's static key, and the 128-bit token is never guessable.
 | macOS | Keychain |
 | Windows | DPAPI (user scope) protected file in `%APPDATA%` |
 | Linux | Secret Service (libsecret) when available, else a `0600` file in `$XDG_DATA_HOME` |
-| Browser | IndexedDB of the station's origin; non-extractable where Web Crypto allows, else as stored bytes |
+| Browser | Web storage of the page's origin (`localStorage`, UI-4), as stored bytes; see §7.1 for a browser station |
 
 Keys are never exported, logged or included in backups (platform backup
 flags MUST exclude them). Moving to a new device means pairing again.
@@ -90,3 +90,33 @@ The browser listener runs on the station's origin. Over plain HTTP the
 session is still end-to-end protected by Noise; HTTPS additionally protects
 the delivery of the app code itself and enables talk-back. Users who need
 that guarantee use the HTTPS port and verify the certificate fingerprint.
+
+### 7.1 Browser station
+
+A browser station (product.md §3.10) keeps everything a station keeps in
+the web storage of the page's origin: the device key (its static Noise key,
+shared with the browser listener role of the same origin, CORE-1), the
+trusted-listener list, its settings and the relay mailbox identity (ID and
+secret, rendezvous.md §3.2). Consequences, which the app states in its
+station settings:
+
+- **Per origin.** `https://relay.example/app/` and `http://localhost:8080/`
+  are two different stations with different keys. A listener pairs with the
+  origin it was invited from.
+- **Who can read it.** Any script running on that origin, browser extensions
+  allowed to read the page, and anyone with access to the unlocked browser
+  profile. Whoever holds the device key and the mailbox secret can impersonate
+  the station to its paired listeners; this is the "compromised device"
+  case of §2 (out of scope), and revoking from the listeners (forget the
+  station) contains it. The server that serves the app is trusted with the
+  app code, as for the browser listener (§7); a self-hosted server moves that
+  trust to its operator.
+- **Lifetime.** Clearing the site's data, a private window ending, or the
+  browser evicting the origin's storage deletes the station's identity:
+  listeners must pair again, and the old mailbox stays claimed by the lost
+  secret on the server (TOFU), so a new mailbox is created. The app asks the
+  browser for persistent storage (`navigator.storage.persist()`) when the
+  station starts, which makes eviction unlikely but not impossible.
+- **No export.** As on every platform (§5), keys are never exported or
+  backed up; moving a browser station to another browser or device means
+  pairing its listeners again.

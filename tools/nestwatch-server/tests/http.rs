@@ -110,6 +110,7 @@ async fn static_directories_and_headers() {
     assert!(APP_CSP.contains("connect-src 'self';"));
     assert_eq!(r.headers["cache-control"], "no-cache");
     assert!(r.headers["permissions-policy"].contains("microphone=(self)"));
+    assert!(r.headers["permissions-policy"].contains("camera=(self)"));
     let wasm = get(&srv, "GET", "/app/assets/app.wasm", "").await;
     assert_eq!(wasm.headers["content-type"], "application/wasm");
     assert_eq!(wasm.body, b"\0asm");

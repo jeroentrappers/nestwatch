@@ -63,7 +63,6 @@ macro_rules! impl_driven {
 }
 
 impl_driven!(nestwatch_session::ListenerSession);
-#[cfg(feature = "native")]
 impl_driven!(nestwatch_session::StationSession<P>, P: nestwatch_session::StationPolicy);
 
 type Inflight = BoxFuture<(LinkWriter, Result<(), NetError>)>;

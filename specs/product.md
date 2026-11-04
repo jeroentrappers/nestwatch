@@ -25,7 +25,9 @@ say so on first launch and in its about screen.
 | Talk-back | Listener speaks through the station's speaker. |
 
 Any native app can act as station or listener. The browser app is a listener
-only (browsers cannot accept connections or advertise services).
+and, through a relay server only, a station (§3.10): browsers cannot accept
+connections or advertise services, so a browser station is reachable through
+its relay mailbox and nothing else.
 
 ## 3. Functional requirements
 
@@ -163,6 +165,54 @@ only (browsers cannot accept connections or advertise services).
   certificate whose fingerprint the station displays.
 - **FR-WEB-3** The browser listener MUST store its own device key so that it
   stays paired across reloads.
+
+### 3.10 Browser station
+
+- **FR-WEBST-1** The browser app MUST offer "Use this device as a station"
+  where the page is a secure context (HTTPS, or `localhost`; the microphone
+  needs one). A browser station is reachable **through a relay server only**
+  (rendezvous.md FR-RV-7): it has no direct endpoints, no mDNS advertisement
+  and serves no browser app. Its relay setting is always on and cannot be
+  turned off.
+- **FR-WEBST-2** The relay server is the page's own origin when the app is
+  served by a relay server (`<origin>/app/`, rendezvous.md FR-RV-5) and cannot
+  be changed there. Elsewhere the user can set it (default
+  `https://nestwatch.appmire.be`). The station settings show the server and
+  the explanation of what it can and cannot see (rendezvous.md FR-RV-1, §7).
+- **FR-WEBST-3** Pairing works as on other stations (FR-PAIR-1, FR-PAIR-3..5):
+  the pairing sheet shows the invitation as a QR code and as links (the
+  `nestwatch://` link and `<server>/app/#<invitation>`), the remaining time,
+  and the verification number of each listener that paired. Invitations carry
+  `r` and `m` and no `a` parameters. Native listeners and the browser listener
+  served by the same relay server can pair with it.
+- **FR-WEBST-4** Audio: the microphone is captured with `getUserMedia`
+  continuously while the station runs (FR-ST-1) and goes through the capture
+  chain, level, encoder and per-listener sound activation gate of media.md
+  §1–§3 unchanged: every listener sets its own mode and threshold, and the
+  station sends what protocol.md §6–§7 prescribe.
+- **FR-WEBST-5** Camera: on demand only (FR-CAM-1), with `getUserMedia`
+  video; frames are taken from the camera through a canvas and sent as JPEG
+  per media.md §5 (one independent JPEG per frame, the listener's size, frame
+  rate and the adaptation ladder). The camera indicator of FR-CAM-2 applies.
+- **FR-WEBST-6** Talk-back from listeners plays through the page's audio
+  output once the user has interacted with the page (browser autoplay rule);
+  until then the station screen asks for a tap (FR-TB-3 otherwise unchanged).
+- **FR-WEBST-7** Battery level and charging state come from the Battery
+  Status API where the browser offers it (FR-ST-6); elsewhere the station
+  reports none.
+- **FR-WEBST-8** While the station runs, the page MUST hold a Screen Wake
+  Lock where the browser offers one, and acquire it again whenever the page
+  becomes visible again (browsers release it when the page is hidden).
+- **FR-WEBST-9** The station screen MUST warn, at all times while running,
+  that the tab must stay open and visible (FR-ST-5): phones suspend background
+  tabs. While the page is hidden the station reports its camera as
+  unavailable (protocol.md §7.7 `video-state unavailable`) and makes it
+  available again when the page is visible.
+- **FR-WEBST-10** Leaving or reloading the page while the station runs MUST
+  ask for confirmation (`beforeunload`).
+- **FR-WEBST-11** The station keeps running while the user switches the app
+  to its listener view and back; only "Stop the station" or closing the page
+  stops it.
 
 ## 4. Non-functional requirements
 

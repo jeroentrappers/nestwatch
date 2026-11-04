@@ -197,8 +197,10 @@ fn secure(mut r: Resp, area: Option<Area>) -> Resp {
         header::CONTENT_SECURITY_POLICY,
         HeaderValue::from_static(csp),
     );
+    // The app is a listener (talk-back: microphone) and a browser station
+    // (microphone and camera, product.md §3.10).
     let permissions = if area == Some(Area::App) {
-        "camera=(), geolocation=(), microphone=(self), payment=(), usb=()"
+        "camera=(self), geolocation=(), microphone=(self), payment=(), usb=()"
     } else {
         "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
     };

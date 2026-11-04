@@ -665,3 +665,51 @@ async fn the_station_notices_a_dead_server() {
     let s = wait_status(&reg, |s| matches!(s, RegistrationStatus::Retrying { .. })).await;
     assert!(matches!(s, RegistrationStatus::Retrying { .. }));
 }
+
+/// OPEN-QUESTIONS WEBST-3: a client without WebSocket pings (a browser
+/// station) keeps its control connection with `ping` messages; each is
+/// answered with `pong`.
+#[tokio::test]
+async fn ping_messages_hold_the_control_connection() {
+    use futures_util::{SinkExt, StreamExt};
+    use nestwatch_relay::Message;
+    use tokio_tungstenite::tungstenite::Message as Ws;
+
+    let srv = TestServer::start(|c| c.limits.control_idle_timeout = 0.6).await;
+    let url = srv.relay().server.ws_url().to_owned();
+    let (mut ws, _) = tokio_tungstenite::connect_async(url).await.unwrap();
+    let identity = MailboxIdentity::generate().unwrap();
+    let register = Message::Register {
+        mailbox: identity.id(),
+        secret: identity.secret(),
+    };
+    ws.send(Ws::Binary(register.encode().unwrap().into()))
+        .await
+        .unwrap();
+    async fn next<S>(ws: &mut S) -> Option<Message>
+    where
+        S: futures_util::Stream<Item = Result<Ws, tokio_tungstenite::tungstenite::Error>> + Unpin,
+    {
+        loop {
+            match tokio::time::timeout(Duration::from_secs(2), ws.next()).await {
+                Ok(Some(Ok(Ws::Binary(b)))) => return Some(Message::decode(&b).unwrap()),
+                Ok(Some(Ok(Ws::Ping(_) | Ws::Pong(_)))) => continue,
+                _ => return None,
+            }
+        }
+    }
+    assert!(matches!(
+        next(&mut ws).await,
+        Some(Message::Registered { .. })
+    ));
+    // Five pings 300 ms apart outlive the 0.6 s idle timeout twice over.
+    for _ in 0..5 {
+        tokio::time::sleep(Duration::from_millis(300)).await;
+        ws.send(Ws::Binary(Message::Ping.encode().unwrap().into()))
+            .await
+            .unwrap();
+        assert_eq!(next(&mut ws).await, Some(Message::Pong));
+    }
+    assert_eq!(srv.server.metrics().mailboxes_online, 1);
+    srv.stop().await;
+}

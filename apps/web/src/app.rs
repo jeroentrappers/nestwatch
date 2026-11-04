@@ -31,21 +31,7 @@ fn App() -> Element {
 }
 
 fn default_name() -> String {
-    let ua = web_sys::window()
-        .and_then(|w| w.navigator().user_agent().ok())
-        .unwrap_or_default();
-    let browser = if ua.contains("Firefox") {
-        "Firefox"
-    } else if ua.contains("Edg/") {
-        "Edge"
-    } else if ua.contains("Chrome") {
-        "Chrome"
-    } else if ua.contains("Safari") {
-        "Safari"
-    } else {
-        "Browser"
-    };
-    format!("{browser} listener")
+    format!("{} listener", crate::station::browser_name())
 }
 
 /// Takes the invitation from the URL fragment (protocol.md §3.5) and
@@ -145,7 +131,8 @@ fn spawn_event_loop(engine: ListenerEngine, audio: Rc<Audio>) {
     });
 }
 
-/// The first tap or key press anywhere unlocks audio (browser rule).
+/// The first tap or key press anywhere unlocks audio (browser rule); any
+/// later one resumes a browser station's sound that the browser suspended.
 fn unlock_on_first_gesture(audio: Rc<Audio>) {
     let Some(doc) = web_sys::window().and_then(|w| w.document()) else {
         return;
@@ -156,6 +143,7 @@ fn unlock_on_first_gesture(audio: Rc<Audio>) {
             if !a.is_unlocked() {
                 a.unlock();
             }
+            crate::station::resume_audio();
         });
         let _ =
             doc.add_event_listener_with_callback_and_bool(event, cb.as_ref().unchecked_ref(), true);
@@ -236,8 +224,8 @@ pub fn run() {
         let mut cfg = ListenerConfig::new(default_name());
         cfg.discovery = false;
         cfg.default_websocket = ws_url.clone();
-        cfg.relay_origin = relay;
-        let engine = match ListenerEngine::start(cfg, storage, clock.clone()) {
+        cfg.relay_origin = relay.clone();
+        let engine = match ListenerEngine::start(cfg, storage.clone(), clock.clone()) {
             Ok(e) => e,
             Err(e) => {
                 web_sys::console::error_1(&JsValue::from_str(&format!("Nestwatch: {e}")));
@@ -252,6 +240,9 @@ pub fn run() {
             storage: local.ok(),
             audio,
             ws_url,
+            relay_origin: relay,
+            engine_storage: storage,
+            clock: clock.clone(),
             tx,
             rx: RefCell::new(Some(rx)),
         };

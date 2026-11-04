@@ -78,7 +78,7 @@
       },
       "how": {
         "heading": "Zo werkt het",
-        "intro": "Elke telefoon, tablet of computer kan zender of luisteraar zijn. In de browser kun je luisteren.",
+        "intro": "Elke telefoon, tablet of computer kan zender of luisteraar zijn. In de browser kun je luisteren, en via de relay kan de browser ook de zender zijn.",
         "steps": [
           {
             "title": "Zet een zender klaar",
@@ -249,11 +249,12 @@
           "key": "browser",
           "name": "Browser",
           "status": "",
-          "roles": "Luisteraar, niets te installeren: de makkelijkste manier om te beginnen.",
+          "roles": "Luisteraar, en zender via de relay. Niets te installeren: de makkelijkste manier om te beginnen.",
           "requirements": ["Chrome of Edge 113, Firefox 128, Safari 17 of nieuwer", "Terugpraten vraagt een HTTPS-adres"],
           "notes": [
             "Open de web-app op deze site op een telefoon, tablet of computer en koppel hem met je zender. Hij verbindt via de relay, dus hij werkt overal, en terugpraten werkt omdat de site HTTPS gebruikt. Zet op de zender <em>Bereikbaar via een relayserver</em> aan.",
-            "Thuis kun je ook het webadres openen dat een computer-zender toont bij het koppelen; die kopie komt van de zender zelf en heeft geen relay nodig."
+            "Thuis kun je ook het webadres openen dat een computer-zender toont bij het koppelen; die kopie komt van de zender zelf en heeft geen relay nodig.",
+            "De web-app op deze site kan ook de zender zijn: kies <em>Use this device as a station</em>. Hij is alleen via de relay bereikbaar en zijn tabblad moet open en zichtbaar blijven, want telefoons pauzeren tabbladen op de achtergrond. Voor een hele nacht is een telefoon of computer met de Nestwatch-app de betrouwbaardere zender."
           ]
         },
         {
@@ -521,7 +522,7 @@
         },
         {
           "q": "Kan ik in een webbrowser luisteren?",
-          "a": ["Ja. Open de web-app op deze site op een computer, tablet of telefoon, en koppel hem met een zender waarop de relay aanstaat. Thuis kun je ook het webadres gebruiken dat een computer-zender toont bij het koppelen; dat komt van de zender zelf."]
+          "a": ["Ja. Open de web-app op deze site op een computer, tablet of telefoon, en koppel hem met een zender waarop de relay aanstaat. Thuis kun je ook het webadres gebruiken dat een computer-zender toont bij het koppelen; dat komt van de zender zelf.", "De browser kan ook de zender zijn: kies in de web-app op deze site <em>Use this device as a station</em>. Hij is alleen via de relay bereikbaar en bewaart zijn sleutels in die browser; houd het tabblad open en zichtbaar zolang hij waakt."]
         },
         {
           "q": "Is er een iPhone-app?",

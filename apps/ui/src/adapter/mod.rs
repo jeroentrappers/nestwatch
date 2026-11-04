@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! [`EngineBackend`]: the [`Backend`] over the nestwatch-core engines.
 //!
-//! The same code serves the native listener (desktop, tokio) and the
-//! browser listener (wasm); the station half exists with the `native`
-//! feature. Snapshots from the engines' `watch` channels are mapped to view
+//! The same code serves the native engines (desktop, tokio) and the
+//! browser engines (wasm): the listener, and the station (relay-only in the
+//! browser, product.md §3.10). Snapshots from the engines' `watch` channels are mapped to view
 //! models ([`listener::map_listener`], [`station::map_station`]) and written
 //! to the [`Ui`] signals by tasks on the UI executor; intents are forwarded
 //! as plain engine calls. Everything the engines do not cover (preferences,
@@ -11,7 +11,6 @@
 //! from the app through the [`Host`] port.
 
 pub mod listener;
-#[cfg(feature = "native")]
 pub mod station;
 
 use std::cell::{Cell, RefCell};
@@ -31,7 +30,6 @@ use crate::backend::{Backend, LocalFuture, Ui, race};
 use crate::model::{
     AlertKind, Capabilities, Frame, Mode, NoticeKind, PairOutcome, Prefs, Theme, UiError,
 };
-#[cfg(feature = "native")]
 use crate::model::{Gain, StationRun};
 
 /// The app side of an [`EngineBackend`]: platform services the engines do
@@ -64,7 +62,6 @@ pub trait Host {
     }
     /// Starts the station engine with its devices (microphone, speaker,
     /// camera, battery, sleep inhibition); the guard keeps them running.
-    #[cfg(feature = "native")]
     fn start_station(&self) -> LocalFuture<Result<station::RunningStation, String>>;
 }
 
@@ -73,9 +70,7 @@ pub struct EngineBackend {
     host: Rc<dyn Host>,
     clock: Arc<dyn Clock>,
     listener: ListenerEngine,
-    #[cfg(feature = "native")]
     station: Rc<RefCell<Option<station::RunningStation>>>,
-    #[cfg(feature = "native")]
     station_gen: Rc<Cell<u64>>,
     ui: Rc<Cell<Option<Ui>>>,
     _not_send: std::marker::PhantomData<RefCell<()>>,
@@ -97,9 +92,7 @@ impl EngineBackend {
             host,
             clock,
             listener,
-            #[cfg(feature = "native")]
             station: Rc::new(RefCell::new(None)),
-            #[cfg(feature = "native")]
             station_gen: Rc::new(Cell::new(0)),
             ui: Rc::new(Cell::new(None)),
             _not_send: std::marker::PhantomData,
@@ -112,7 +105,6 @@ impl EngineBackend {
     }
 
     /// The running station engine, if any.
-    #[cfg(feature = "native")]
     pub fn station(&self) -> Option<nestwatch_core::station::StationEngine> {
         self.station.borrow().as_ref().map(|s| s.engine.clone())
     }
@@ -442,7 +434,6 @@ impl Backend for EngineBackend {
             .map_err(plain)
     }
 
-    #[cfg(feature = "native")]
     fn start_station(&self) -> LocalFuture<Result<(), UiError>> {
         let host = self.host.clone();
         let slot = self.station.clone();
@@ -473,7 +464,6 @@ impl Backend for EngineBackend {
         })
     }
 
-    #[cfg(feature = "native")]
     fn stop_station(&self) -> LocalFuture<()> {
         let slot = self.station.clone();
         let gen_ = self.station_gen.clone();
@@ -492,7 +482,6 @@ impl Backend for EngineBackend {
         })
     }
 
-    #[cfg(feature = "native")]
     fn open_pairing(&self) -> LocalFuture<Result<(), UiError>> {
         let engine = self.station();
         let ui = self.ui.get();
@@ -511,14 +500,12 @@ impl Backend for EngineBackend {
         })
     }
 
-    #[cfg(feature = "native")]
     fn close_pairing(&self) {
         if let Some(s) = self.station() {
             s.close_pairing();
         }
     }
 
-    #[cfg(feature = "native")]
     fn rename_station(&self, name: &str) -> Result<(), UiError> {
         let s = self
             .station()
@@ -526,42 +513,36 @@ impl Backend for EngineBackend {
         s.rename(name).map_err(|e| UiError::Other(e.to_string()))
     }
 
-    #[cfg(feature = "native")]
     fn revoke(&self, listener: &str) {
         if let Some(s) = self.station() {
             s.revoke(listener);
         }
     }
 
-    #[cfg(feature = "native")]
     fn set_camera_enabled(&self, on: bool) {
         if let Some(s) = self.station() {
             s.set_camera_enabled(on);
         }
     }
 
-    #[cfg(feature = "native")]
     fn set_talk_enabled(&self, on: bool) {
         if let Some(s) = self.station() {
             s.set_talk_enabled(on);
         }
     }
 
-    #[cfg(feature = "native")]
     fn set_gain(&self, gain: Gain) {
         if let Some(s) = self.station() {
             s.set_gain(station::gain_setting(gain));
         }
     }
 
-    #[cfg(feature = "native")]
     fn set_talkback_volume(&self, volume: f32) {
         if let Some(s) = self.station() {
             s.set_talkback_volume(volume);
         }
     }
 
-    #[cfg(feature = "native")]
     fn set_relay_enabled(&self, on: bool) -> Result<(), UiError> {
         let s = self
             .station()
@@ -570,7 +551,6 @@ impl Backend for EngineBackend {
             .map_err(|e| UiError::Other(e.to_string()))
     }
 
-    #[cfg(feature = "native")]
     fn set_relay_server(&self, origin: &str) -> Result<(), UiError> {
         let s = self
             .station()
@@ -579,7 +559,6 @@ impl Backend for EngineBackend {
             .map_err(|_| UiError::Other(crate::strings::RELAY_SERVER_INVALID.into()))
     }
 
-    #[cfg(feature = "native")]
     fn reset_relay_identity(&self) -> Result<(), UiError> {
         let s = self
             .station()

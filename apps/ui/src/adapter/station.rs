@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Station snapshot → [`StationModel`] (FR-ST-1..8), native only.
+//! Station snapshot → [`StationModel`] (FR-ST-1..8), native and browser.
 
 use std::any::Any;
 use std::cell::Cell;
@@ -195,7 +195,7 @@ pub(super) fn spawn_station_pumps(
     });
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "native"))]
 mod tests {
     use super::*;
     use std::sync::Arc;

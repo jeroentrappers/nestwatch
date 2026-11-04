@@ -37,6 +37,14 @@ the project runs one at `nestwatch.appmire.be`.
   works there because the origin is a secure context.
 - **FR-RV-6** Users MUST be able to point stations and listeners at a
   self-hosted server.
+- **FR-RV-7** A station MAY be **relay-only**: reachable through its mailbox
+  and nothing else. The browser station (product.md §3.10) always is; a
+  native station is when it publishes no endpoints (RVAPP-9 `--no-endpoints`).
+  Its relay setting is on by definition, its invitations carry `r` and `m`
+  and no `a` parameters, and it offers no direct path: its `accept` carries
+  no candidates, and a listener that receives no candidates in `accepted`
+  neither punches nor retries punching on that session (§5.2). The listener
+  tile shows the path "relayed" for as long as the session lasts.
 
 ## 3. Identifiers
 
@@ -139,7 +147,9 @@ addresses.
    station switches without delay. Audio continuity: the listener keeps
    playing the relayed stream until the first direct frame is decoded.
 5. If no direct path forms, the session stays relayed; the listener retries
-   punching after network changes or every 5 minutes.
+   punching after network changes or every 5 minutes, unless the station's
+   `accepted` carried no candidates at all (a relay-only station, FR-RV-7):
+   then the session simply stays relayed.
 
 TCP candidates (`tcp:`) are tried as ordinary NWP/1 TCP endpoints; they
 succeed when the station has a reachable public port (for example a port
@@ -148,8 +158,10 @@ forward or IPv6 without a firewall).
 ## 6. Server behaviour
 
 - Serves, over HTTPS behind the host's reverse proxy: the landing page, the
-  browser listener app (built from `apps/web`), the download page, and the
-  `/nwr/1` WebSocket endpoint.
+  browser app (built from `apps/web`; listener, and relay-only station of
+  product.md §3.10), the download page, and the `/nwr/1` WebSocket endpoint.
+  The app's pages allow the microphone and the camera for the page's own
+  origin (the browser station needs both).
 - Keeps all state in memory except the mailbox secret hashes and transfer
   counters (persisted, so a restart does not let a mailbox be taken over).
 - Logs aggregate counters only (registrations, pipes, bytes, errors). It

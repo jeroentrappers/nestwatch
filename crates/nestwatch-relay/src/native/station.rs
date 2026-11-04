@@ -16,69 +16,10 @@ use super::ws::{self, Ws};
 use crate::candidate::Candidate;
 use crate::exchange::{self, PeerInfo};
 use crate::msg::{ErrorCode, Message, SessionId};
+use crate::registration::{
+    End, Incoming, REQUEST_QUEUE, RegistrationConfig, RegistrationStatus, SESSION_VALIDITY, end_for,
+};
 use crate::{MailboxIdentity, RelayConfig, RelayError};
-
-/// Validity of a session offered in `incoming` (§4.2).
-const SESSION_VALIDITY: Duration = Duration::from_secs(30);
-/// Incoming requests queued for the application at most; more are dropped
-/// (the listener retries).
-const REQUEST_QUEUE: usize = 16;
-
-/// Options of a [`StationRegistration`].
-#[derive(Debug, Clone)]
-pub struct RegistrationConfig {
-    /// The server.
-    pub relay: RelayConfig,
-    /// WebSocket ping interval on the control connection (§4.1: 20 s).
-    pub ping_interval: Duration,
-    /// Reconnect when nothing (not even a pong) arrived for this long.
-    pub dead_after: Duration,
-    /// First reconnect delay; doubles up to `backoff_max`.
-    pub backoff_min: Duration,
-    /// Longest reconnect delay.
-    pub backoff_max: Duration,
-    /// Candidates sent by [`StationRegistration::next`]'s automatic accept.
-    pub candidates: Vec<Candidate>,
-}
-
-impl RegistrationConfig {
-    /// Defaults of §4.1: ping every 20 s, dead after 50 s, backoff 1..60 s.
-    pub fn new(relay: RelayConfig) -> Self {
-        Self {
-            relay,
-            ping_interval: Duration::from_secs(20),
-            dead_after: Duration::from_secs(50),
-            backoff_min: Duration::from_secs(1),
-            backoff_max: Duration::from_secs(60),
-            candidates: Vec::new(),
-        }
-    }
-}
-
-/// State of the control connection, for the station UI.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RegistrationStatus {
-    /// Opening the control connection.
-    Connecting,
-    /// Registered; listeners can reach the station.
-    Registered {
-        /// The station's public address as the server sees it.
-        observed: String,
-    },
-    /// The last attempt failed; the next one follows after `retry_in`.
-    Retrying {
-        /// What went wrong.
-        error: String,
-        /// Delay before the next attempt.
-        retry_in: Duration,
-    },
-    /// The server refused for good (`mailbox-taken`, `version`); no more
-    /// attempts. "Reset relay identity" (a new mailbox) is the way out of
-    /// `mailbox-taken`.
-    Rejected(ErrorCode),
-    /// Stopped by the application.
-    Stopped,
-}
 
 /// A listener asks to connect (`incoming`, §4.2). Accept it within 30 s.
 #[derive(Debug)]
@@ -116,15 +57,6 @@ impl IncomingRequest {
             peer: self.peer,
         })
     }
-}
-
-/// An accepted listener: the relay pipe and the listener's candidates.
-#[derive(Debug)]
-pub struct Incoming {
-    /// The relay pipe ([`Messages`](nestwatch_net::LinkKind::Messages)).
-    pub link: Link,
-    /// The listener's candidates and observed address.
-    pub peer: PeerInfo,
 }
 
 /// Keeps a station registered at a relay server (rendezvous.md §4.1): one
@@ -223,13 +155,6 @@ async fn stopped(stop: &mut watch::Receiver<bool>) {
     let _ = stop.wait_for(|s| *s).await;
 }
 
-enum End {
-    Stop,
-    Retry(String),
-    Slow(String),
-    Fatal(ErrorCode),
-}
-
 async fn control_loop(
     config: RegistrationConfig,
     identity: MailboxIdentity,
@@ -278,16 +203,6 @@ async fn control_loop(
                 return;
             }
         }
-    }
-}
-
-fn end_for(code: ErrorCode) -> End {
-    match code {
-        ErrorCode::MailboxTaken | ErrorCode::Version => End::Fatal(code),
-        ErrorCode::RateLimited | ErrorCode::Replaced | ErrorCode::Unavailable => {
-            End::Slow(code.to_string())
-        }
-        other => End::Retry(other.to_string()),
     }
 }
 

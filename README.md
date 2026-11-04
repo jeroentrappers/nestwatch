@@ -3,7 +3,8 @@
 A private, local-first baby monitor for every device you own.
 
 - **Station and listener on any device**: Linux, macOS, Windows, Android,
-  iPhone/iPad, plus a browser listener served by any station.
+  iPhone/iPad, plus the browser: a listener served by any station or relay
+  server, and a station through the relay.
 - **Several listeners per station, several stations per listener**, mixed
   into one calm view.
 - **Sound activation**: stations only send audio while the room is louder

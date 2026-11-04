@@ -78,7 +78,7 @@
       },
       "how": {
         "heading": "How it works",
-        "intro": "Any phone, tablet or computer can be a station or a listener. The browser can listen.",
+        "intro": "Any phone, tablet or computer can be a station or a listener. The browser can listen, and through the relay it can be the station too.",
         "steps": [
           {
             "title": "Set up a station",
@@ -249,11 +249,12 @@
           "key": "browser",
           "name": "Browser",
           "status": "",
-          "roles": "Listener, nothing to install: the easiest way to start.",
+          "roles": "Listener, and station through the relay. Nothing to install: the easiest way to start.",
           "requirements": ["Chrome or Edge 113, Firefox 128, Safari 17 or newer", "Talk-back needs an HTTPS address"],
           "notes": [
             "Open the web app on this site on any phone, tablet or computer and pair it with your station. It connects through the relay, so it works from anywhere, and talk-back works because the site uses HTTPS. Switch on <em>Reachable through a relay server</em> on the station.",
-            "At home you can also open the web address a computer station shows on its pairing screen; that copy is served by the station itself and needs no relay."
+            "At home you can also open the web address a computer station shows on its pairing screen; that copy is served by the station itself and needs no relay.",
+            "The web app on this site can also be the station: choose <em>Use this device as a station</em>. It is reachable through the relay only, and its tab must stay open and visible, because phones pause tabs in the background. For a whole night, a phone or computer with the Nestwatch app makes the more reliable station."
           ]
         },
         {
@@ -521,7 +522,7 @@
         },
         {
           "q": "Can I listen in a web browser?",
-          "a": ["Yes. Open the web app on this site on any computer, tablet or phone, and pair it with a station that has the relay switched on. At home you can also use the web address a computer station shows when you pair; it is served by the station itself."]
+          "a": ["Yes. Open the web app on this site on any computer, tablet or phone, and pair it with a station that has the relay switched on. At home you can also use the web address a computer station shows when you pair; it is served by the station itself.", "The browser can be the station as well: in the web app on this site, choose <em>Use this device as a station</em>. It is reachable through the relay only and keeps its keys in that browser; keep the tab open and visible while it watches."]
         },
         {
           "q": "Is there an iPhone app?",
