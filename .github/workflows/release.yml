@@ -249,6 +249,9 @@ jobs:
     env:
       NDK_VERSION: "30.0.16248370"
       CARGO_NDK_VERSION: "4.1.2"
+      # UniFFI reads the bindings metadata from the library's symbols; the
+      # Android Gradle plugin strips the .so when it packages the APK.
+      CARGO_PROFILE_RELEASE_STRIP: none
     steps:
       - uses: actions/checkout@v7
         with:
