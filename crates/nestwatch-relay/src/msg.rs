@@ -172,6 +172,11 @@ pub enum Message {
         /// The station's address as the server sees it (RELAY-6).
         observed: String,
     },
+    /// client → server: application-level keep-alive for clients that
+    /// cannot send WebSocket pings (browsers; OPEN-QUESTIONS WEBST-3).
+    Ping,
+    /// server → client: answer to [`Message::Ping`].
+    Pong,
     /// A message type this implementation does not know (ignored).
     Unknown {
         /// Its `t`.
@@ -456,6 +461,8 @@ impl Message {
             Self::Incoming { .. } => "incoming",
             Self::Accept { .. } => "accept",
             Self::Accepted { .. } => "accepted",
+            Self::Ping => "ping",
+            Self::Pong => "pong",
             Self::Unknown { t } => t,
         }
     }
@@ -525,6 +532,7 @@ impl Message {
                 w.strs("candidates", candidates);
                 w.str("observed", observed);
             }
+            Self::Ping | Self::Pong => {}
             Self::Unknown { .. } => return Err(DecodeError::Invalid("t")),
         }
         Ok(w.finish())
@@ -569,6 +577,8 @@ impl Message {
                 candidates: f.candidates()?,
                 observed: f.text("observed", MAX_OBSERVED_LEN)?,
             },
+            "ping" => Self::Ping,
+            "pong" => Self::Pong,
             _ => Self::Unknown { t },
         })
     }
@@ -622,7 +632,20 @@ mod tests {
                 candidates: vec!["udp:10.0.0.2:4000".into()],
                 observed: "[2001:db8::2]:443".into(),
             },
+            Message::Ping,
+            Message::Pong,
         ]
+    }
+
+    #[test]
+    fn keep_alive_messages_have_no_fields() {
+        // {"t": "ping"} and {"t": "pong"}.
+        assert_eq!(hex(&Message::Ping.encode().unwrap()), "a161746470696e67");
+        assert_eq!(hex(&Message::Pong.encode().unwrap()), "a1617464706f6e67");
+        assert_eq!(
+            Message::decode(&Message::Pong.encode().unwrap()).unwrap(),
+            Message::Pong
+        );
     }
 
     #[test]

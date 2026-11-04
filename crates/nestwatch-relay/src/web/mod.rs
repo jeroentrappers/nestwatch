@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Browser listener (wasm32): relayed connect over the browser WebSocket
-//! (rendezvous.md FR-RV-5). The page is served by the relay server itself,
-//! so `connect-src 'self'` covers the rendezvous WebSocket.
+//! Browser client (wasm32) over the browser WebSocket: the listener's
+//! relayed connect (rendezvous.md FR-RV-5) and the relay-only station's
+//! registration (FR-RV-7, [`StationRegistration`]). When the page is served
+//! by the relay server itself, `connect-src 'self'` covers the rendezvous
+//! WebSocket.
+
+mod station;
+
+pub use station::{IncomingRequest, StationRegistration};
 
 use nestwatch_net::Link;
 

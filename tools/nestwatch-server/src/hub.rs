@@ -348,6 +348,9 @@ impl Hub {
                         Some(Ok(WsMessage::Ping(_) | WsMessage::Pong(_) | WsMessage::Frame(_))) => {}
                         Some(Ok(WsMessage::Binary(b))) => match Message::decode(&b) {
                             Ok(Message::Unknown { .. }) => {}
+                            // Keep-alive of clients without WebSocket pings
+                            // (browser stations, OPEN-QUESTIONS WEBST-3).
+                            Ok(Message::Ping) => ok = send(&mut ws, &Message::Pong).await,
                             _ => {
                                 inc(&self.metrics.protocol_errors);
                                 send(&mut ws, &Message::Error { code: ErrorCode::Protocol }).await;

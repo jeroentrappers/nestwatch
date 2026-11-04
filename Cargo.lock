@@ -4394,6 +4394,7 @@ dependencies = [
  "futures-util",
  "getrandom 0.3.4",
  "gloo-timers",
+ "js-sys",
  "minicbor",
  "nestwatch-crypto",
  "nestwatch-net",
@@ -4407,6 +4408,7 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "tokio-tungstenite",
+ "wasm-bindgen-futures",
  "webpki-roots",
 ]
 

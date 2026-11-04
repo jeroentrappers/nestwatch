@@ -12,6 +12,10 @@ default = ["native", "direct"]
 ## Native client on tokio: station registration, relayed connect, STUN.
 native = [
     "dep:tokio",
+    "tokio/net",
+    "tokio/rt",
+    "tokio/time",
+    "tokio/io-util",
     "dep:tokio-tungstenite",
     "dep:tokio-rustls",
     "dep:rustls",
@@ -20,8 +24,9 @@ native = [
 ]
 ## Hole punching and the direct QUIC transport (rendezvous.md §5.2).
 direct = ["native", "dep:quinn", "dep:rcgen"]
-## Browser listener (wasm32): relayed connect over the browser WebSocket.
-web = ["dep:gloo-timers", "dep:futures-util"]
+## Browser (wasm32): relayed connect (listener) and station registration
+## (relay-only station) over the browser WebSocket.
+web = ["dep:gloo-timers", "dep:futures-util", "dep:tokio", "dep:js-sys", "dep:wasm-bindgen-futures"]
 
 [dependencies]
 nestwatch-net = { path = "../nestwatch-net" }
@@ -37,10 +42,13 @@ gloo-timers = { version = "0.3", features = ["futures"], optional = true }
 quinn = { version = "0.11.12", default-features = false, features = ["runtime-tokio", "rustls-ring"], optional = true }
 rcgen = { version = "0.14", default-features = false, features = ["crypto", "ring"], optional = true }
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12", "logging"], optional = true }
-tokio = { version = "1", features = ["net", "rt", "time", "sync", "macros", "io-util"], optional = true }
+# `sync` and `macros` work in the browser; `native` adds the runtime parts.
+tokio = { version = "1", default-features = false, features = ["sync", "macros"], optional = true }
 tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12", "logging"], optional = true }
 tokio-tungstenite = { version = "0.28", default-features = false, features = ["handshake"], optional = true }
 webpki-roots = { version = "1", optional = true }
+js-sys = { version = "0.3", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
 
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
 getrandom = { version = "0.3.4", features = ["wasm_js"] }

@@ -120,7 +120,7 @@ pub(crate) async fn listener_connect(
     .await
 }
 
-#[cfg(feature = "native")]
+#[cfg(any(feature = "native", all(feature = "web", target_arch = "wasm32")))]
 /// Station: `accept` on a fresh connection (§4.2). The server does not
 /// answer; the link is a relay pipe from now on (if the session had expired
 /// the server sends `error` and closes, which the NWP/1 session then sees as
