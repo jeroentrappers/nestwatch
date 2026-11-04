@@ -6,3 +6,10 @@
 .idea/
 .gradle/
 build/
+# iOS build outputs (apps/ios/build-rust.sh) and local tools.
+/apps/ios/Frameworks/
+/apps/ios/Generated/
+/apps/ios/.tools/
+/apps/ios/build/
+xcuserdata/
+*.xcuserstate

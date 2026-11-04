@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Generates the Kotlin and Swift bindings of nestwatch-ffi (UniFFI library mode)
 # into target/uniffi/{kotlin,swift}. The Android build generates its own
-# Kotlin copy (apps/android, task uniffiBindings); the iOS build will use
-# the Swift sources, header and module map from here.
+# Kotlin copy (apps/android, task uniffiBindings); apps/ios/build-rust.sh
+# packages the Swift sources, header and module map from here.
 #
 # Usage: crates/nestwatch-ffi/generate-bindings.sh [kotlin|swift|all]
 set -eu
