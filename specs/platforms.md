@@ -7,7 +7,7 @@
 | Linux | station, listener | x86_64 and aarch64, glibc 2.31; PipeWire, PulseAudio or ALSA | Dioxus desktop | Rust directly |
 | macOS | station, listener | macOS 12, Apple silicon and Intel | Dioxus desktop | Rust directly |
 | Windows | station, listener | Windows 10 21H2, x86_64 and arm64 | Dioxus desktop | Rust directly |
-| Browser | listener | Chrome/Edge 113, Firefox 128, Safari 17 | Dioxus web (wasm) | Rust compiled to wasm32 |
+| Browser | listener; station through a relay server only (§2.5) | Chrome/Edge 113, Firefox 128, Safari 17 | Dioxus web (wasm) | Rust compiled to wasm32 |
 | Android | station, listener | Android 6.0 (API 23) | Jetpack Compose | UniFFI (Kotlin) |
 | iOS / iPadOS | station, listener | iOS 15 | SwiftUI | UniFFI (Swift) |
 
@@ -52,13 +52,27 @@
 
 ### 2.5 Browser
 
-- Listener only. Talk-back only in a secure context.
+- Listener, and station **through a relay server only** (product.md §3.10,
+  rendezvous.md FR-RV-7): a page cannot accept connections, open UDP sockets
+  or advertise over mDNS, so a browser station has no direct endpoints and
+  serves nothing; listeners reach it through its relay mailbox. Talk-back on
+  the listener and the whole station role need a secure context.
 - Audio output starts after the first user gesture (browser rule); the UI
   asks for a tap before playback.
 - Uses the Web Audio API for playback and capture; Opus via WebCodecs where
   available, otherwise codec 2.
 - Offers notifications via the Notification API when permitted; alerts are
   otherwise visual plus a sound.
+- Station: microphone and camera through `getUserMedia` (camera only while
+  a listener watches), camera frames through a canvas; talk-back plays after
+  the first user gesture; battery through the Battery Status API where it
+  exists; a Screen Wake Lock while running, acquired again on every return to
+  the visible state; a `beforeunload` confirmation while running.
+- Station in the background: browsers throttle or suspend hidden tabs (phones
+  suspend them), so the station screen always says that the tab must stay
+  open and visible, reports the camera unavailable while hidden, and stops
+  for good when the tab is closed. The station keeps running while the app
+  shows its listener view.
 
 ## 3. Clarifications
 
