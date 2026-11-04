@@ -402,6 +402,7 @@ jobs:
             if [ -f dist/nestwatch-server-linux-x86_64 ]; then
               echo "| Relay server (Linux x86_64) | \`nestwatch-server-linux-x86_64\` |"
             fi
+            echo "| Relay server (container, amd64 and arm64) | \`docker pull ghcr.io/${{ github.repository_owner }}/nestwatch-server:${{ needs.meta.outputs.version }}\` |"
             echo
             echo "The macOS app and the Windows installer are not signed yet. macOS: open the app once, then System Settings → Privacy & Security → Open Anyway. Windows: SmartScreen → More info → Run anyway."
             echo
