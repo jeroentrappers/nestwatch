@@ -38,11 +38,16 @@ pub(super) async fn dial(shared: &Shared, r: &RelayRef) -> Result<Dialed, String
     let (link, peer) = nestwatch_relay::connect_via_relay(&cfg, MailboxId(r.mailbox), &candidates)
         .await
         .map_err(|e| e.to_string())?;
-    let punch = socket.map(|socket| native::Punch {
-        socket,
-        peer: peer.candidates,
-        relay: r.clone(),
-    });
+    // A station that sent no candidates offers no direct path (a relay-only
+    // station, rendezvous.md FR-RV-7): no punching, and no retries.
+    let punch = match socket {
+        Some(socket) if !peer.candidates.is_empty() => Some(native::Punch {
+            socket,
+            peer: peer.candidates,
+            relay: r.clone(),
+        }),
+        _ => None,
+    };
     Ok(Dialed {
         link,
         path: NetPath::Relayed,

@@ -132,6 +132,7 @@ fn apply(s: &mut Session, cmd: Cmd) {
 }
 
 /// Runs one accepted connection to its end.
+#[cfg(feature = "native")]
 pub(crate) async fn run(shared: Arc<Shared>, link: Link) {
     let transport = Transport::from(link.kind());
     let peer = link.info().peer;

@@ -20,8 +20,16 @@
 //! key, trust stores, settings) and [`Clock`].
 //!
 //! Features: `native` (default) runs on tokio and provides both engines;
-//! `web` builds the listener engine for `wasm32-unknown-unknown` over the
-//! browser WebSocket client.
+//! `web` builds both for `wasm32-unknown-unknown` over the browser
+//! WebSocket client: the listener, and the station as a relay-only station
+//! (rendezvous.md FR-RV-7, product.md §3.10).
+
+#![cfg_attr(
+    // `web` built for a native target (`cargo check`) has no browser
+    // WebSocket: the relay paths are stubs and much is unused.
+    all(not(feature = "native"), not(target_arch = "wasm32")),
+    allow(dead_code, unused_imports)
+)]
 
 #[cfg(not(any(feature = "native", feature = "web")))]
 compile_error!("enable feature `native` or `web`");
@@ -36,7 +44,6 @@ mod storage;
 mod types;
 
 pub mod listener;
-#[cfg(feature = "native")]
 pub mod station;
 
 pub use clock::{Clock, ManualClock, SystemClock};

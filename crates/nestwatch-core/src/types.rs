@@ -27,7 +27,6 @@ impl ListenMode {
         }
     }
 
-    #[cfg(feature = "native")]
     pub(crate) fn from_wire(m: nestwatch_proto::control::ListenMode) -> Self {
         match m {
             nestwatch_proto::control::ListenMode::Continuous => Self::Continuous,

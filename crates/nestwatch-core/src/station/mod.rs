@@ -3,7 +3,9 @@
 //! protocol.md; media.md).
 //!
 //! A [`StationEngine`] serves listeners over TCP and WebSocket, advertises
-//! itself over mDNS, runs the pairing window, and moves media:
+//! itself over mDNS, runs the pairing window, and moves media (with the
+//! `web` feature, in the browser, it is a relay-only station: no TCP, no
+//! WebSocket server, no mDNS, rendezvous.md FR-RV-7, product.md §3.10):
 //!
 //! - audio: [`push_capture`](StationEngine::push_capture) → capture chain →
 //!   level → encoder → shared ring → per-listener sound activation gate →
@@ -34,21 +36,29 @@ use std::time::Duration;
 use minicbor::{Decode, Encode};
 use nestwatch_crypto::{DeviceKey, InviteToken, PairingCode};
 use nestwatch_media::capture::{GainSetting, GainStep};
+#[cfg(feature = "native")]
 use nestwatch_net::StationListener;
+#[cfg(feature = "native")]
 use nestwatch_net::mdns::{Advertisement, Advertiser};
+#[cfg(feature = "native")]
 use nestwatch_net::web::{StationCert, WebServer};
 use nestwatch_proto::control::{CloseReason, Control, Hello, Role, StationStatus, caps};
-use nestwatch_proto::{Endpoint, Host, Invitation, StationTxt};
+use nestwatch_proto::{Endpoint, Invitation};
+#[cfg(feature = "native")]
+use nestwatch_proto::{Host, StationTxt};
 use thiserror::Error;
 use tokio::sync::{broadcast, watch};
 
 use crate::clock::Clock;
 use crate::persist;
+use crate::rt;
 use crate::storage::{Storage, StorageError};
 use crate::types::{ListenMode, Transport, clamp_name};
 
 pub use media::{CameraAvailability, CameraFrame, CameraRequest, PixelFormat};
+#[cfg(feature = "native")]
 pub use nestwatch_net::web::{AssetSource, WebConfig};
+#[cfg(feature = "native")]
 pub use nestwatch_net::{BindScope, ListenConfig};
 pub use pairing::PairingEnd;
 pub use relay::{
@@ -64,6 +74,7 @@ use trust::TrustStore;
 /// Storage key of the station settings.
 pub const KEY_SETTINGS: &str = "station-settings";
 /// Storage key of the HTTPS certificate (protocol.md §3.3).
+#[cfg(feature = "native")]
 pub const KEY_CERT: &str = "station-cert";
 
 /// Connections still in preface or handshake at most; more are dropped
@@ -71,6 +82,7 @@ pub const KEY_CERT: &str = "station-cert";
 const MAX_PENDING_SESSIONS: usize = 16;
 
 /// The browser listener app and its server ports (protocol.md §3.3).
+#[cfg(feature = "native")]
 #[derive(Debug, Clone)]
 pub struct WebOptions {
     /// Ports, CSP and origin checks.
@@ -86,15 +98,21 @@ pub struct StationConfig {
     /// Display name used until the user renames the station.
     pub name: String,
     /// TCP listener ports (protocol.md §3.2).
+    #[cfg(feature = "native")]
     pub tcp: ListenConfig,
     /// HTTP(S) and WebSocket serving; `None` disables it.
+    #[cfg(feature = "native")]
     pub web: Option<WebOptions>,
     /// Advertise over mDNS (protocol.md §3.4).
+    #[cfg(feature = "native")]
     pub mdns: bool,
     /// Endpoints to put in invitations instead of the local interface
-    /// addresses (protocol.md §3.5).
+    /// addresses (protocol.md §3.5). An empty list makes a relay-only
+    /// station (rendezvous.md FR-RV-7); in the browser there are none.
+    #[cfg(feature = "native")]
     pub endpoints: Option<Vec<Endpoint>>,
     /// Time allowed to ask Tailscale for the VPN DNS name.
+    #[cfg(feature = "native")]
     pub tailscale_timeout: Duration,
     /// Concurrent listener sessions; more get `busy` (protocol.md §9: 8).
     pub max_listeners: usize,
@@ -118,10 +136,15 @@ impl StationConfig {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
+            #[cfg(feature = "native")]
             tcp: ListenConfig::default(),
+            #[cfg(feature = "native")]
             web: None,
+            #[cfg(feature = "native")]
             mdns: true,
+            #[cfg(feature = "native")]
             endpoints: None,
+            #[cfg(feature = "native")]
             tailscale_timeout: nestwatch_net::local::TAILSCALE_TIMEOUT,
             max_listeners: 8,
             pairing_window: Duration::from_secs(600),
@@ -135,6 +158,7 @@ impl StationConfig {
 
     /// Loopback only, OS-chosen ports, no mDNS, no web server: for tests
     /// and local tools. Invitations carry `127.0.0.1:<port>`.
+    #[cfg(feature = "native")]
     pub fn loopback(name: impl Into<String>) -> Self {
         Self {
             tcp: ListenConfig {
@@ -215,6 +239,7 @@ fn gain_code(g: GainSetting) -> u8 {
     }
 }
 
+#[cfg(feature = "native")]
 #[derive(Encode, Decode)]
 struct CertRecord {
     #[n(0)]
@@ -424,6 +449,7 @@ pub(crate) struct Inner {
     pub charging: Option<bool>,
     pub last_status: Option<StationStatus>,
     pub last_status_ms: u64,
+    #[cfg(feature = "native")]
     pub advertiser: Option<Advertiser>,
     pub tcp_port: u16,
     pub http_port: Option<u16>,
@@ -554,7 +580,10 @@ impl Shared {
             https_port: g.https_port,
             https_fingerprint: g.fingerprint.clone(),
             endpoints: g.endpoints.clone(),
+            #[cfg(feature = "native")]
             mdns: g.advertiser.is_some(),
+            #[cfg(not(feature = "native"))]
+            mdns: false,
             pairing: g.pairing_info.clone(),
             listeners,
             camera_on: g.camera.wanted.is_some(),
@@ -579,6 +608,7 @@ impl Shared {
     }
 
     /// The TXT data for mDNS (protocol.md §3.4).
+    #[cfg(feature = "native")]
     fn txt(&self, g: &Inner) -> StationTxt {
         StationTxt {
             id: nestwatch_proto::DeviceId::parse(&self.device_id).expect("canonical device id"),
@@ -588,7 +618,12 @@ impl Shared {
         }
     }
 
+    /// Re-announces mDNS after a TXT or name change (none in the browser).
+    #[cfg(not(feature = "native"))]
+    pub fn update_mdns(&self, _g: &mut Inner, _renamed: bool) {}
+
     /// Re-announces mDNS after a TXT or name change.
+    #[cfg(feature = "native")]
     pub fn update_mdns(&self, g: &mut Inner, renamed: bool) {
         if !self.cfg.mdns || !g.running {
             return;
@@ -710,7 +745,8 @@ impl Shared {
 }
 
 /// The station engine. Cheap to clone; all clones control the same
-/// station. Must be started inside a tokio runtime.
+/// station. Must be started inside a tokio runtime (natively) or on the
+/// browser event loop (`web`).
 #[derive(Clone)]
 pub struct StationEngine {
     shared: Arc<Shared>,
@@ -731,6 +767,7 @@ pub fn stored_trusted_listeners(
     Ok(TrustStore::load(storage)?.list().to_vec())
 }
 
+#[cfg(feature = "native")]
 fn cert_names(endpoints: &[Endpoint]) -> Vec<Host> {
     let mut names = vec![Host::Dns("localhost".into())];
     names.push(Host::Ipv4(std::net::Ipv4Addr::LOCALHOST));
@@ -742,6 +779,7 @@ fn cert_names(endpoints: &[Endpoint]) -> Vec<Host> {
     names
 }
 
+#[cfg(feature = "native")]
 fn load_or_create_cert(
     storage: &dyn Storage,
     endpoints: &[Endpoint],
@@ -766,6 +804,12 @@ fn load_or_create_cert(
 impl StationEngine {
     /// Loads (or creates) the device key, trust list and settings, binds
     /// the TCP and web ports, starts mDNS and begins serving.
+    ///
+    /// In the browser (`web`) there is nothing to bind: the station is
+    /// relay-only (rendezvous.md FR-RV-7) and serves listeners once the
+    /// relay is on ([`set_relay_enabled`](Self::set_relay_enabled)).
+    // In the browser the ports are single-threaded (no `Send`).
+    #[cfg_attr(not(feature = "native"), allow(clippy::arc_with_non_send_sync))]
     pub async fn start(
         cfg: StationConfig,
         storage: Arc<dyn Storage>,
@@ -781,33 +825,22 @@ impl StationEngine {
         }
         let relay_identity = relay::load_identity(&*storage)?;
 
-        let tcp = StationListener::bind(cfg.tcp)?;
-        let tcp_port = tcp.port();
-        let endpoints = match &cfg.endpoints {
-            Some(e) => e.clone(),
-            None if cfg.tcp.scope == nestwatch_net::BindScope::Loopback => {
-                vec![Endpoint::new(
-                    std::net::IpAddr::from(std::net::Ipv4Addr::LOCALHOST),
-                    tcp_port,
-                )]
-            }
-            None => nestwatch_net::local::station_endpoints(tcp_port, cfg.tailscale_timeout).await,
-        };
-        let mut web = None;
-        let mut fingerprint = None;
-        if let Some(w) = &cfg.web {
-            let cert = if w.config.https.is_some() {
-                Some(load_or_create_cert(&*storage, &endpoints)?)
-            } else {
-                None
-            };
-            fingerprint = cert.as_ref().map(StationCert::fingerprint);
-            web = Some(WebServer::start(w.config.clone(), w.assets.clone(), cert.as_ref()).await?);
-        }
-        let http_port = web.as_ref().and_then(WebServer::http_port);
-        let https_port = web.as_ref().and_then(WebServer::https_port);
+        #[cfg(feature = "native")]
+        let Bound {
+            tcp,
+            web,
+            tcp_port,
+            http_port,
+            https_port,
+            fingerprint,
+            endpoints,
+        } = bind(&cfg, &*storage).await?;
+        #[cfg(not(feature = "native"))]
+        let (tcp_port, http_port, https_port, fingerprint, endpoints) =
+            (0, None, None, None, Vec::new());
 
         let gain = settings.gain();
+
         let inner = Inner {
             running: true,
             settings,
@@ -823,6 +856,7 @@ impl StationEngine {
             charging: None,
             last_status: None,
             last_status_ms: clock.now_ms(),
+            #[cfg(feature = "native")]
             advertiser: None,
             tcp_port,
             http_port,
@@ -880,9 +914,12 @@ impl StationEngine {
             }
             shared.publish(&g);
         }
-        spawn_accept_tcp(shared.clone(), tcp);
-        if let Some(web) = web {
-            spawn_accept_web(shared.clone(), web);
+        #[cfg(feature = "native")]
+        {
+            spawn_accept_tcp(shared.clone(), tcp);
+            if let Some(web) = web {
+                spawn_accept_web(shared.clone(), web);
+            }
         }
         spawn_ticker(shared.clone());
         Ok(Self { shared })
@@ -932,10 +969,16 @@ impl StationEngine {
         let token = InviteToken::generate().map_err(|_| StationError::Rng)?;
         let code = PairingCode::generate().map_err(|_| StationError::Rng)?;
         let id = self.shared.key.device_id();
-        let c = code.clone();
-        let psk = tokio::task::spawn_blocking(move || c.psk(&id))
-            .await
-            .map_err(|e| StationError::Invalid(e.to_string()))?;
+        #[cfg(feature = "native")]
+        let psk = {
+            let c = code.clone();
+            tokio::task::spawn_blocking(move || c.psk(&id))
+                .await
+                .map_err(|e| StationError::Invalid(e.to_string()))?
+        };
+        // The browser has no blocking pool; one derivation per window.
+        #[cfg(not(feature = "native"))]
+        let psk = code.psk(&id);
         let shared = &self.shared;
         let mut g = shared.lock();
         if !g.running {
@@ -1197,7 +1240,10 @@ impl StationEngine {
             for s in g.sessions.values() {
                 s.send(Cmd::Close(CloseReason::Shutdown, None));
             }
-            g.advertiser = None;
+            #[cfg(feature = "native")]
+            {
+                g.advertiser = None;
+            }
             if g.camera.wanted.take().is_some() {
                 shared.emit(StationEvent::CameraNotWanted);
             }
@@ -1208,11 +1254,62 @@ impl StationEngine {
             if shared.lock().sessions.is_empty() {
                 break;
             }
-            tokio::time::sleep(Duration::from_millis(20)).await;
+            rt::sleep(Duration::from_millis(20)).await;
         }
     }
 }
 
+/// What [`bind`] opened.
+#[cfg(feature = "native")]
+struct Bound {
+    tcp: StationListener,
+    web: Option<WebServer>,
+    tcp_port: u16,
+    http_port: Option<u16>,
+    https_port: Option<u16>,
+    fingerprint: Option<String>,
+    endpoints: Vec<Endpoint>,
+}
+
+/// Binds the TCP listener and the web server and works out the invitation
+/// endpoints (protocol.md §3.2, §3.3, §3.5).
+#[cfg(feature = "native")]
+async fn bind(cfg: &StationConfig, storage: &dyn Storage) -> Result<Bound, StationError> {
+    let tcp = StationListener::bind(cfg.tcp)?;
+    let tcp_port = tcp.port();
+    let endpoints = match &cfg.endpoints {
+        Some(e) => e.clone(),
+        None if cfg.tcp.scope == nestwatch_net::BindScope::Loopback => {
+            vec![Endpoint::new(
+                std::net::IpAddr::from(std::net::Ipv4Addr::LOCALHOST),
+                tcp_port,
+            )]
+        }
+        None => nestwatch_net::local::station_endpoints(tcp_port, cfg.tailscale_timeout).await,
+    };
+    let mut web = None;
+    let mut fingerprint = None;
+    if let Some(w) = &cfg.web {
+        let cert = if w.config.https.is_some() {
+            Some(load_or_create_cert(storage, &endpoints)?)
+        } else {
+            None
+        };
+        fingerprint = cert.as_ref().map(StationCert::fingerprint);
+        web = Some(WebServer::start(w.config.clone(), w.assets.clone(), cert.as_ref()).await?);
+    }
+    Ok(Bound {
+        tcp,
+        http_port: web.as_ref().and_then(WebServer::http_port),
+        https_port: web.as_ref().and_then(WebServer::https_port),
+        web,
+        tcp_port,
+        fingerprint,
+        endpoints,
+    })
+}
+
+#[cfg(feature = "native")]
 fn spawn_accept_tcp(shared: Arc<Shared>, mut listener: StationListener) {
     let mut stop = shared.shutdown.subscribe();
     tokio::spawn(async move {
@@ -1228,6 +1325,7 @@ fn spawn_accept_tcp(shared: Arc<Shared>, mut listener: StationListener) {
     });
 }
 
+#[cfg(feature = "native")]
 fn spawn_accept_web(shared: Arc<Shared>, mut web: WebServer) {
     let mut stop = shared.shutdown.subscribe();
     tokio::spawn(async move {
@@ -1244,6 +1342,7 @@ fn spawn_accept_web(shared: Arc<Shared>, mut web: WebServer) {
     });
 }
 
+#[cfg(feature = "native")]
 fn spawn_ticker(shared: Arc<Shared>) {
     let mut stop = shared.shutdown.subscribe();
     let period = shared.cfg.level_interval.max(Duration::from_millis(10));
@@ -1253,6 +1352,21 @@ fn spawn_ticker(shared: Arc<Shared>) {
         loop {
             tokio::select! {
                 _ = tick.tick() => shared.tick(),
+                () = stopped(&mut stop) => break,
+            }
+        }
+    });
+}
+
+/// The browser ticker: the same period, measured from the end of each tick.
+#[cfg(not(feature = "native"))]
+fn spawn_ticker(shared: Arc<Shared>) {
+    let mut stop = shared.shutdown.subscribe();
+    let period = shared.cfg.level_interval.max(Duration::from_millis(10));
+    rt::spawn(async move {
+        loop {
+            tokio::select! {
+                () = rt::sleep(period) => shared.tick(),
                 () = stopped(&mut stop) => break,
             }
         }

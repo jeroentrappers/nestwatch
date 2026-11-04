@@ -255,6 +255,49 @@ async fn relay_only_invitation_then_direct_without_audio_gap() {
     srv.shutdown().await;
 }
 
+/// FR-RV-7, §5.2 item 5: a relay-only station (no endpoints, no direct
+/// path, as the browser station) sends no candidates; the listener stays
+/// relayed and never comes back for another candidate exchange.
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn relay_only_station_without_candidates_stays_relayed() {
+    let (srv, _state) = server().await;
+    let mut cfg = relay_station_config(&srv, Some(Vec::new()));
+    cfg.relay.direct = false;
+    let station = station_with(cfg, &MemoryStorage::new()).await;
+    station.set_relay_server(&origin(&srv)).unwrap();
+    station.set_relay_enabled(true).unwrap();
+    online(&station).await;
+    let info = station.open_pairing().await.unwrap();
+    let inv = nestwatch_proto::Invitation::parse(&info.invite_uri).unwrap();
+    assert!(inv.endpoints.is_empty() && inv.relay.is_some());
+
+    let mut lcfg = relay_listener_config(&srv);
+    lcfg.relay.retry_interval = Duration::from_millis(300);
+    let listener = listener_with(lcfg, &MemoryStorage::new());
+    let r = listener.pair_invitation(&info.invite_uri).await.unwrap();
+    let id = r.station_id.clone();
+    wait_path(&listener, &id, NetPath::Relayed).await;
+    let connects = srv.metrics().connects_total;
+    tokio::time::sleep(Duration::from_millis(1500)).await;
+    assert_eq!(
+        srv.metrics().connects_total,
+        connects,
+        "no punching retries against a station without candidates"
+    );
+    let v = view(&listener, &id);
+    assert_eq!(
+        (v.status, v.path),
+        (ConnStatus::Live, Some(NetPath::Relayed))
+    );
+    let ss = station.snapshot();
+    assert_eq!(ss.listeners.len(), 1);
+    assert_eq!(ss.listeners[0].transport, Transport::Relayed);
+
+    listener.shutdown().await;
+    station.shutdown().await;
+    srv.shutdown().await;
+}
+
 /// FR-RV-1: the relay is off by default: no registration, no `r`/`m`.
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn relay_off_means_no_registration_and_no_relay_in_invitations() {
