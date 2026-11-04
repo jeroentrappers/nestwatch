@@ -15,6 +15,7 @@ use std::time::Duration;
 use clap::{Parser, Subcommand};
 use nestwatch_core::listener::{
     ConnStatus, ListenSettings, ListenerConfig, ListenerEngine, ListenerEvent, NetPath, Route,
+    VideoRequest,
 };
 use nestwatch_core::station::{
     AssetSource, BindScope, ListenConfig, RelayStatus, StationConfig, StationEngine, StationEvent,
@@ -153,6 +154,14 @@ struct ListenArgs {
     /// Stay on the relay; do not punch a direct path.
     #[arg(long)]
     no_direct: bool,
+    /// Open the camera view of every live station and report the frames
+    /// received (tests, FR-CAM-1).
+    #[arg(long)]
+    video: bool,
+    /// Hold talk-back to every live station for 10 s with a 440 Hz tone
+    /// (tests, FR-TB-1).
+    #[arg(long)]
+    talk_tone: bool,
 }
 
 fn data_dir(cli: &Cli) -> PathBuf {
@@ -691,12 +700,13 @@ async fn run_listen(a: ListenArgs, storage: Arc<dyn Storage>) -> Result<(), Stri
                     }
                     if v.status == ConnStatus::Live {
                         println!(
-                            "{}: level {:.1} dBFS {} battery {} listeners {}",
+                            "{}: level {:.1} dBFS {} battery {} listeners {} audio frames {}",
                             v.name,
                             v.level_dbfs.unwrap_or(-90.0),
                             if v.open { "open" } else { "quiet" },
                             v.battery.map_or("-".into(), |b| format!("{b}%")),
-                            v.station_listeners.unwrap_or(0)
+                            v.station_listeners.unwrap_or(0),
+                            v.audio_frames
                         );
                     }
                 }
@@ -713,7 +723,12 @@ async fn run_listen(a: ListenArgs, storage: Arc<dyn Storage>) -> Result<(), Stri
         Some(path) => Some(spawn_wav_writer(path, l.clone())?),
         None => None,
     };
+    let tester =
+        (a.video || a.talk_tone).then(|| spawn_media_tester(l.clone(), a.video, a.talk_tone));
     stop_signal(a.duration).await;
+    if let Some(t) = tester {
+        t.abort();
+    }
     status.abort();
     if let Some((task, stop)) = writer {
         let _ = stop.send(());
@@ -722,6 +737,66 @@ async fn run_listen(a: ListenArgs, storage: Arc<dyn Storage>) -> Result<(), Stri
     l.shutdown().await;
     printer.abort();
     Ok(())
+}
+
+/// `--video` / `--talk-tone`: once a station is live, open its camera view
+/// and hold talk-back with a 440 Hz tone for 10 s; report the frames
+/// received every second.
+fn spawn_media_tester(l: ListenerEngine, video: bool, talk: bool) -> tokio::task::JoinHandle<()> {
+    /// 10 s of 20 ms ticks.
+    const TALK_TICKS: u64 = 500;
+    tokio::spawn(async move {
+        let mut frames = l.video_frames();
+        let (mut count, mut size) = (0u64, (0u16, 0u16));
+        // Stations served, with the tick their talk-back started.
+        let mut started: Vec<(String, u64)> = Vec::new();
+        let mut tone = (0..320 * 50)
+            .map(|i| {
+                let t = i as f32 / 16_000.0;
+                ((t * 440.0 * std::f32::consts::TAU).sin() * 8_000.0) as i16
+            })
+            .cycle();
+        let mut tick = tokio::time::interval(Duration::from_millis(20));
+        let mut n = 0u64;
+        loop {
+            tokio::select! {
+                f = frames.recv() => match f {
+                    Ok(f) => {
+                        count += 1;
+                        size = (f.width, f.height);
+                    }
+                    Err(tokio::sync::broadcast::error::RecvError::Lagged(k)) => count += k,
+                    Err(_) => break,
+                },
+                _ = tick.tick() => {
+                    n += 1;
+                    for v in l.snapshot().stations.iter().filter(|v| v.status == ConnStatus::Live) {
+                        if !started.iter().any(|(id, _)| id == &v.id) {
+                            started.push((v.id.clone(), n));
+                            if video {
+                                let _ = l.request_video(&v.id, VideoRequest::default());
+                            }
+                            if talk {
+                                let _ = l.talk(&v.id, true);
+                            }
+                        }
+                    }
+                    if talk {
+                        for (id, at) in &started {
+                            if n == at + TALK_TICKS {
+                                let _ = l.talk(id, false);
+                            }
+                        }
+                        let block: Vec<i16> = (&mut tone).take(320).collect();
+                        l.push_talk_capture(&block, 16_000, 1);
+                    }
+                    if n % 50 == 0 && video {
+                        println!("video: {count} frames, last {}x{}", size.0, size.1);
+                    }
+                }
+            }
+        }
+    })
 }
 
 /// The tile's path label (rendezvous.md FR-RV-4).
