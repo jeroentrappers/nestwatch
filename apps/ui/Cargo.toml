@@ -11,8 +11,9 @@ rust-version.workspace = true
 default = []
 ## Backend adapters over the native nestwatch-core engines (station and listener).
 native = ["dep:nestwatch-core", "nestwatch-core/native", "dep:nestwatch-media", "dep:tokio"]
-## Backend adapter over the browser nestwatch-core listener engine (wasm32).
-web = ["dep:nestwatch-core", "nestwatch-core/web", "dep:tokio"]
+## Backend adapter over the browser nestwatch-core engines (wasm32): the
+## listener and the relay-only station.
+web = ["dep:nestwatch-core", "nestwatch-core/web", "dep:nestwatch-media", "dep:tokio"]
 
 [dependencies]
 base64 = "0.22.1"

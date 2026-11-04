@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 //! The browser [`Host`]: preferences in `localStorage`, theme on `<html>`,
-//! audio unlock, notifications and the page's own station WebSocket.
+//! audio unlock, notifications, the page's own station WebSocket and the
+//! relay-only browser station (product.md §3.10).
 
 use std::rc::Rc;
+use std::sync::Arc;
 
 use dioxus::core::spawn_forever;
 use dioxus::prelude::*;
+use nestwatch_core::{Clock, Storage};
 use nestwatch_ui::adapter::Host;
-use nestwatch_ui::model::{Capabilities, Platform, Prefs, Theme};
+use nestwatch_ui::adapter::station::RunningStation;
+use nestwatch_ui::model::{Capabilities, Platform, Prefs, StationDevices, Theme};
 use nestwatch_ui::{LocalFuture, Ui};
 use tokio::sync::mpsc;
 use wasm_bindgen::JsValue;
@@ -25,6 +29,8 @@ pub enum HostMsg {
     AudioUnlocked,
     /// Whether a notification permission prompt can still be shown.
     NotificationsAskable(bool),
+    /// The browser station's devices changed.
+    StationDevices(StationDevices),
 }
 
 /// The browser host.
@@ -34,6 +40,13 @@ pub struct WebHost {
     /// The station's own WebSocket; `None` on a relay server, where the
     /// page's host is not a station (rendezvous.md FR-RV-5).
     pub ws_url: Option<String>,
+    /// The page's origin when a relay server serves the app (FR-RV-5,
+    /// FR-WEBST-2).
+    pub relay_origin: Option<String>,
+    /// The engines' storage and clock (a browser station shares them with
+    /// the listener: one device key per origin, CORE-1).
+    pub engine_storage: Arc<dyn Storage>,
+    pub clock: Arc<dyn Clock>,
     pub tx: mpsc::UnboundedSender<HostMsg>,
     pub rx: std::cell::RefCell<Option<mpsc::UnboundedReceiver<HostMsg>>>,
 }
@@ -102,9 +115,12 @@ impl Host for WebHost {
             && web_sys::window().is_some_and(|w| w.navigator().media_devices().is_ok());
         Capabilities {
             platform: Platform::Web,
-            station: false,
+            // FR-WEBST-1: microphone access needs a secure context.
+            station: mic,
             discovery: false,
             talk: mic,
+            relay_only: true,
+            relay_server_fixed: self.relay_origin.is_some(),
         }
     }
 
@@ -124,6 +140,11 @@ impl Host for WebHost {
                     match m {
                         HostMsg::AudioUnlocked => ui.audio_locked.set(false),
                         HostMsg::NotificationsAskable(a) => ui.notifications_askable.set(a),
+                        HostMsg::StationDevices(d) => {
+                            if *ui.station_devices.peek() != d {
+                                ui.station_devices.set(d);
+                            }
+                        }
                     }
                 }
             });
@@ -159,6 +180,7 @@ impl Host for WebHost {
 
     fn unlock_audio(&self) {
         self.audio.unlock();
+        crate::station::resume_audio();
     }
 
     fn request_notifications(&self) {
@@ -179,5 +201,14 @@ impl Host for WebHost {
 
     fn default_route(&self) -> Option<String> {
         self.ws_url.clone()
+    }
+
+    fn start_station(&self) -> LocalFuture<Result<RunningStation, String>> {
+        Box::pin(crate::station::start(
+            self.engine_storage.clone(),
+            self.clock.clone(),
+            self.relay_origin.clone(),
+            self.tx.clone(),
+        ))
     }
 }

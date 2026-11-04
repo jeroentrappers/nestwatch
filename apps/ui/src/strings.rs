@@ -32,6 +32,48 @@ pub const ROLE_TAB_STATION: &str = "Station";
 /// Browser cannot be a station.
 pub const ROLE_STATION_UNAVAILABLE: &str =
     "A browser can only listen. Use the Nestwatch app on a phone or computer as the station.";
+/// The browser's entry to the station role (product.md FR-WEBST-1).
+pub const STATION_USE_THIS_DEVICE: &str = "Use this device as a station";
+/// Explanation of the browser station role.
+pub const ROLE_STATION_HINT_WEB: &str = "Put this device in the child's room. Listeners reach it through the relay server; keep this tab open.";
+
+// ----- browser station (product.md §3.10) -----------------------------------
+
+/// Always shown while a browser station runs (FR-WEBST-9).
+pub const STATION_WEB_KEEP_VISIBLE: &str = "Keep this tab open and visible. Phones pause hidden tabs, and closing or reloading the tab stops the station.";
+/// Wake lock held (FR-WEBST-8).
+pub const WAKE_LOCK_ON: &str = "The screen stays on while the station runs.";
+/// No wake lock (FR-WEBST-8).
+pub const WAKE_LOCK_OFF: &str =
+    "This browser cannot keep the screen on: turn off auto-lock, or keep the screen on yourself.";
+/// The station's sound waits for a tap (FR-WEBST-6).
+pub const STATION_TAP_TO_START: &str = "Tap to start the microphone and speaker";
+/// Explanation of the station's tap prompt.
+pub const STATION_TAP_HINT: &str = "Browsers only record and play sound after a tap.";
+/// No microphone (FR-WEBST-4).
+pub const MIC_UNAVAILABLE: &str = "No microphone access: the station sends silence. Allow the microphone for this site, then stop and start the station.";
+/// Station footnote in the browser (FR-WEBST-11).
+pub const STATION_KEEPS_RUNNING_WEB: &str = "The station keeps running while you switch to Listening. Closing or reloading this tab stops it.";
+/// Relay section of a relay-only station (rendezvous.md FR-RV-7).
+pub const RELAY_ONLY_NOTE: &str =
+    "A browser station is reachable through the relay server only, so this setting stays on.";
+/// The relay server is the page's origin (FR-WEBST-2).
+pub const RELAY_SERVER_FIXED: &str = "This station uses the server this page comes from.";
+/// Pairing codes need the local network (OPEN-QUESTIONS WEBST-1).
+pub const PAIR_CODE_RELAY_ONLY: &str =
+    "Pairing codes need the local network: scan the QR code or open a link instead.";
+/// Where a browser station keeps its keys (security.md §7.1).
+pub const BROWSER_STATION_STORAGE: &str = "This station's keys are kept in this browser, for this site only. Clearing the site's data or closing a private window removes the station; its listeners then need to pair again.";
+/// Default name of a browser station.
+pub fn browser_station_name(browser: &str) -> String {
+    format!("{browser} station")
+}
+/// A configurable server the page may not be allowed to reach (WEBST-8).
+pub fn relay_open_app_hint(server: &str) -> String {
+    format!(
+        "If the relay stays unreachable, this page may not be allowed to connect to it: open {server}/app/ and start the station there."
+    )
+}
 
 // ----- common ---------------------------------------------------------------
 
@@ -239,6 +281,8 @@ pub const PAIR_CLOSED: &str = "Pairing is closed.";
 pub const PAIR_JUST_PAIRED: &str = "Paired now. Check that the listener shows the same number:";
 /// Link label.
 pub const PAIR_LINK: &str = "Web link";
+/// The `nestwatch://` invitation link, when the station has no web address.
+pub const PAIR_APP_LINK: &str = "App link";
 
 // ----- add a station (listener) ----------------------------------------------
 

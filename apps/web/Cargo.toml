@@ -1,6 +1,6 @@
 [package]
 name = "nestwatch-web"
-description = "Nestwatch browser listener (wasm32), served by stations"
+description = "Nestwatch browser app (wasm32): listener, and relay-only station; served by stations and relay servers"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -33,6 +33,7 @@ web-sys = { version = "0.3", features = [
   "Notification", "NotificationOptions", "NotificationPermission",
   "MediaQueryList", "Event", "EventTarget", "KeyboardEvent", "console", "AddEventListenerOptions",
   "Navigator",
+  "HtmlVideoElement", "HtmlMediaElement", "HtmlCanvasElement", "CanvasRenderingContext2d", "ImageData",
 ] }
 
 [lints]

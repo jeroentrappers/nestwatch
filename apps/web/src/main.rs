@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-//! Nestwatch browser listener (platforms.md §2.5), served by every station
-//! (protocol.md §3.3) and built to a self-contained static bundle
-//! (security.md PRIV-1): see `apps/web/README.md`.
+//! Nestwatch browser app (platforms.md §2.5): a listener, served by every
+//! station (protocol.md §3.3) and by relay servers, and a relay-only station
+//! (product.md §3.10); built to a self-contained static bundle (security.md
+//! PRIV-1): see `apps/web/README.md`.
 
 // The demo build (design previews) skips the engine boot.
 #![cfg_attr(
@@ -15,6 +16,8 @@ mod app;
 mod audio;
 #[cfg(target_arch = "wasm32")]
 mod host;
+#[cfg(target_arch = "wasm32")]
+mod station;
 #[cfg(target_arch = "wasm32")]
 mod storage;
 

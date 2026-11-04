@@ -114,6 +114,8 @@ impl Host for DesktopHost {
             station: true,
             discovery: true,
             talk: true,
+            relay_only: false,
+            relay_server_fixed: false,
         }
     }
 

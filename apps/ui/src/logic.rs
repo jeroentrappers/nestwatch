@@ -2,7 +2,7 @@
 //! Pure presentation logic: level mapping, formatting, status pills and
 //! calibration chart geometry. No Dioxus, no engines; unit tested.
 
-use crate::model::{Conn, ListenerRow, Mode, NetPath, RelayView, Talk, Tile};
+use crate::model::{Conn, ListenerRow, Mode, NetPath, PairingModel, RelayView, Talk, Tile};
 use crate::strings as s;
 
 /// dBFS shown at the left end of meters (0 %).
@@ -397,6 +397,26 @@ pub fn camera_pill(listeners: &[ListenerRow]) -> String {
     }
 }
 
+/// The pairing sheet's links (FR-PAIR-1): the copyable one with its label,
+/// and the one shown below it. The station's own web address comes first;
+/// a relay-only station (rendezvous.md FR-RV-7) has none, so its relay
+/// browser link is the copyable one and the `nestwatch://` link follows.
+pub fn pairing_links(p: &PairingModel) -> (&'static str, String, Option<(&'static str, String)>) {
+    match (&p.web_url, &p.relay_web_url) {
+        (Some(w), relay) => (
+            s::PAIR_LINK,
+            w.clone(),
+            relay.clone().map(|r| (s::PAIR_RELAY_LINK, r)),
+        ),
+        (None, Some(r)) => (
+            s::PAIR_RELAY_LINK,
+            r.clone(),
+            Some((s::PAIR_APP_LINK, p.invite_uri.clone())),
+        ),
+        (None, None) => (s::PAIR_APP_LINK, p.invite_uri.clone(), None),
+    }
+}
+
 /// Station pill: "2 listening".
 pub fn listening_count(n: usize) -> String {
     s::listening_count(n)
@@ -444,6 +464,38 @@ mod tests {
             routes: 2,
             alerting: false,
         }
+    }
+
+    #[test]
+    fn pairing_links_put_the_relay_first_without_a_web_address() {
+        let mut p = PairingModel {
+            invite_uri: "nestwatch://invite?v=1".into(),
+            web_url: None,
+            relay_web_url: Some("https://relay.example/app/#x".into()),
+            code: "AAAAA-BBBBB".into(),
+            remaining_ms: 1,
+            pairings: 0,
+            max_pairings: 8,
+        };
+        let (label, link, second) = pairing_links(&p);
+        assert_eq!(
+            (label, link.as_str()),
+            (s::PAIR_RELAY_LINK, "https://relay.example/app/#x")
+        );
+        assert_eq!(
+            second,
+            Some((s::PAIR_APP_LINK, "nestwatch://invite?v=1".to_owned()))
+        );
+        p.web_url = Some("http://192.168.1.2:47180/#x".into());
+        let (label, _, second) = pairing_links(&p);
+        assert_eq!(label, s::PAIR_LINK);
+        assert_eq!(second.unwrap().0, s::PAIR_RELAY_LINK);
+        p.web_url = None;
+        p.relay_web_url = None;
+        assert_eq!(
+            pairing_links(&p),
+            (s::PAIR_APP_LINK, "nestwatch://invite?v=1".to_owned(), None)
+        );
     }
 
     #[test]

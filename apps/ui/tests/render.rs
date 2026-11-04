@@ -53,10 +53,42 @@ fn first_launch_shows_the_disclaimer_and_roles() {
     let html = render(Platform::Desktop, Prefs::default(), None);
     assert!(html.contains(s::DISCLAIMER), "{html}");
     assert!(html.contains(s::ROLE_STATION) && html.contains(s::ROLE_LISTENER));
-    // The browser cannot be a station: only the disclaimer and a button.
+    // The browser listens first; the relay-only station is a secondary
+    // choice (product.md FR-WEBST-1).
     let web = render(Platform::Web, Prefs::default(), None);
     assert!(web.contains(s::DISCLAIMER) && web.contains(s::DISCLAIMER_ACCEPT));
     assert!(!web.contains(s::ROLE_STATION));
+    assert!(
+        web.contains(s::STATION_USE_THIS_DEVICE)
+            && web.contains(&escaped(s::ROLE_STATION_HINT_WEB))
+    );
+}
+
+/// product.md §3.10: the browser station screen warns about the tab, never
+/// asks whether to use the relay (always on), and the listener home offers
+/// the station role.
+#[test]
+fn browser_station_and_its_entry_render() {
+    let html = render(Platform::Web, prefs(Role::Station), None);
+    for needle in [
+        s::STATION_WEB_KEEP_VISIBLE,
+        s::STATION_KEEPS_RUNNING_WEB,
+        s::PAIR_LISTENER,
+        s::ROLE_TAB_LISTENING,
+    ] {
+        assert!(
+            html.contains(&escaped(needle)),
+            "missing {needle:?} in {html}"
+        );
+    }
+    assert!(!html.contains(s::RELAY_SETUP_TITLE), "{html}");
+    assert!(!html.contains(&escaped(s::STATION_KEEPS_RUNNING)));
+    let home = render(Platform::Web, prefs(Role::Listener), None);
+    assert!(home.contains(s::STATION_USE_THIS_DEVICE), "{home}");
+    // No role switch in the browser until the station is in use.
+    assert!(!home.contains(s::ROLE_TAB_STATION), "{home}");
+    let desktop = render(Platform::Desktop, prefs(Role::Listener), None);
+    assert!(!desktop.contains(s::STATION_USE_THIS_DEVICE));
 }
 
 #[test]

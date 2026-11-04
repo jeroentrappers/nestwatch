@@ -4,7 +4,8 @@
 //! plain method calls.
 //!
 //! Implementations: [`crate::adapter::EngineBackend`] over the nestwatch-core
-//! engines (native desktop: station and listener; browser: listener) and
+//! engines (native desktop: station and listener; browser: listener and
+//! relay-only station) and
 //! [`crate::demo::DemoBackend`] with made-up data for design previews.
 
 use std::collections::BTreeMap;
@@ -17,7 +18,7 @@ use dioxus::prelude::*;
 
 use crate::model::{
     Capabilities, Frame, Gain, LevelHistory, ListenerModel, Mode, Notice, NoticeKind, PairOutcome,
-    Prefs, StationRun, Theme, UiError,
+    Prefs, StationDevices, StationRun, Theme, UiError,
 };
 
 /// A boxed, single-threaded future (UI tasks run on the UI thread).
@@ -31,6 +32,8 @@ pub struct Ui {
     pub listener: Signal<ListenerModel>,
     /// Station state.
     pub station: Signal<StationRun>,
+    /// Device state of a browser station (tap prompt, microphone, wake lock).
+    pub station_devices: Signal<StationDevices>,
     /// Recent levels per station (calibration chart).
     pub history: Signal<BTreeMap<String, LevelHistory>>,
     /// Newest camera frame per station.
@@ -56,6 +59,7 @@ impl Ui {
         Self {
             listener: Signal::new(ListenerModel::default()),
             station: Signal::new(StationRun::Stopped),
+            station_devices: Signal::new(StationDevices::default()),
             history: Signal::new(BTreeMap::new()),
             frames: Signal::new(BTreeMap::new()),
             notices: Signal::new(Vec::new()),

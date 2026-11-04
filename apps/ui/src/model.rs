@@ -43,7 +43,7 @@ impl Theme {
 pub enum Platform {
     /// Dioxus desktop: station and listener, discovery, tray.
     Desktop,
-    /// Browser listener.
+    /// Browser: listener, and relay-only station (product.md §3.10).
     Web,
 }
 
@@ -58,6 +58,28 @@ pub struct Capabilities {
     pub discovery: bool,
     /// Talk-back possible here (a browser needs a secure context).
     pub talk: bool,
+    /// The station is reachable through a relay server only, which is
+    /// always on (browser station, rendezvous.md FR-RV-7).
+    pub relay_only: bool,
+    /// The relay server is the page's own origin and cannot be changed
+    /// (browser app served by a relay server, product.md FR-WEBST-2).
+    pub relay_server_fixed: bool,
+}
+
+/// What the browser knows about a running station's devices
+/// (product.md FR-WEBST-4..9). Native hosts leave the defaults.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct StationDevices {
+    /// Microphone or speaker wait for a tap (browser autoplay rule).
+    pub needs_tap: bool,
+    /// Microphone: `None` while unknown, `Some(false)` when unavailable or
+    /// denied (the station then sends silence).
+    pub mic: Option<bool>,
+    /// Screen wake lock: `None` while not applicable, `Some(false)` when
+    /// the browser offers none or refused it.
+    pub wake_lock: Option<bool>,
+    /// The page is hidden (the camera is reported unavailable meanwhile).
+    pub hidden: bool,
 }
 
 /// Connection state of a followed station (FR-LS-3, FR-LS-5).

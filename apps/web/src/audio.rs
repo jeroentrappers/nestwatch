@@ -30,7 +30,7 @@ use web_sys::{
 const FRAME: usize = 320;
 
 /// Converts and forwards one block of microphone samples.
-type MicFeed = dyn Fn(&[f32]);
+pub(crate) type MicFeed = dyn Fn(&[f32]);
 const WORKLET_URL: &str = "audio-worklet.js";
 
 #[derive(Default)]
@@ -145,13 +145,7 @@ impl Audio {
         self.inner.borrow_mut().ctx = Some(ctx.clone());
         let this = self.clone();
         spawn_local(async move {
-            let worklet = match ctx.audio_worklet() {
-                Ok(w) => match w.add_module(WORKLET_URL) {
-                    Ok(p) => JsFuture::from(p).await.is_ok(),
-                    Err(_) => false,
-                },
-                Err(_) => false,
-            };
+            let worklet = load_worklet(&ctx).await;
             let ok = if worklet {
                 this.start_worklet(&ctx)
             } else {
@@ -209,95 +203,42 @@ impl Audio {
     }
 
     fn start_worklet(self: &Rc<Self>, ctx: &AudioContext) -> bool {
-        let opts = AudioWorkletNodeOptions::new();
-        opts.set_number_of_inputs(0);
-        opts.set_number_of_outputs(1);
-        opts.set_output_channel_count(&Array::of1(&JsValue::from(1)));
-        let node = match AudioWorkletNode::new_with_options(ctx, "nestwatch-playback", &opts) {
-            Ok(n) => n,
-            Err(_) => return false,
-        };
-        let Ok(port) = node.port() else { return false };
-        let this = self.clone();
-        let port2 = port.clone();
-        let closure = Closure::<dyn FnMut(MessageEvent)>::new(move |e: MessageEvent| {
-            let data = e.data();
-            let need = Reflect::get(&data, &JsValue::from_str("need"))
-                .ok()
-                .and_then(|v| v.as_f64())
-                .unwrap_or(0.0) as usize;
+        let (pull_this, stats_this) = (self.clone(), self.clone());
+        let pull: Rc<PullFrame> = Rc::new(move |out: &mut [f32]| pull_this.pull_frame(out));
+        let on_stats: Rc<WorkletStats> = Rc::new(move |underruns, played| {
             {
-                let mut c = this.counters.borrow_mut();
-                if let Some(u) = Reflect::get(&data, &JsValue::from_str("underruns"))
-                    .ok()
-                    .and_then(|v| v.as_f64())
-                {
-                    c.underruns = u;
-                }
-                if let Some(p) = Reflect::get(&data, &JsValue::from_str("played"))
-                    .ok()
-                    .and_then(|v| v.as_f64())
-                {
-                    c.played = p;
-                }
+                let mut c = stats_this.counters.borrow_mut();
+                c.underruns = underruns;
+                c.played = played;
             }
-            let mut buf = [0f32; FRAME];
-            for _ in 0..need.min(50) {
-                this.pull_frame(&mut buf);
-                let arr = Float32Array::new_with_length(FRAME as u32);
-                arr.copy_from(&buf);
-                let _ = port2.post_message_with_transferable(&arr, &Array::of1(&arr.buffer()));
-            }
-            this.publish_counters();
+            stats_this.publish_counters();
         });
-        port.set_onmessage(Some(closure.as_ref().unchecked_ref()));
-        if node.connect_with_audio_node(&ctx.destination()).is_err() {
+        let Some(node) = playback_worklet(ctx, pull, on_stats) else {
             return false;
-        }
+        };
         set(&self.stats, "mode", "worklet");
         log("Nestwatch: audio playback through AudioWorklet at 16 kHz");
         let mut inner = self.inner.borrow_mut();
-        inner.node = Some(node.into());
-        inner.closures.push(closure.into_js_value());
+        inner.node = Some(node.node);
+        inner.closures.push(node.closure);
         true
     }
 
     fn start_script_processor(self: &Rc<Self>, ctx: &AudioContext) {
-        let node: ScriptProcessorNode = match ctx
-            .create_script_processor_with_buffer_size_and_number_of_input_channels_and_number_of_output_channels(
-                1024, 0, 1,
-            ) {
-            Ok(n) => n,
-            Err(e) => {
-                web_sys::console::error_2(&JsValue::from_str("Nestwatch: no ScriptProcessor"), &e);
-                return;
-            }
+        let (pull_this, played_this) = (self.clone(), self.clone());
+        let pull: Rc<PullFrame> = Rc::new(move |out: &mut [f32]| pull_this.pull_frame(out));
+        let on_played: Rc<dyn Fn(usize)> = Rc::new(move |n| {
+            played_this.counters.borrow_mut().played += n as f64;
+            played_this.publish_counters();
+        });
+        let Some(node) = playback_script_processor(ctx, pull, on_played) else {
+            return;
         };
-        let this = self.clone();
-        // Buffers are powers of two (1024 = 64 ms), frames are 320 samples:
-        // carry the rest of a pulled frame over to the next callback.
-        let mut carry: std::collections::VecDeque<f32> = std::collections::VecDeque::new();
-        let closure =
-            Closure::<dyn FnMut(AudioProcessingEvent)>::new(move |e: AudioProcessingEvent| {
-                let Ok(out) = e.output_buffer() else { return };
-                let len = out.length() as usize;
-                let mut frame = [0f32; FRAME];
-                while carry.len() < len {
-                    this.pull_frame(&mut frame);
-                    carry.extend(frame);
-                }
-                let data: Vec<f32> = carry.drain(..len).collect();
-                let _ = out.copy_to_channel(&data, 0);
-                this.counters.borrow_mut().played += len as f64;
-                this.publish_counters();
-            });
-        node.set_onaudioprocess(Some(closure.as_ref().unchecked_ref()));
-        let _ = node.connect_with_audio_node(&ctx.destination());
         set(&self.stats, "mode", "script-processor");
         log("Nestwatch: audio playback through ScriptProcessorNode (no AudioWorklet)");
         let mut inner = self.inner.borrow_mut();
-        inner.node = Some(node.into());
-        inner.closures.push(closure.into_js_value());
+        inner.node = Some(node.node);
+        inner.closures.push(node.closure);
     }
 
     /// Plays the alert sound (FR-AL-1), if audio is unlocked.
@@ -330,24 +271,11 @@ impl Audio {
         if self.inner.borrow().mic.is_some() {
             return;
         }
-        let Some(window) = web_sys::window() else {
-            return;
-        };
-        if !window.is_secure_context() {
-            return;
-        }
-        let Ok(devices) = window.navigator().media_devices() else {
-            return;
-        };
         let gen_ = self.mic_gen.get() + 1;
         self.mic_gen.set(gen_);
-        let constraints = MediaStreamConstraints::new();
-        let audio = Object::new();
-        set(&audio, "echoCancellation", true);
-        set(&audio, "noiseSuppression", true);
-        set(&audio, "channelCount", 1);
-        constraints.set_audio(&audio);
-        let Ok(promise) = devices.get_user_media_with_constraints(&constraints) else {
+        // Talk-back (media.md §4.3): platform echo cancellation and noise
+        // suppression on.
+        let Some(promise) = microphone(true) else {
             return;
         };
         let this = self.clone();
@@ -371,18 +299,8 @@ impl Audio {
                 return;
             };
             let _ = ctx.resume();
-            let Ok(source) = ctx.create_media_stream_source(&stream) else {
-                stop_tracks(&stream);
-                return;
-            };
             let rate = ctx.sample_rate() as u32;
-            let worklet = match ctx.audio_worklet() {
-                Ok(w) => match w.add_module(WORKLET_URL) {
-                    Ok(p) => JsFuture::from(p).await.is_ok(),
-                    Err(_) => false,
-                },
-                Err(_) => false,
-            };
+            let worklet = load_worklet(&ctx).await;
             if this.mic_gen.get() != gen_ {
                 stop_tracks(&stream);
                 let _ = ctx.close();
@@ -396,54 +314,20 @@ impl Audio {
                         .map(|s| (s.clamp(-1.0, 1.0) * 32767.0) as i16)
                         .collect();
                     this.engine.push_talk_capture(&pcm, rate, 1);
-                    let mut c = this.counters.borrow_mut();
-                    c.mic_blocks += 1.0;
-                    c.mic_samples += pcm.len() as f64;
+                    {
+                        let mut c = this.counters.borrow_mut();
+                        c.mic_blocks += 1.0;
+                        c.mic_samples += pcm.len() as f64;
+                    }
+                    this.publish_counters();
                 })
             };
-            let mut node_and_closure: Option<(JsValue, JsValue)> = None;
-            if worklet && let Ok(node) = AudioWorkletNode::new(&ctx, "nestwatch-capture") {
-                if let Ok(port) = node.port() {
-                    let this2 = this.clone();
-                    let feed = feed.clone();
-                    let closure =
-                        Closure::<dyn FnMut(MessageEvent)>::new(move |e: MessageEvent| {
-                            if let Ok(arr) = e.data().dyn_into::<Float32Array>() {
-                                feed(&arr.to_vec());
-                                this2.publish_counters();
-                            }
-                        });
-                    port.set_onmessage(Some(closure.as_ref().unchecked_ref()));
-                    let _ = source.connect_with_audio_node(&node);
-                    let _ = node.connect_with_audio_node(&ctx.destination());
-                    node_and_closure = Some((node.into(), closure.into_js_value()));
-                }
-            }
-            if node_and_closure.is_none()
-                && let Ok(node) = ctx
-                    .create_script_processor_with_buffer_size_and_number_of_input_channels_and_number_of_output_channels(
-                        2048, 1, 1,
-                    )
-            {
-                let this2 = this.clone();
-                let closure = Closure::<dyn FnMut(AudioProcessingEvent)>::new(move |e: AudioProcessingEvent| {
-                    if let Ok(buf) = e.input_buffer()
-                        && let Ok(data) = buf.get_channel_data(0)
-                    {
-                        feed(&data);
-                        this2.publish_counters();
-                    }
-                });
-                node.set_onaudioprocess(Some(closure.as_ref().unchecked_ref()));
-                let _ = source.connect_with_audio_node(&node);
-                let _ = node.connect_with_audio_node(&ctx.destination());
-                node_and_closure = Some((node.into(), closure.into_js_value()));
-            }
-            let Some((node, closure)) = node_and_closure else {
+            let Some(node) = capture(&ctx, &stream, worklet, feed) else {
                 stop_tracks(&stream);
                 let _ = ctx.close();
                 return;
             };
+            let (node, closure) = (node.node, node.closure);
             set(&this.stats, "mic", "on");
             this.inner.borrow_mut().mic = Some(Mic {
                 stream,
@@ -465,7 +349,181 @@ impl Audio {
     }
 }
 
-fn stop_tracks(stream: &MediaStream) {
+/// Pulls one 20 ms frame (320 samples) of 16 kHz output.
+pub(crate) type PullFrame = dyn Fn(&mut [f32]);
+/// Playback worklet counters: underruns and samples played.
+pub(crate) type WorkletStats = dyn Fn(f64, f64);
+
+/// A Web Audio node and the callback that feeds it; both must stay alive
+/// while the node runs.
+pub(crate) struct Node {
+    pub node: JsValue,
+    pub closure: JsValue,
+}
+
+/// Loads `audio-worklet.js` into `ctx`; `false` without `AudioWorklet`.
+pub(crate) async fn load_worklet(ctx: &AudioContext) -> bool {
+    match ctx.audio_worklet() {
+        Ok(w) => match w.add_module(WORKLET_URL) {
+            Ok(p) => JsFuture::from(p).await.is_ok(),
+            Err(_) => false,
+        },
+        Err(_) => false,
+    }
+}
+
+/// Plays frames from `pull` through the `nestwatch-playback` worklet: it
+/// asks for frames whenever less than 100 ms are buffered (CORE-12).
+pub(crate) fn playback_worklet(
+    ctx: &AudioContext,
+    pull: Rc<PullFrame>,
+    on_stats: Rc<WorkletStats>,
+) -> Option<Node> {
+    let opts = AudioWorkletNodeOptions::new();
+    opts.set_number_of_inputs(0);
+    opts.set_number_of_outputs(1);
+    opts.set_output_channel_count(&Array::of1(&JsValue::from(1)));
+    let node = AudioWorkletNode::new_with_options(ctx, "nestwatch-playback", &opts).ok()?;
+    let port = node.port().ok()?;
+    let port2 = port.clone();
+    let closure = Closure::<dyn FnMut(MessageEvent)>::new(move |e: MessageEvent| {
+        let data = e.data();
+        let num = |k: &str| {
+            Reflect::get(&data, &JsValue::from_str(k))
+                .ok()
+                .and_then(|v| v.as_f64())
+        };
+        let need = num("need").unwrap_or(0.0) as usize;
+        let mut buf = [0f32; FRAME];
+        for _ in 0..need.min(50) {
+            pull(&mut buf);
+            let arr = Float32Array::new_with_length(FRAME as u32);
+            arr.copy_from(&buf);
+            let _ = port2.post_message_with_transferable(&arr, &Array::of1(&arr.buffer()));
+        }
+        on_stats(
+            num("underruns").unwrap_or(0.0),
+            num("played").unwrap_or(0.0),
+        );
+    });
+    port.set_onmessage(Some(closure.as_ref().unchecked_ref()));
+    node.connect_with_audio_node(&ctx.destination()).ok()?;
+    Some(Node {
+        node: node.into(),
+        closure: closure.into_js_value(),
+    })
+}
+
+/// Plays frames from `pull` through a `ScriptProcessorNode` (browsers
+/// without `AudioWorklet`).
+pub(crate) fn playback_script_processor(
+    ctx: &AudioContext,
+    pull: Rc<PullFrame>,
+    on_played: Rc<dyn Fn(usize)>,
+) -> Option<Node> {
+    let node: ScriptProcessorNode = match ctx
+        .create_script_processor_with_buffer_size_and_number_of_input_channels_and_number_of_output_channels(
+            1024, 0, 1,
+        ) {
+        Ok(n) => n,
+        Err(e) => {
+            web_sys::console::error_2(&JsValue::from_str("Nestwatch: no ScriptProcessor"), &e);
+            return None;
+        }
+    };
+    // Buffers are powers of two (1024 = 64 ms), frames are 320 samples:
+    // carry the rest of a pulled frame over to the next callback.
+    let mut carry: std::collections::VecDeque<f32> = std::collections::VecDeque::new();
+    let closure =
+        Closure::<dyn FnMut(AudioProcessingEvent)>::new(move |e: AudioProcessingEvent| {
+            let Ok(out) = e.output_buffer() else { return };
+            let len = out.length() as usize;
+            let mut frame = [0f32; FRAME];
+            while carry.len() < len {
+                pull(&mut frame);
+                carry.extend(frame);
+            }
+            let data: Vec<f32> = carry.drain(..len).collect();
+            let _ = out.copy_to_channel(&data, 0);
+            on_played(len);
+        });
+    node.set_onaudioprocess(Some(closure.as_ref().unchecked_ref()));
+    let _ = node.connect_with_audio_node(&ctx.destination());
+    Some(Node {
+        node: node.into(),
+        closure: closure.into_js_value(),
+    })
+}
+
+/// Asks for the microphone (secure contexts only). Talk-back wants the
+/// platform's echo cancellation and noise suppression; a station wants the
+/// room as it is (its own gain and AGC run in the engine, media.md §1).
+pub(crate) fn microphone(voice: bool) -> Option<js_sys::Promise> {
+    let window = web_sys::window()?;
+    if !window.is_secure_context() {
+        return None;
+    }
+    let devices = window.navigator().media_devices().ok()?;
+    let constraints = MediaStreamConstraints::new();
+    let audio = Object::new();
+    set(&audio, "echoCancellation", voice);
+    set(&audio, "noiseSuppression", voice);
+    set(&audio, "autoGainControl", voice);
+    set(&audio, "channelCount", 1);
+    constraints.set_audio(&audio);
+    devices.get_user_media_with_constraints(&constraints).ok()
+}
+
+/// Feeds microphone blocks of `stream` (in `ctx`, at its rate) to `feed`:
+/// the `nestwatch-capture` worklet when loaded, else a `ScriptProcessorNode`.
+pub(crate) fn capture(
+    ctx: &AudioContext,
+    stream: &MediaStream,
+    worklet: bool,
+    feed: Rc<MicFeed>,
+) -> Option<Node> {
+    let source = ctx.create_media_stream_source(stream).ok()?;
+    if worklet && let Ok(node) = AudioWorkletNode::new(ctx, "nestwatch-capture") {
+        if let Ok(port) = node.port() {
+            let feed = feed.clone();
+            let closure = Closure::<dyn FnMut(MessageEvent)>::new(move |e: MessageEvent| {
+                if let Ok(arr) = e.data().dyn_into::<Float32Array>() {
+                    feed(&arr.to_vec());
+                }
+            });
+            port.set_onmessage(Some(closure.as_ref().unchecked_ref()));
+            let _ = source.connect_with_audio_node(&node);
+            let _ = node.connect_with_audio_node(&ctx.destination());
+            return Some(Node {
+                node: node.into(),
+                closure: closure.into_js_value(),
+            });
+        }
+    }
+    let node = ctx
+        .create_script_processor_with_buffer_size_and_number_of_input_channels_and_number_of_output_channels(
+            2048, 1, 1,
+        )
+        .ok()?;
+    let closure =
+        Closure::<dyn FnMut(AudioProcessingEvent)>::new(move |e: AudioProcessingEvent| {
+            if let Ok(buf) = e.input_buffer()
+                && let Ok(data) = buf.get_channel_data(0)
+            {
+                feed(&data);
+            }
+        });
+    node.set_onaudioprocess(Some(closure.as_ref().unchecked_ref()));
+    let _ = source.connect_with_audio_node(&node);
+    let _ = node.connect_with_audio_node(&ctx.destination());
+    Some(Node {
+        node: node.into(),
+        closure: closure.into_js_value(),
+    })
+}
+
+/// Stops every track of `stream`.
+pub(crate) fn stop_tracks(stream: &MediaStream) {
     for t in stream.get_tracks().iter() {
         if let Ok(t) = t.dyn_into::<web_sys::MediaStreamTrack>() {
             t.stop();

@@ -12,7 +12,7 @@ use super::listener::RoleSwitch;
 use super::relay::{RelaySettings, RelaySetup};
 use crate::backend::{BackendHandle, Ui};
 use crate::logic;
-use crate::model::{CameraHere, Gain, PairingModel, RelayView, StationModel, StationRun};
+use crate::model::{CameraHere, Gain, PairingModel, Platform, RelayView, StationModel, StationRun};
 use crate::qr;
 use crate::strings as s;
 
@@ -113,7 +113,13 @@ fn RunningStation(model: StationModel) -> Element {
     }
 
     let open_pairing = backend.clone();
-    let ask_relay = !nav.prefs.read().relay_asked;
+    let caps = backend.capabilities();
+    let web = caps.platform == Platform::Web;
+    let ui = use_context::<Ui>();
+    let devices = ui.station_devices.read().clone();
+    let unlock = backend.clone();
+    // A relay-only station never asks: the relay is always on (FR-RV-7).
+    let ask_relay = !nav.prefs.read().relay_asked && !caps.relay_only;
     let relay_pill = (model.relay != RelayView::Off).then(|| logic::relay_pill(&model.relay));
     rsx! {
         main { class: "page stack station",
@@ -151,6 +157,29 @@ fn RunningStation(model: StationModel) -> Element {
                     span { class: "{p.classes()}", "{p.text}" }
                 }
             }
+            // FR-WEBST-6, FR-WEBST-4, FR-WEBST-8, FR-WEBST-9.
+            if web {
+                if devices.needs_tap {
+                    button {
+                        class: "card audio-prompt",
+                        r#type: "button",
+                        onclick: move |_| unlock.unlock_audio(),
+                        strong { "{s::STATION_TAP_TO_START}" }
+                        span { class: "caption", "{s::STATION_TAP_HINT}" }
+                    }
+                }
+                if devices.mic == Some(false) {
+                    p { class: "card error", role: "alert", "{s::MIC_UNAVAILABLE}" }
+                }
+                div { class: "card stack-s keep-visible", role: "note",
+                    strong { "{s::STATION_WEB_KEEP_VISIBLE}" }
+                    if let Some(w) = devices.wake_lock {
+                        span { class: "caption",
+                            if w { "{s::WAKE_LOCK_ON}" } else { "{s::WAKE_LOCK_OFF}" }
+                        }
+                    }
+                }
+            }
             div { class: "hero",
                 Ring { level: model.level_dbfs, threshold, sound: hearing }
             }
@@ -184,7 +213,9 @@ fn RunningStation(model: StationModel) -> Element {
                     onclick: move |_| dimmed.set(true),
                     "{s::DIM_SCREEN}"
                 }
-                p { class: "caption footnote", "{s::STATION_KEEPS_RUNNING}" }
+                p { class: "caption footnote",
+                    if web { "{s::STATION_KEEPS_RUNNING_WEB}" } else { "{s::STATION_KEEPS_RUNNING}" }
+                }
                 button {
                     class: "btn ghost",
                     r#type: "button",
@@ -197,6 +228,7 @@ fn RunningStation(model: StationModel) -> Element {
             PairingSheet {
                 pairing: model.pairing.clone(),
                 device_id: model.device_id.clone(),
+                code_usable: !caps.relay_only,
                 onclose: move |_| sheet.set(false),
             }
         }
@@ -208,11 +240,13 @@ fn RunningStation(model: StationModel) -> Element {
     }
 }
 
-/// The pairing sheet (FR-PAIR-1..5).
+/// The pairing sheet (FR-PAIR-1..5). `code_usable` is false for a
+/// relay-only station, which no listener can find by code (WEBST-1).
 #[component]
 fn PairingSheet(
     pairing: Option<PairingModel>,
     device_id: String,
+    code_usable: bool,
     onclose: EventHandler<()>,
 ) -> Element {
     let backend = use_context::<BackendHandle>();
@@ -234,9 +268,11 @@ fn PairingSheet(
                     Some(p) => {
                         let qr = qr::qr_svg(&p.invite_uri);
                         let left = p.max_pairings.saturating_sub(p.pairings);
-                        let link = p.web_url.clone().unwrap_or_else(|| p.invite_uri.clone());
+                        // The copyable link: the station's own web address,
+                        // else the relay's (a relay-only station), else the
+                        // app link; the next one below it.
+                        let (label, link, second) = logic::pairing_links(&p);
                         let link2 = link.clone();
-                        let relay_link = p.relay_web_url.clone();
                         rsx! {
                             p { class: "muted", "{s::PAIR_INTRO}" }
                             if let Some(q) = qr {
@@ -253,16 +289,20 @@ fn PairingSheet(
                                     }
                                 }
                             }
-                            div { class: "stack-s centered",
-                                span { class: "caption", "{s::PAIR_CODE_INTRO}" }
-                                span { class: "code-display", "{p.code}" }
-                                span { class: "caption", "{s::PAIR_STATION_ID} " span { class: "mono", "{logic::grouped_id(&device_id)}" } }
+                            if code_usable {
+                                div { class: "stack-s centered",
+                                    span { class: "caption", "{s::PAIR_CODE_INTRO}" }
+                                    span { class: "code-display", "{p.code}" }
+                                    span { class: "caption", "{s::PAIR_STATION_ID} " span { class: "mono", "{logic::grouped_id(&device_id)}" } }
+                                }
+                            } else {
+                                p { class: "caption", "{s::PAIR_CODE_RELAY_ONLY}" }
                             }
                             p { class: "caption", role: "timer",
                                 "{s::pairing_open_for(&logic::remaining(p.remaining_ms), left)}"
                             }
                             div { class: "row link-row",
-                                span { class: "caption", "{s::PAIR_LINK}" }
+                                span { class: "caption", "{label}" }
                                 a { class: "mono link grow", href: "{link}", "{link}" }
                                 button {
                                     class: "btn ghost",
@@ -275,9 +315,9 @@ fn PairingSheet(
                                     if *copied.read() { "{s::COPIED}" } else { "{s::COPY}" }
                                 }
                             }
-                            if let Some(r) = relay_link {
+                            if let Some((label2, r)) = second {
                                 div { class: "row link-row",
-                                    span { class: "caption", "{s::PAIR_RELAY_LINK}" }
+                                    span { class: "caption", "{label2}" }
                                     a { class: "mono link grow", href: "{r}", "{r}" }
                                 }
                             }
@@ -474,6 +514,9 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                         span { class: "mono fingerprint", "{f}" }
                         span { class: "caption", "{s::HTTPS_FINGERPRINT_HINT}" }
                     }
+                }
+                if backend.capabilities().platform == Platform::Web {
+                    p { class: "caption", "{s::BROWSER_STATION_STORAGE}" }
                 }
                 ThemePicker {}
                 button {

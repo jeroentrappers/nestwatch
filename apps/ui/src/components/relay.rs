@@ -71,11 +71,14 @@ pub fn RelaySetup(server: String) -> Element {
 }
 
 /// The relay section of the station settings: toggle, status pill, server
-/// address (FR-RV-6) and "reset relay identity" (§3.2).
+/// address (FR-RV-6) and "reset relay identity" (§3.2). A relay-only
+/// station (FR-RV-7) has no toggle, and a server fixed to the page's origin
+/// (product.md FR-WEBST-2) no address field.
 #[component]
 pub fn RelaySettings(model: StationModel) -> Element {
     let backend = use_context::<BackendHandle>();
     let nav = use_context::<Nav>();
+    let caps = backend.capabilities();
     let set = model.settings.clone();
     let mut server = use_signal(|| set.relay_server.clone());
     let mut error = use_signal(|| None::<String>);
@@ -91,13 +94,18 @@ pub fn RelaySettings(model: StationModel) -> Element {
     };
     rsx! {
         section { class: "stack-s relay-settings", aria_label: s::RELAY_TITLE,
-            SwitchRow {
-                label: s::RELAY_TITLE.to_owned(),
-                checked: set.relay_enabled,
-                onchange: move |v: bool| {
-                    let _ = b_toggle.set_relay_enabled(v);
-                    nav.update_prefs(&b_toggle, |p| p.relay_asked = true);
-                },
+            if caps.relay_only {
+                h3 { "{s::RELAY_TITLE}" }
+                p { class: "caption", "{s::RELAY_ONLY_NOTE}" }
+            } else {
+                SwitchRow {
+                    label: s::RELAY_TITLE.to_owned(),
+                    checked: set.relay_enabled,
+                    onchange: move |v: bool| {
+                        let _ = b_toggle.set_relay_enabled(v);
+                        nav.update_prefs(&b_toggle, |p| p.relay_asked = true);
+                    },
+                }
             }
             div { class: "row wrap", role: "status",
                 span { class: "{pill.classes()}", "{pill.text}" }
@@ -106,6 +114,9 @@ pub fn RelaySettings(model: StationModel) -> Element {
                 }
             }
             RelayExplainer { server: set.relay_server.clone() }
+            if caps.relay_server_fixed {
+                p { class: "caption", "{s::RELAY_SERVER_FIXED}" }
+            } else {
             form {
                 class: "field",
                 onsubmit: move |e: FormEvent| {
@@ -134,6 +145,10 @@ pub fn RelaySettings(model: StationModel) -> Element {
                 if let Some(e) = error.read().as_ref() {
                     span { class: "caption", role: "alert", "{e}" }
                 }
+                if caps.relay_only {
+                    span { class: "caption", "{s::relay_open_app_hint(&set.relay_server)}" }
+                }
+            }
             }
             div { class: "stack-s",
                 if *confirm.read() {

@@ -9,18 +9,31 @@ use super::common::{Brand, Meter, Segmented, StatusPill, Toggle};
 use super::settings_panel::SettingsPanel;
 use crate::backend::{BackendHandle, Ui};
 use crate::logic;
-use crate::model::{Conn, Mode, Platform, Role, Talk, Tile};
+use crate::model::{Conn, Mode, Platform, Role, StationRun, Talk, Tile};
 use crate::strings as s;
 
-/// Desktop role switch (design README §5.1).
+/// Role switch (design README §5.1): always on desktop, in the browser
+/// while the station is in use.
 #[component]
 pub fn RoleSwitch() -> Element {
     let backend = use_context::<BackendHandle>();
     let nav = use_context::<Nav>();
-    if !backend.capabilities().station {
+    let ui = use_context::<Ui>();
+    let caps = backend.capabilities();
+    if !caps.station {
         return rsx! {};
     }
     let role = nav.prefs.read().role;
+    // In the browser the switch appears once the station is in use; until
+    // then the listener home offers "Use this device as a station".
+    let station_in_use = role == Some(Role::Station)
+        || !matches!(
+            *ui.station.read(),
+            StationRun::Stopped | StationRun::Failed(_)
+        );
+    if caps.platform == Platform::Web && !station_in_use {
+        return rsx! {};
+    }
     let options = vec![
         (
             s::ROLE_TAB_LISTENING.to_owned(),
@@ -59,6 +72,14 @@ pub fn ListenerHome() -> Element {
     };
     let unlock = backend.clone();
     let notif = backend.clone();
+    let use_station = backend.clone();
+    // FR-WEBST-1: the browser's entry to the station role.
+    let offer_station = caps.platform == Platform::Web
+        && caps.station
+        && matches!(
+            *ui.station.read(),
+            StationRun::Stopped | StationRun::Failed(_)
+        );
     rsx! {
         main { class: "page stack",
             header { class: "app-top",
@@ -128,6 +149,16 @@ pub fn ListenerHome() -> Element {
                     "{s::BROWSER_KEEP_OPEN}"
                 } else {
                     "{s::KEEPS_LISTENING}"
+                }
+            }
+            if offer_station {
+                button {
+                    class: "btn ghost web-station-entry",
+                    r#type: "button",
+                    onclick: move |_| {
+                        nav.update_prefs(&use_station, |p| p.role = Some(Role::Station));
+                    },
+                    "{s::STATION_USE_THIS_DEVICE}"
                 }
             }
         }
