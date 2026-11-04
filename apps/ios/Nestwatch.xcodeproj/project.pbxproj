@@ -1,0 +1,748 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0167D3B4042A59CB1195B245 /* Bonjour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509B329CBC911EE35ABE2035 /* Bonjour.swift */; };
+		063C4EEB8D454C864C511AF7 /* Station.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413BF1EFACEF75CE19B5E509 /* Station.swift */; };
+		15DF8DA39E1CFC5874EE1A63 /* Alerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3677E47BD76D2B72FEC656 /* Alerts.swift */; };
+		182B209CA6371CDE7021912C /* FFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8281EFFD8DC94FAD94946C0 /* FFI.swift */; };
+		19FBEF4FF3B4A71FFE640B23 /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF906EA70CB1C0A4F2B326EA /* Text.swift */; };
+		2120CCD7CA44FEF9734FDEAE /* Battery.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27D8CB1CEEFFCA5CFC31876 /* Battery.swift */; };
+		39FBB53E362B756422936A06 /* AddStation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C91271DC582184023A4AEEA8 /* AddStation.swift */; };
+		465B29D9A9C68AE7C2EA9F5E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6D3064F7383EA3A04ADD89EE /* Localizable.strings */; };
+		4F95F155930A51A6706BB242 /* Nestwatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82628F8D32F1F4D31E8785F /* Nestwatch.swift */; };
+		5B142C205DCED25F8BF20A21 /* PairingFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76AEC466F1A10616DA45A5D4 /* PairingFlowTests.swift */; };
+		71ABF36AEAD7AE85E508C8F8 /* NestwatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 966B5DC4F7E13C3B8E945F4F /* NestwatchApp.swift */; };
+		7270B87AC1700B50919D3509 /* StationSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F30D840DEB791E5E299CECB /* StationSettings.swift */; };
+		72D3AFE4726D6695D5FA543A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4398A4EAB639DAB4B9B25BD6 /* Assets.xcassets */; };
+		7476CE17DC40440198FDB0E8 /* Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A05DF75185BEB92E325B1EE /* Presentation.swift */; };
+		781325667BFB23973523A481 /* LogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6BF537DD51EA862CDBDF887 /* LogicTests.swift */; };
+		8603FF4B82F35F9058F61A7E /* StationCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE754F12B5F084C7F774AE42 /* StationCamera.swift */; };
+		95257208F15D7FEF880D6807 /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97734B88BE81411EC633F20 /* Root.swift */; };
+		A78D8DB61115AFEE1E68DB6D /* LevelHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F204D8EBE7CBA12C95A8A217 /* LevelHistory.swift */; };
+		B3AD3B4976035ECEE463D6CD /* NestwatchFFI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B83200117784AA28EF664E9 /* NestwatchFFI.swift */; };
+		B558933771EA65F8289425C3 /* QrScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D0CE9156B8E7C0DE9EEA0C5 /* QrScanner.swift */; };
+		C256F5A41D39DFCCBA7D854E /* Prefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED0B1D559D4E0455C15F8C1B /* Prefs.swift */; };
+		C677F091B840046609B13CA6 /* Audio.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65FCCF8C1EBEC702423B256 /* Audio.swift */; };
+		D32F573D3A2ED6021683F380 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE94048220FDFF5BC15C461 /* Theme.swift */; };
+		D944C878E38434FE12839763 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 895F994684757996BA4C64AE /* Camera.swift */; };
+		DDE4EC515A94D10D0572933A /* KeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFE58A8E2F4E6D3C74FBF5CA /* KeychainStorage.swift */; };
+		E3E85BB47287E19335057044 /* NestwatchFFI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2831C36A469D869110D0FC03 /* NestwatchFFI.xcframework */; };
+		EBB8C334CA21500F6D4F6DC9 /* Hosts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7235367F02DD60C65D7034B /* Hosts.swift */; };
+		EDCFA14B7D3A0DB106B3D2AD /* Welcome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7224ED61C5F16C45602C93AE /* Welcome.swift */; };
+		F0917CE98B44C9DF65ED12C2 /* NetInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC5ACB0463A35FEE523022D8 /* NetInfo.swift */; };
+		F9D0F000839573D1E8F3F33F /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E11264EE88E75D0214C9EF0 /* Components.swift */; };
+		FC43A2735A1B975611657D0B /* Listener.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE39985EAADD48B3618204BD /* Listener.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		55E3C337BCDC2C11DB3864CE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D1BF7954B1DCD305C5EDB162 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FB419011C4CC2B07031D8A5F;
+			remoteInfo = Nestwatch;
+		};
+		DFF9D34C140F73C6BF1AE140 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D1BF7954B1DCD305C5EDB162 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FB419011C4CC2B07031D8A5F;
+			remoteInfo = Nestwatch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0F30D840DEB791E5E299CECB /* StationSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationSettings.swift; sourceTree = "<group>"; };
+		10F4DBE143CFF713CD7D05ED /* NestwatchUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NestwatchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D0CE9156B8E7C0DE9EEA0C5 /* QrScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrScanner.swift; sourceTree = "<group>"; };
+		2831C36A469D869110D0FC03 /* NestwatchFFI.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = NestwatchFFI.xcframework; path = Frameworks/NestwatchFFI.xcframework; sourceTree = "<group>"; };
+		28AD3C3B0BD2E9DB76390168 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		2B83200117784AA28EF664E9 /* NestwatchFFI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestwatchFFI.swift; sourceTree = "<group>"; };
+		3DFC1BDE720B8A7F28D831F9 /* Nestwatch.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Nestwatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		413BF1EFACEF75CE19B5E509 /* Station.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Station.swift; sourceTree = "<group>"; };
+		4398A4EAB639DAB4B9B25BD6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4E11264EE88E75D0214C9EF0 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		509B329CBC911EE35ABE2035 /* Bonjour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bonjour.swift; sourceTree = "<group>"; };
+		5651B2DEDDBD32703A1FB2B8 /* Nestwatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nestwatch.entitlements; sourceTree = "<group>"; };
+		5B3677E47BD76D2B72FEC656 /* Alerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alerts.swift; sourceTree = "<group>"; };
+		7224ED61C5F16C45602C93AE /* Welcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Welcome.swift; sourceTree = "<group>"; };
+		76AEC466F1A10616DA45A5D4 /* PairingFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingFlowTests.swift; sourceTree = "<group>"; };
+		895F994684757996BA4C64AE /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
+		8A05DF75185BEB92E325B1EE /* Presentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Presentation.swift; sourceTree = "<group>"; };
+		966B5DC4F7E13C3B8E945F4F /* NestwatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NestwatchApp.swift; sourceTree = "<group>"; };
+		A7235367F02DD60C65D7034B /* Hosts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hosts.swift; sourceTree = "<group>"; };
+		A8281EFFD8DC94FAD94946C0 /* FFI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFI.swift; sourceTree = "<group>"; };
+		AE31161745B5FC88C7B7E5D9 /* NestwatchTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NestwatchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AFE58A8E2F4E6D3C74FBF5CA /* KeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStorage.swift; sourceTree = "<group>"; };
+		B6BF537DD51EA862CDBDF887 /* LogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogicTests.swift; sourceTree = "<group>"; };
+		B82628F8D32F1F4D31E8785F /* Nestwatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Nestwatch.swift; sourceTree = "<group>"; };
+		BB5CAC44E7B26211C7423796 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		BFE94048220FDFF5BC15C461 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		C91271DC582184023A4AEEA8 /* AddStation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStation.swift; sourceTree = "<group>"; };
+		CE39985EAADD48B3618204BD /* Listener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Listener.swift; sourceTree = "<group>"; };
+		CF906EA70CB1C0A4F2B326EA /* Text.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Text.swift; sourceTree = "<group>"; };
+		D65FCCF8C1EBEC702423B256 /* Audio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Audio.swift; sourceTree = "<group>"; };
+		E97734B88BE81411EC633F20 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
+		EC5ACB0463A35FEE523022D8 /* NetInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetInfo.swift; sourceTree = "<group>"; };
+		ED0B1D559D4E0455C15F8C1B /* Prefs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Prefs.swift; sourceTree = "<group>"; };
+		F204D8EBE7CBA12C95A8A217 /* LevelHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelHistory.swift; sourceTree = "<group>"; };
+		F27D8CB1CEEFFCA5CFC31876 /* Battery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Battery.swift; sourceTree = "<group>"; };
+		FE754F12B5F084C7F774AE42 /* StationCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationCamera.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		06F169BD301378F8A6990B95 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3E85BB47287E19335057044 /* NestwatchFFI.xcframework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		120522438FB1B1A544A198F1 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				7FFFB1CC4CED7B2BA5E9285E /* Screens */,
+				4E11264EE88E75D0214C9EF0 /* Components.swift */,
+				E97734B88BE81411EC633F20 /* Root.swift */,
+				BFE94048220FDFF5BC15C461 /* Theme.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		175D65CC08B983DA0E17DD49 /* Platform */ = {
+			isa = PBXGroup;
+			children = (
+				5B3677E47BD76D2B72FEC656 /* Alerts.swift */,
+				D65FCCF8C1EBEC702423B256 /* Audio.swift */,
+				F27D8CB1CEEFFCA5CFC31876 /* Battery.swift */,
+				509B329CBC911EE35ABE2035 /* Bonjour.swift */,
+				A7235367F02DD60C65D7034B /* Hosts.swift */,
+				EC5ACB0463A35FEE523022D8 /* NetInfo.swift */,
+				FE754F12B5F084C7F774AE42 /* StationCamera.swift */,
+			);
+			path = Platform;
+			sourceTree = "<group>";
+		};
+		1CEB8BA739E7060EB5D565B7 /* NestwatchTests */ = {
+			isa = PBXGroup;
+			children = (
+				B6BF537DD51EA862CDBDF887 /* LogicTests.swift */,
+			);
+			path = NestwatchTests;
+			sourceTree = "<group>";
+		};
+		1D72C92F84F02DD1AD4F2C61 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				966B5DC4F7E13C3B8E945F4F /* NestwatchApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		2D322825E0A1243131C09C42 /* Nestwatch */ = {
+			isa = PBXGroup;
+			children = (
+				1D72C92F84F02DD1AD4F2C61 /* App */,
+				39085F3901D6BC95C05D14E5 /* Core */,
+				175D65CC08B983DA0E17DD49 /* Platform */,
+				582B52D6FC8B35E3AAAF890D /* Resources */,
+				120522438FB1B1A544A198F1 /* UI */,
+			);
+			path = Nestwatch;
+			sourceTree = "<group>";
+		};
+		342BC128392B7290D0A13BAF = {
+			isa = PBXGroup;
+			children = (
+				6D00560EE31DBC2091ADF7BE /* Generated */,
+				2D322825E0A1243131C09C42 /* Nestwatch */,
+				1CEB8BA739E7060EB5D565B7 /* NestwatchTests */,
+				64A9B3A91767A730678DFE23 /* NestwatchUITests */,
+				B8B77F12BB5E5FF1F9027997 /* Frameworks */,
+				C235169FA2FE94C0E0D39A0E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		39085F3901D6BC95C05D14E5 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A8281EFFD8DC94FAD94946C0 /* FFI.swift */,
+				AFE58A8E2F4E6D3C74FBF5CA /* KeychainStorage.swift */,
+				F204D8EBE7CBA12C95A8A217 /* LevelHistory.swift */,
+				B82628F8D32F1F4D31E8785F /* Nestwatch.swift */,
+				ED0B1D559D4E0455C15F8C1B /* Prefs.swift */,
+				8A05DF75185BEB92E325B1EE /* Presentation.swift */,
+				CF906EA70CB1C0A4F2B326EA /* Text.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		582B52D6FC8B35E3AAAF890D /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6D3064F7383EA3A04ADD89EE /* Localizable.strings */,
+				4398A4EAB639DAB4B9B25BD6 /* Assets.xcassets */,
+				BB5CAC44E7B26211C7423796 /* Info.plist */,
+				5651B2DEDDBD32703A1FB2B8 /* Nestwatch.entitlements */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		64A9B3A91767A730678DFE23 /* NestwatchUITests */ = {
+			isa = PBXGroup;
+			children = (
+				76AEC466F1A10616DA45A5D4 /* PairingFlowTests.swift */,
+			);
+			path = NestwatchUITests;
+			sourceTree = "<group>";
+		};
+		6D00560EE31DBC2091ADF7BE /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				2B83200117784AA28EF664E9 /* NestwatchFFI.swift */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		7FFFB1CC4CED7B2BA5E9285E /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				C91271DC582184023A4AEEA8 /* AddStation.swift */,
+				895F994684757996BA4C64AE /* Camera.swift */,
+				CE39985EAADD48B3618204BD /* Listener.swift */,
+				1D0CE9156B8E7C0DE9EEA0C5 /* QrScanner.swift */,
+				413BF1EFACEF75CE19B5E509 /* Station.swift */,
+				0F30D840DEB791E5E299CECB /* StationSettings.swift */,
+				7224ED61C5F16C45602C93AE /* Welcome.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		B8B77F12BB5E5FF1F9027997 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				2831C36A469D869110D0FC03 /* NestwatchFFI.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C235169FA2FE94C0E0D39A0E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3DFC1BDE720B8A7F28D831F9 /* Nestwatch.app */,
+				AE31161745B5FC88C7B7E5D9 /* NestwatchTests.xctest */,
+				10F4DBE143CFF713CD7D05ED /* NestwatchUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5AB2DCE50B24868060AC31EB /* NestwatchUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5BF6EA452D10C4D5FBB380F4 /* Build configuration list for PBXNativeTarget "NestwatchUITests" */;
+			buildPhases = (
+				7197416776D2919E07841E96 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CF25E4C4F4EFC35FC34ED84E /* PBXTargetDependency */,
+			);
+			name = NestwatchUITests;
+			packageProductDependencies = (
+			);
+			productName = NestwatchUITests;
+			productReference = 10F4DBE143CFF713CD7D05ED /* NestwatchUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		D0F3C9AAFADF157345247ABB /* NestwatchTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC253B0A9B5A906E0DE1F0A3 /* Build configuration list for PBXNativeTarget "NestwatchTests" */;
+			buildPhases = (
+				D8C57434C100E1817C0B33C6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				069D6974BF89CDE1C2CF9A71 /* PBXTargetDependency */,
+			);
+			name = NestwatchTests;
+			packageProductDependencies = (
+			);
+			productName = NestwatchTests;
+			productReference = AE31161745B5FC88C7B7E5D9 /* NestwatchTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FB419011C4CC2B07031D8A5F /* Nestwatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 88BCE5EF85AF1F806BC934AA /* Build configuration list for PBXNativeTarget "Nestwatch" */;
+			buildPhases = (
+				FA2A092D505E4D0B008B29D5 /* Check the Rust core */,
+				36A986C967A38E49D36CAA1C /* Sources */,
+				CD73E803C591B5BE9BEA8F12 /* Resources */,
+				06F169BD301378F8A6990B95 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Nestwatch;
+			packageProductDependencies = (
+			);
+			productName = Nestwatch;
+			productReference = 3DFC1BDE720B8A7F28D831F9 /* Nestwatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D1BF7954B1DCD305C5EDB162 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					5AB2DCE50B24868060AC31EB = {
+						TestTargetID = FB419011C4CC2B07031D8A5F;
+					};
+					FB419011C4CC2B07031D8A5F = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 1CC7DF48AB481FC81E4DB5D0 /* Build configuration list for PBXProject "Nestwatch" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 342BC128392B7290D0A13BAF;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C235169FA2FE94C0E0D39A0E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FB419011C4CC2B07031D8A5F /* Nestwatch */,
+				D0F3C9AAFADF157345247ABB /* NestwatchTests */,
+				5AB2DCE50B24868060AC31EB /* NestwatchUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CD73E803C591B5BE9BEA8F12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72D3AFE4726D6695D5FA543A /* Assets.xcassets in Resources */,
+				465B29D9A9C68AE7C2EA9F5E /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		FA2A092D505E4D0B008B29D5 /* Check the Rust core */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Check the Rust core";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ ! -d \"$SRCROOT/Frameworks/NestwatchFFI.xcframework\" ] || [ ! -f \"$SRCROOT/Generated/NestwatchFFI.swift\" ]; then\n  echo \"error: run apps/ios/build-rust.sh first (builds the Rust core and its Swift bindings)\"\n  exit 1\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		36A986C967A38E49D36CAA1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39FBB53E362B756422936A06 /* AddStation.swift in Sources */,
+				15DF8DA39E1CFC5874EE1A63 /* Alerts.swift in Sources */,
+				C677F091B840046609B13CA6 /* Audio.swift in Sources */,
+				2120CCD7CA44FEF9734FDEAE /* Battery.swift in Sources */,
+				0167D3B4042A59CB1195B245 /* Bonjour.swift in Sources */,
+				D944C878E38434FE12839763 /* Camera.swift in Sources */,
+				F9D0F000839573D1E8F3F33F /* Components.swift in Sources */,
+				182B209CA6371CDE7021912C /* FFI.swift in Sources */,
+				EBB8C334CA21500F6D4F6DC9 /* Hosts.swift in Sources */,
+				DDE4EC515A94D10D0572933A /* KeychainStorage.swift in Sources */,
+				A78D8DB61115AFEE1E68DB6D /* LevelHistory.swift in Sources */,
+				FC43A2735A1B975611657D0B /* Listener.swift in Sources */,
+				4F95F155930A51A6706BB242 /* Nestwatch.swift in Sources */,
+				71ABF36AEAD7AE85E508C8F8 /* NestwatchApp.swift in Sources */,
+				B3AD3B4976035ECEE463D6CD /* NestwatchFFI.swift in Sources */,
+				F0917CE98B44C9DF65ED12C2 /* NetInfo.swift in Sources */,
+				C256F5A41D39DFCCBA7D854E /* Prefs.swift in Sources */,
+				7476CE17DC40440198FDB0E8 /* Presentation.swift in Sources */,
+				B558933771EA65F8289425C3 /* QrScanner.swift in Sources */,
+				95257208F15D7FEF880D6807 /* Root.swift in Sources */,
+				063C4EEB8D454C864C511AF7 /* Station.swift in Sources */,
+				8603FF4B82F35F9058F61A7E /* StationCamera.swift in Sources */,
+				7270B87AC1700B50919D3509 /* StationSettings.swift in Sources */,
+				19FBEF4FF3B4A71FFE640B23 /* Text.swift in Sources */,
+				D32F573D3A2ED6021683F380 /* Theme.swift in Sources */,
+				EDCFA14B7D3A0DB106B3D2AD /* Welcome.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7197416776D2919E07841E96 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5B142C205DCED25F8BF20A21 /* PairingFlowTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D8C57434C100E1817C0B33C6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				781325667BFB23973523A481 /* LogicTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		069D6974BF89CDE1C2CF9A71 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FB419011C4CC2B07031D8A5F /* Nestwatch */;
+			targetProxy = 55E3C337BCDC2C11DB3864CE /* PBXContainerItemProxy */;
+		};
+		CF25E4C4F4EFC35FC34ED84E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FB419011C4CC2B07031D8A5F /* Nestwatch */;
+			targetProxy = DFF9D34C140F73C6BF1AE140 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		6D3064F7383EA3A04ADD89EE /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				28AD3C3B0BD2E9DB76390168 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		139DC8D1A2504D456067F04A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.nestwatch.NestwatchTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nestwatch.app/Nestwatch";
+			};
+			name = Debug;
+		};
+		89B7910CFFC94DF8688A75F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A5EC4A7D586DCD053C32A903 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AAFA2A59A10E32DABB0C863F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Nestwatch/Resources/Nestwatch.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"Frameworks\"",
+				);
+				INFOPLIST_FILE = Nestwatch/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.nestwatch.Nestwatch;
+				PRODUCT_NAME = Nestwatch;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BCC6D9A51F8E96837DB57FEC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Nestwatch/Resources/Nestwatch.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"Frameworks\"",
+				);
+				INFOPLIST_FILE = Nestwatch/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.nestwatch.Nestwatch;
+				PRODUCT_NAME = Nestwatch;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D3116D1CFC21DFE77593B9CA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.nestwatch.NestwatchUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Nestwatch;
+			};
+			name = Release;
+		};
+		D421C9E2B2C5E993321442F7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.nestwatch.NestwatchUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Nestwatch;
+			};
+			name = Debug;
+		};
+		E8E06EA1D9EB2F89D6DD845F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = org.nestwatch.NestwatchTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nestwatch.app/Nestwatch";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1CC7DF48AB481FC81E4DB5D0 /* Build configuration list for PBXProject "Nestwatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				89B7910CFFC94DF8688A75F5 /* Debug */,
+				A5EC4A7D586DCD053C32A903 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5BF6EA452D10C4D5FBB380F4 /* Build configuration list for PBXNativeTarget "NestwatchUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D421C9E2B2C5E993321442F7 /* Debug */,
+				D3116D1CFC21DFE77593B9CA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		88BCE5EF85AF1F806BC934AA /* Build configuration list for PBXNativeTarget "Nestwatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAFA2A59A10E32DABB0C863F /* Debug */,
+				BCC6D9A51F8E96837DB57FEC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DC253B0A9B5A906E0DE1F0A3 /* Build configuration list for PBXNativeTarget "NestwatchTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				139DC8D1A2504D456067F04A /* Debug */,
+				E8E06EA1D9EB2F89D6DD845F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D1BF7954B1DCD305C5EDB162 /* Project object */;
+}

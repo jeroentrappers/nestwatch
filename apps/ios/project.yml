@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# XcodeGen spec for Nestwatch.xcodeproj. The generated project is committed,
+# so building needs only Xcode; after changing this file regenerate it with
+# XcodeGen 2.46.0 (see README.md).
+name: Nestwatch
+options:
+  bundleIdPrefix: org.nestwatch
+  deploymentTarget:
+    iOS: "15.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+  groupSortPosition: top
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "15.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    DEAD_CODE_STRIPPING: YES
+targets:
+  Nestwatch:
+    type: application
+    platform: iOS
+    sources:
+      - path: Nestwatch
+      - path: Generated/NestwatchFFI.swift
+        optional: true
+    dependencies:
+      - framework: Frameworks/NestwatchFFI.xcframework
+        embed: false
+    preBuildScripts:
+      - name: Check the Rust core
+        basedOnDependencyAnalysis: false
+        script: |
+          if [ ! -d "$SRCROOT/Frameworks/NestwatchFFI.xcframework" ] || [ ! -f "$SRCROOT/Generated/NestwatchFFI.swift" ]; then
+            echo "error: run apps/ios/build-rust.sh first (builds the Rust core and its Swift bindings)"
+            exit 1
+          fi
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nestwatch.Nestwatch
+        PRODUCT_NAME: Nestwatch
+        INFOPLIST_FILE: Nestwatch/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Nestwatch/Resources/Nestwatch.entitlements
+        CODE_SIGN_STYLE: Automatic
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+  NestwatchTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: NestwatchTests
+    dependencies:
+      - target: Nestwatch
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nestwatch.NestwatchTests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Nestwatch.app/Nestwatch"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+  NestwatchUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: NestwatchUITests
+    dependencies:
+      - target: Nestwatch
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.nestwatch.NestwatchUITests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Nestwatch
+schemes:
+  Nestwatch:
+    build:
+      targets:
+        Nestwatch: all
+        NestwatchTests: [test]
+        NestwatchUITests: [test]
+    test:
+      targets:
+        - NestwatchTests
+        - NestwatchUITests
+      gatherCoverageData: false
