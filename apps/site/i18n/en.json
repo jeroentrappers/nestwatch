@@ -28,6 +28,8 @@
     "footer_license": "Free software under the <a href=\"{repo}/blob/main/LICENSE\">GNU AGPL v3.0 or later</a>.",
     "footer_source": "Source code on GitHub",
     "footer_privacy": "This website sets no cookies, loads nothing from other servers and has no analytics.",
+    "open_app": "Open the app",
+    "open_app_long": "Open the web app",
     "og_alt": "The Nestwatch logo, a honey crescent with two lavender sound waves, and the words: a private baby monitor for every device you own.",
     "not_found": {
       "title": "This page is not here",
@@ -44,9 +46,9 @@
         "pills": ["No account", "End-to-end encrypted", "Open source"],
         "title": "A baby monitor that stays in your home.",
         "lead": "Nestwatch turns the phones, tablets and computers you already own into a baby monitor. Sound and video travel directly from one of your devices to another, end-to-end encrypted. There is no account to make and no cloud in between.",
-        "cta_download": "Download Nestwatch",
-        "cta_how": "How it works",
-        "note": "Linux, macOS, Windows and Android today, plus a listener in the browser. iPhone and iPad are coming.",
+        "cta_app": "Open the web app",
+        "cta_download": "Download the apps",
+        "note": "Listen in any browser, nothing to install. Apps for Linux, macOS, Windows and Android; iPhone and iPad are coming.",
         "shot_alt": "Nestwatch listener on a computer: three station tiles. Nursery shows sound with a live camera view, Leo's room is quiet, Grandma's is reconnecting. A side panel shows the listening settings with a room-level chart and threshold.",
         "shot_caption": "The listener on a computer, following three stations (design preview)."
       },
@@ -183,9 +185,9 @@
       },
       "cta": {
         "heading": "Try Nestwatch on the devices you have",
-        "body": "Free and open source. Use an old phone or laptop as the station, and your phone as the listener.",
-        "download": "Download",
-        "source": "View the source"
+        "body": "Free and open source. Use an old phone or laptop as the station, and listen on your phone from this website.",
+        "app": "Open the web app",
+        "download": "Download the apps"
       }
     },
     "download": {
@@ -247,11 +249,11 @@
           "key": "browser",
           "name": "Browser",
           "status": "",
-          "roles": "Listener only, no installation.",
+          "roles": "Listener, nothing to install: the easiest way to start.",
           "requirements": ["Chrome or Edge 113, Firefox 128, Safari 17 or newer", "Talk-back needs an HTTPS address"],
           "notes": [
-            "Every computer running a Nestwatch station serves the browser listener on your network: open the web address shown on the station's pairing screen. A hosted copy at <code>/app/</code> on this site will connect through the relay once it is available.",
-            "The bundle below is the same browser listener as static files, for stations and self-hosted relays."
+            "Open the web app on this site on any phone, tablet or computer and pair it with your station. It connects through the relay, so it works from anywhere, and talk-back works because the site uses HTTPS. Switch on <em>Reachable through a relay server</em> on the station.",
+            "At home you can also open the web address a computer station shows on its pairing screen; that copy is served by the station itself and needs no relay."
           ]
         },
         {
@@ -505,7 +507,7 @@
         },
         {
           "q": "Can I listen in a web browser?",
-          "a": ["Yes, on a computer, tablet or phone on the same network as a desktop or laptop station. Open the web address the station shows when you pair. For talk-back, use the station's HTTPS address."]
+          "a": ["Yes. Open the web app on this site on any computer, tablet or phone, and pair it with a station that has the relay switched on. At home you can also use the web address a computer station shows when you pair; it is served by the station itself."]
         },
         {
           "q": "Is there an iPhone app?",

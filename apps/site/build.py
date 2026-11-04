@@ -24,6 +24,8 @@ BASE_URL = "https://nestwatch.appmire.be"
 REPO = "https://github.com/jeroentrappers/nestwatch"
 LATEST = f"{REPO}/releases/latest"
 DOWNLOAD = f"{LATEST}/download"
+# The hosted browser listener, served next to this site (rendezvous.md FR-RV-5).
+APP_URL = "/app/"
 LANGS = ["en", "nl"]  # first is the default, served at /
 PAGES = ["home", "download", "privacy", "self-hosting", "about", "faq"]
 
@@ -42,7 +44,6 @@ ASSETS = {
     "macos": [("dmg", "Apple silicon + Intel", "nestwatch-macos-universal.dmg")],
     "windows": [("msi", "x86_64", "nestwatch-windows-x86_64.msi")],
     "android": [("apk", "arm64, armv7, x86_64", "nestwatch-android.apk")],
-    "web": [("tar.gz", "WebAssembly", "nestwatch-web.tar.gz")],
     "server": [("binary", "Linux x86_64", "nestwatch-server-linux-x86_64")],
     "sums": [("SHA256SUMS", "SHA-256", "SHA256SUMS")],
 }
@@ -242,6 +243,7 @@ def layout(s: dict, lang: str, page: str, body: str) -> str:
       <ul>{nav}</ul>
     </nav>
     <div class="row head-tools">
+      <a class="btn primary open-app" href="{APP_URL}">{ui["open_app"]}</a>
       {langs}
       <button class="btn icon ghost theme-toggle" type="button"
         data-label-night="{e(ui["theme_to_day"])}" data-label-day="{e(ui["theme_to_night"])}"
@@ -293,8 +295,8 @@ def home(s, lang):
       <h1 id="hero-h">{h["title"]}</h1>
       <p class="lead">{h["lead"]}</p>
       <div class="row wrap">
-        <a class="btn primary big" href="{page_path(lang, "download")}">{h["cta_download"]}</a>
-        <a class="btn ghost big" href="#how">{h["cta_how"]}</a>
+        <a class="btn primary big" href="{APP_URL}">{h["cta_app"]}</a>
+        <a class="btn ghost big" href="{page_path(lang, "download")}">{h["cta_download"]}</a>
       </div>
       <p class="caption-strong">{h["note"]}</p>
     </div>
@@ -341,8 +343,8 @@ def home(s, lang):
     cta = p["cta"]
     final = f"""<section class="band" aria-labelledby="cta-h"><div class="page"><div class="card cta">
   {logo(56)}<div class="stack-s grow"><h2 id="cta-h">{cta["heading"]}</h2><p class="muted">{cta["body"]}</p></div>
-  <div class="row wrap"><a class="btn primary big" href="{page_path(lang, "download")}">{cta["download"]}</a>
-  <a class="btn ghost big" href="{REPO}">{cta["source"]}</a></div>
+  <div class="row wrap"><a class="btn primary big" href="{APP_URL}">{cta["app"]}</a>
+  <a class="btn ghost big" href="{page_path(lang, "download")}">{cta["download"]}</a></div>
 </div></div></section>"""
     return hero + promise + how + features + screens + networks + relay + final
 
@@ -366,7 +368,8 @@ def download(s, lang):
     p = s["pages"]["download"]
     ui = s["ui"]
     blocks = []
-    for pl in p["platforms"]:
+    # The web app comes first: most people need nothing else to listen.
+    for pl in sorted(p["platforms"], key=lambda pl: pl["key"] != "browser"):
         key = pl["key"]
         req = "".join(f"<li>{x}</li>" for x in pl["requirements"])
         notes = paras(pl.get("notes", []))
@@ -374,10 +377,7 @@ def download(s, lang):
         if key == "ios":
             links = f'<p><span class="pill warn">{ui["coming_soon"]}</span></p>'
         elif key == "browser":
-            links = (
-                asset_links("web", pl["name"], ui)
-                + f'<p class="row wrap"><code>{e(BASE_URL.split("//")[1])}/app/</code>{pill(ui["coming_soon"], "warn")}</p>'
-            )
+            links = f'<div class="dl-row"><a class="btn primary big" href="{APP_URL}">{ui["open_app_long"]}</a></div>'
         else:
             links = asset_links(key, pl["name"], ui)
         status = pill(soon, "warn") if soon else ""
@@ -496,6 +496,8 @@ def check_links(out: Path) -> list[str]:
     for f, p in parsed.items():
         for link in p.links:
             if link.startswith(("http://", "https://", "data:", "mailto:")):
+                continue
+            if link.startswith(APP_URL):  # served next to the site, not from it
                 continue
             path, _, frag = link.partition("#")
             target = f if not path else out / path.lstrip("/")

@@ -28,6 +28,8 @@
     "footer_license": "Vrije software onder de <a href=\"{repo}/blob/main/LICENSE\">GNU AGPL v3.0 of later</a>.",
     "footer_source": "Broncode op GitHub",
     "footer_privacy": "Deze website zet geen cookies, laadt niets van andere servers en heeft geen statistieken.",
+    "open_app": "Open de app",
+    "open_app_long": "Open de web-app",
     "og_alt": "Het Nestwatch-logo, een honingkleurige maansikkel met twee lavendelkleurige geluidsgolven, en de woorden: een privé babyfoon voor al je toestellen.",
     "not_found": {
       "title": "Deze pagina bestaat niet",
@@ -44,9 +46,9 @@
         "pills": ["Geen account", "End-to-end versleuteld", "Open source"],
         "title": "Een babyfoon die thuis blijft.",
         "lead": "Nestwatch maakt van de telefoons, tablets en computers die je al hebt een babyfoon. Geluid en beeld gaan rechtstreeks van het ene toestel naar het andere, end-to-end versleuteld. Je maakt geen account aan en er zit geen cloud tussen.",
-        "cta_download": "Nestwatch downloaden",
-        "cta_how": "Zo werkt het",
-        "note": "Nu voor Linux, macOS, Windows en Android, en luisteren kan ook in de browser. iPhone en iPad komen eraan. De apps zijn voorlopig in het Engels.",
+        "cta_app": "Open de web-app",
+        "cta_download": "Download de apps",
+        "note": "Luister in elke browser, niets te installeren. Apps voor Linux, macOS, Windows en Android; iPhone en iPad komen eraan. De apps zijn voorlopig in het Engels.",
         "shot_alt": "Nestwatch-luisteraar op een computer: drie zendertegels. Kinderkamer heeft geluid en een live camerabeeld, Leo's kamer is stil, bij Oma wordt opnieuw verbonden. Een zijpaneel toont de luisterinstellingen met een grafiek van het geluidsniveau en de drempel.",
         "shot_caption": "De luisteraar op een computer, met drie zenders (ontwerpvoorbeeld)."
       },
@@ -183,9 +185,9 @@
       },
       "cta": {
         "heading": "Probeer Nestwatch op de toestellen die je hebt",
-        "body": "Gratis en open source. Gebruik een oude telefoon of laptop als zender, en je eigen telefoon als luisteraar.",
-        "download": "Downloaden",
-        "source": "Bekijk de broncode"
+        "body": "Gratis en open source. Gebruik een oude telefoon of laptop als zender, en luister op je telefoon via deze website.",
+        "app": "Open de web-app",
+        "download": "Download de apps"
       }
     },
     "download": {
@@ -247,11 +249,11 @@
           "key": "browser",
           "name": "Browser",
           "status": "",
-          "roles": "Alleen luisteraar, niets te installeren.",
+          "roles": "Luisteraar, niets te installeren: de makkelijkste manier om te beginnen.",
           "requirements": ["Chrome of Edge 113, Firefox 128, Safari 17 of nieuwer", "Terugpraten vraagt een HTTPS-adres"],
           "notes": [
-            "Elke computer met een Nestwatch-zender biedt de browserluisteraar aan op je netwerk: open het webadres dat de zender toont bij het koppelen. Een kopie op <code>/app/</code> van deze site verbindt via de relay zodra die beschikbaar is.",
-            "Het pakket hieronder is dezelfde browserluisteraar als statische bestanden, voor zenders en zelf gehoste relays."
+            "Open de web-app op deze site op een telefoon, tablet of computer en koppel hem met je zender. Hij verbindt via de relay, dus hij werkt overal, en terugpraten werkt omdat de site HTTPS gebruikt. Zet op de zender <em>Bereikbaar via een relayserver</em> aan.",
+            "Thuis kun je ook het webadres openen dat een computer-zender toont bij het koppelen; die kopie komt van de zender zelf en heeft geen relay nodig."
           ]
         },
         {
@@ -505,7 +507,7 @@
         },
         {
           "q": "Kan ik in een webbrowser luisteren?",
-          "a": ["Ja, op een computer, tablet of telefoon op hetzelfde netwerk als een zender op een desktop of laptop. Open het webadres dat de zender toont bij het koppelen. Gebruik het HTTPS-adres van de zender om terug te praten."]
+          "a": ["Ja. Open de web-app op deze site op een computer, tablet of telefoon, en koppel hem met een zender waarop de relay aanstaat. Thuis kun je ook het webadres gebruiken dat een computer-zender toont bij het koppelen; dat komt van de zender zelf."]
         },
         {
           "q": "Is er een iPhone-app?",

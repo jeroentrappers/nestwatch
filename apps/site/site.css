@@ -73,6 +73,8 @@ code, pre { font-family: var(--font-mono); }
 .site-nav a:hover { background: var(--ink-2); color: var(--text-1); }
 .site-nav a[aria-current="page"] { background: var(--ink-2); color: var(--text-1); }
 .head-tools { gap: var(--space-2); flex: none; }
+.open-app { white-space: nowrap; }
+@media (max-width: 440px) { .head-row .brand span { display: none; } }
 .lang { padding: 0 14px; font-size: var(--text-s); }
 .theme-toggle .sun { display: none; }
 :root[data-theme="day"] .theme-toggle .sun { display: block; }
