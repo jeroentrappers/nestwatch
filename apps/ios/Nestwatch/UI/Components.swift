@@ -240,26 +240,7 @@ struct LevelRing: View {
         let word = tr(sound ? "ring_sound" : "ring_quiet")
         let db = "\(Int(levelDb.isFinite ? levelDb.rounded() : -90))"
         ZStack {
-            Canvas { ctx, sz in
-                let stroke = sz.width * 0.07
-                let r = sz.width / 2 - stroke / 2 - 4
-                let centre = CGPoint(x: sz.width / 2, y: sz.height / 2)
-                func arc(_ to: CGFloat) -> Path {
-                    var p = Path()
-                    p.addArc(center: centre, radius: r, startAngle: .degrees(135), endAngle: .degrees(135 + 270 * Double(to)), clockwise: false)
-                    return p
-                }
-                let style = StrokeStyle(lineWidth: stroke, lineCap: .round)
-                ctx.stroke(arc(1), with: .color(c.ink3), style: style)
-                if f > 0.001 { ctx.stroke(arc(f), with: .color(sound ? c.coral : c.sage), style: style) }
-                if let t = thresholdDb {
-                    let a = (135 + 270 * Double(levelPosition(t))) * .pi / 180
-                    var tick = Path()
-                    tick.move(to: CGPoint(x: centre.x + (r - stroke) * cos(a), y: centre.y + (r - stroke) * sin(a)))
-                    tick.addLine(to: CGPoint(x: centre.x + (r + stroke) * cos(a), y: centre.y + (r + stroke) * sin(a)))
-                    ctx.stroke(tick, with: .color(c.text1), style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                }
-            }
+            Canvas { ctx, sz in draw(ctx, sz, f) }
             .animation(.linear(duration: 0.16), value: f)
             if showNumbers {
                 VStack(spacing: 2) {
@@ -271,6 +252,28 @@ struct LevelRing: View {
         .frame(width: size, height: size)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("\(tr("ring_label")): \(db) \(tr("db")), \(word)"))
+    }
+
+    private func draw(_ ctx: GraphicsContext, _ sz: CGSize, _ f: CGFloat) {
+        let stroke: CGFloat = sz.width * 0.07
+        let r: CGFloat = sz.width / 2 - stroke / 2 - 4
+        let centre = CGPoint(x: sz.width / 2, y: sz.height / 2)
+        func arc(_ to: CGFloat) -> Path {
+            var p = Path()
+            let end: Double = 135 + 270 * Double(to)
+            p.addArc(center: centre, radius: r, startAngle: .degrees(135), endAngle: .degrees(end), clockwise: false)
+            return p
+        }
+        let style = StrokeStyle(lineWidth: stroke, lineCap: .round)
+        ctx.stroke(arc(1), with: .color(c.ink3), style: style)
+        if f > 0.001 { ctx.stroke(arc(f), with: .color(sound ? c.coral : c.sage), style: style) }
+        guard let t = thresholdDb else { return }
+        let a: Double = (135 + 270 * Double(levelPosition(t))) * .pi / 180
+        let dx = CGFloat(cos(a)), dy = CGFloat(sin(a))
+        var tick = Path()
+        tick.move(to: CGPoint(x: centre.x + (r - stroke) * dx, y: centre.y + (r - stroke) * dy))
+        tick.addLine(to: CGPoint(x: centre.x + (r + stroke) * dx, y: centre.y + (r + stroke) * dy))
+        ctx.stroke(tick, with: .color(c.text1), style: StrokeStyle(lineWidth: 4, lineCap: .round))
     }
 }
 
