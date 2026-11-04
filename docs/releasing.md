@@ -55,6 +55,14 @@ Every desktop package contains `nestwatch-desktop`, `nestwatch-station`
 serves it from (OPEN-QUESTIONS UI-10): `<exe dir>/../share/nestwatch/web` on
 Linux and macOS, `<exe dir>\web` on Windows.
 
+The **Docker** workflow ([.github/workflows/docker.yml](../.github/workflows/docker.yml))
+runs on the same tag. It builds the [Dockerfile](../Dockerfile) on native
+amd64 and arm64 runners and publishes `ghcr.io/jeroentrappers/nestwatch-server`
+as `<version>`, `<major>.<minor>` and `latest` (pre-releases only as
+`<version>`). Re-publish an existing tag with **Actions → Docker → Run
+workflow**. The first publish creates the package as private: make it public
+once under the package's **Package settings → Change visibility**.
+
 ## 3. Packaging choices
 
 The desktop app is a plain Cargo binary using Dioxus' desktop renderer, so

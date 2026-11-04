@@ -1,0 +1,5 @@
+# Caddy obtains and renews the certificate; WebSockets (/nwr/1) need no
+# extra configuration.
+{$NESTWATCH_DOMAIN} {
+	reverse_proxy nestwatch:8740
+}

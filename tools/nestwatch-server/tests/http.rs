@@ -181,6 +181,19 @@ async fn missing_directories_are_404() {
 }
 
 #[tokio::test]
+async fn without_a_site_the_root_opens_the_app() {
+    let app = tempfile::tempdir().unwrap();
+    write(app.path(), "index.html", b"<title>listener</title>");
+    let a = app.path().to_owned();
+    let srv = TestServer::start(move |c| c.app_dir = Some(a)).await;
+    let r = get(&srv, "GET", "/", "").await;
+    assert_eq!(r.status, 302);
+    assert_eq!(r.headers["location"], "/app/");
+    assert_eq!(get(&srv, "GET", "/other", "").await.status, 404);
+    srv.stop().await;
+}
+
+#[tokio::test]
 async fn healthz_reports_aggregate_counters_only() {
     let srv = TestServer::start(|_| {}).await;
     let identity = MailboxIdentity::generate().unwrap();

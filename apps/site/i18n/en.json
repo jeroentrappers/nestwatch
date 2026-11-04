@@ -371,7 +371,7 @@
     "self-hosting": {
       "title": "Run your own relay",
       "lead": "The relay server is a single program with no database. If you have a small Linux server with a domain name, you can run your own and point your devices at it.",
-      "description": "How to self-host the optional Nestwatch relay server: a single binary behind nginx or Caddy, HTTPS with WebSocket on /nwr/1, UDP 3478, and a systemd unit.",
+      "description": "How to self-host the optional Nestwatch relay server with Docker Compose or as a single binary behind nginx or Caddy: HTTPS with WebSocket on /nwr/1, UDP 3478, and a systemd unit.",
       "sections": [
         {
           "id": "status",
@@ -401,17 +401,31 @@
           ]
         },
         {
+          "id": "docker",
+          "heading": "With Docker Compose (quickest)",
+          "pill": "",
+          "list": [
+            "One image, <code>ghcr.io/jeroentrappers/nestwatch-server</code>, holds the relay, the browser listener and this website, for x86_64 and ARM64 servers.",
+            "The compose file adds Caddy, which gets the HTTPS certificate for your domain by itself. Already running a reverse proxy? Use <code>compose.proxy.yml</code> instead.",
+            "Open <strong>UDP 3478</strong> in your firewall as well as TCP 80 and 443."
+          ],
+          "code": "mkdir nestwatch && cd nestwatch\nbase=https://raw.githubusercontent.com/jeroentrappers/nestwatch/main/packaging/docker\ncurl -fLO $base/compose.yml -fLO $base/Caddyfile -fL -o .env $base/.env.example\n# set NESTWATCH_DOMAIN=relay.example.org in .env\ndocker compose up -d",
+          "after": [
+            "The compose files and the details, such as running without the website, are in <a href=\"{repo}/tree/main/packaging/docker\">packaging/docker</a> and <a href=\"{repo}/blob/main/docs/self-hosting.md#docker-compose\">docs/self-hosting.md</a>."
+          ]
+        },
+        {
           "id": "setup",
-          "heading": "Setup in short",
+          "heading": "With the binary and systemd",
           "pill": "",
           "list": [
             "Download <code>nestwatch-server-linux-x86_64</code> from the <a href=\"{latest}\">latest release</a> and install it as <code>/usr/local/bin/nestwatch-server</code>.",
             "Create a system user and a state directory, for example <code>/var/lib/nestwatch-server</code>.",
             "Run it with systemd: it listens on a local HTTP port for the reverse proxy and directly on UDP 3478.",
-            "Configure nginx or Caddy for your domain: forward <code>/nwr/1</code> to that local port with WebSocket upgrades, and serve the static website and browser listener (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>) for everything else.",
+            "Configure nginx or Caddy for your domain: forward everything to that local port, with WebSocket upgrades for <code>/nwr/1</code>. Unpack the website and browser listener (<code>nestwatch-site.tar.gz</code>, <code>nestwatch-web.tar.gz</code>) and pass their directories to the server, which serves them.",
             "On each station, turn on <strong>Reachable through a relay server</strong> and enter your server's address, for example <code>https://relay.example.org</code>."
           ],
-          "code": "# Caddyfile: HTTPS certificates and WebSocket upgrades are automatic\nrelay.example.org {\n\thandle /nwr/1 {\n\t\treverse_proxy 127.0.0.1:8480\n\t}\n\thandle {\n\t\t# static files: this website, browser listener in /app/\n\t\troot * /var/www/nestwatch\n\t\tfile_server\n\t}\n}",
+          "code": "# Caddyfile: HTTPS certificates and WebSocket upgrades are automatic;\n# nestwatch-server serves /nwr/1, the website and the browser listener\nrelay.example.org {\n\treverse_proxy 127.0.0.1:8740\n}",
           "after": [
             "Configuration for nginx, the systemd unit and the firewall rules are in <a href=\"{repo}/blob/main/docs/self-hosting.md\">docs/self-hosting.md</a>."
           ]

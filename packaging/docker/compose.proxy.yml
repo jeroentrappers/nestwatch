@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Nestwatch relay with the browser listener and website, for a host that
+# already has a reverse proxy terminating TLS. Point the proxy at
+# http://127.0.0.1:8740 (WebSocket upgrades for /nwr/1, long read timeouts)
+# and open UDP 3478. docs/self-hosting.md has nginx and Caddy examples.
+#
+#   docker compose -f compose.proxy.yml up -d
+name: nestwatch
+
+services:
+  nestwatch:
+    image: ghcr.io/jeroentrappers/nestwatch-server:${NESTWATCH_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      # The host proxy reaches the container through this network's gateway.
+      NESTWATCH_SERVER_TRUSTED_PROXIES: ${NESTWATCH_SUBNET:-172.31.240.0/24}
+    ports:
+      - "127.0.0.1:8740:8740"
+      - "3478:3478/udp"
+    volumes:
+      - nestwatch-data:/data
+    networks: [nestwatch]
+
+networks:
+  nestwatch:
+    ipam:
+      config:
+        - subnet: ${NESTWATCH_SUBNET:-172.31.240.0/24}
+
+volumes:
+  nestwatch-data:

@@ -3,10 +3,11 @@
 //! from TOML; every field has a default, and the command line and
 //! environment override it (see `main.rs`).
 
-use std::net::SocketAddr;
+use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::path::PathBuf;
 use std::time::Duration;
 
+use ipnet::IpNet;
 use serde::Deserialize;
 
 /// Everything the server needs.
@@ -26,8 +27,11 @@ pub struct Config {
     /// Downloads, served at `/downloads/`.
     pub downloads_dir: Option<PathBuf>,
     /// Take the client address from `X-Forwarded-For` / `X-Real-IP` when
-    /// the TCP peer is a loopback address (the local reverse proxy).
+    /// the TCP peer is one of `trusted_proxies` (the reverse proxy).
     pub trust_proxy: bool,
+    /// Peers whose forwarded headers are believed: loopback by default; add
+    /// the proxy's network when it runs elsewhere, e.g. in another container.
+    pub trusted_proxies: Vec<IpNet>,
     /// Reject WebSocket upgrades whose `Origin` names another host than
     /// `Host` (browsers on other sites); native clients send no `Origin`.
     pub check_origin: bool,
@@ -47,6 +51,10 @@ impl Default for Config {
             app_dir: None,
             downloads_dir: None,
             trust_proxy: true,
+            trusted_proxies: vec![
+                IpNet::new_assert(Ipv4Addr::LOCALHOST.into(), 8).trunc(),
+                IpNet::new_assert(Ipv6Addr::LOCALHOST.into(), 128),
+            ],
             check_origin: true,
             log_interval: 300.0,
             limits: Limits::default(),
@@ -171,5 +179,18 @@ mod tests {
         assert_eq!(secs(l.pipe_lifetime), Duration::from_secs(86_400));
         assert_eq!(secs(l.session_timeout), Duration::from_secs(30));
         assert_eq!(secs(-1.0), Duration::ZERO);
+    }
+
+    #[test]
+    fn trusted_proxies_default_to_loopback() {
+        let trusted = |c: &Config, ip: &str| {
+            let ip: std::net::IpAddr = ip.parse().unwrap();
+            c.trusted_proxies.iter().any(|n| n.contains(&ip))
+        };
+        let c = Config::default();
+        assert!(trusted(&c, "127.0.0.1") && trusted(&c, "::1"));
+        assert!(!trusted(&c, "172.18.0.3"));
+        let c = Config::from_toml(r#"trusted_proxies = ["172.16.0.0/12"]"#).unwrap();
+        assert!(trusted(&c, "172.18.0.3") && !trusted(&c, "127.0.0.1"));
     }
 }

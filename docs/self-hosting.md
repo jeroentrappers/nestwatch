@@ -1,7 +1,7 @@
 # Self-hosting the Nestwatch relay server
 
-> **Status:** `nestwatch-server` (`tools/nestwatch-server`) is available;
-> relay support in the station and listener apps is being integrated. Run
+> `nestwatch-server` (`tools/nestwatch-server`) ships with every release
+> since 0.1.0, as a binary and as a container image. Run
 > `nestwatch-server --help` for every option and its environment variable
 > (`NESTWATCH_SERVER_*`); a TOML file can be passed with `--config`.
 
@@ -20,6 +20,55 @@ The server never sees content: the Noise handshake between the two devices
 runs end to end through it. What an operator can and cannot learn is listed
 in [rendezvous.md §7](../specs/rendezvous.md#7-privacy-and-security); tell
 your users.
+
+There are two ways to run it:
+
+- **Docker Compose** (quickest, below): one image with the server, the
+  browser listener and the website, for linux/amd64 and linux/arm64.
+- **The binary with systemd** behind your own nginx or Caddy (sections 1–8).
+
+## Docker Compose
+
+The image `ghcr.io/jeroentrappers/nestwatch-server` (tags `latest`, `0.1`,
+`0.1.0`, …) runs as an unprivileged user, keeps its state in the volume
+`/data`, listens on TCP 8740 (HTTP, for a reverse proxy) and UDP 3478
+(STUN), and serves the website at `/` and the browser listener at `/app/`.
+Every option can be set with `NESTWATCH_SERVER_*` environment variables.
+
+Two compose files are in [packaging/docker](../packaging/docker):
+
+- [`compose.yml`](../packaging/docker/compose.yml): the server plus Caddy,
+  which obtains the HTTPS certificate itself. Needs TCP 80 and 443 free on
+  the host.
+- [`compose.proxy.yml`](../packaging/docker/compose.proxy.yml): only the
+  server, published on `127.0.0.1:8740`, for a host that already runs a
+  reverse proxy. Configure that proxy as in §4 (WebSocket upgrades for
+  `/nwr/1`, long read timeouts, `X-Real-IP`).
+
+```sh
+mkdir nestwatch && cd nestwatch
+base=https://raw.githubusercontent.com/jeroentrappers/nestwatch/main/packaging/docker
+curl -fLO $base/compose.yml -fLO $base/Caddyfile -fL -o .env $base/.env.example
+$EDITOR .env               # NESTWATCH_DOMAIN=relay.example.org
+docker compose up -d
+docker compose logs -f nestwatch
+```
+
+Open UDP 3478 in the firewall (§5), then check it as in §6.
+
+The server must see each client's real address for its per-address limits.
+Both compose files put the containers on a fixed network
+(`NESTWATCH_SUBNET`, default `172.31.240.0/24`) and pass it as
+`NESTWATCH_SERVER_TRUSTED_PROXIES`, so the server believes the forwarded
+address from Caddy or the host's proxy and from nobody else. Change the
+subnet in `.env` if it clashes with another network.
+
+Without the website (relay and browser listener only), add
+`NESTWATCH_SERVER_NO_SITE: "true"` to the service's `environment`; `/` then
+redirects to `/app/`.
+
+To build the image yourself: `docker build -t nestwatch-server .` in a
+checkout.
 
 ## 1. What you need
 
@@ -43,7 +92,7 @@ your users.
 | `/var/www/nestwatch/` | static files served by the proxy: the website (`nestwatch-site.tar.gz`) with the browser listener (`nestwatch-web.tar.gz`) in `app/` |
 
 ```sh
-# Binary (when releases include it)
+# Binary
 curl -fLO https://github.com/jeroentrappers/nestwatch/releases/latest/download/nestwatch-server-linux-x86_64
 curl -fLO https://github.com/jeroentrappers/nestwatch/releases/latest/download/SHA256SUMS
 sha256sum --check --ignore-missing SHA256SUMS

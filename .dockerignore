@@ -1,0 +1,9 @@
+target/
+**/target/
+.git/
+apps/android/
+apps/ios/
+**/node_modules/
+**/build/
+**/.gradle/
+dist/

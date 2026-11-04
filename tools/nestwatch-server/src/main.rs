@@ -36,15 +36,22 @@ struct Args {
     /// Landing page directory, served at /.
     #[arg(long, env = "NESTWATCH_SERVER_SITE_DIR")]
     site_dir: Option<PathBuf>,
+    /// Serve no landing page (overrides --site-dir); / then opens the app.
+    #[arg(long, env = "NESTWATCH_SERVER_NO_SITE")]
+    no_site: bool,
     /// Browser listener app directory, served at /app/.
     #[arg(long, env = "NESTWATCH_SERVER_APP_DIR")]
     app_dir: Option<PathBuf>,
     /// Downloads directory, served at /downloads/.
     #[arg(long, env = "NESTWATCH_SERVER_DOWNLOADS_DIR")]
     downloads_dir: Option<PathBuf>,
-    /// Trust X-Forwarded-For / X-Real-IP from a loopback proxy.
+    /// Trust X-Forwarded-For / X-Real-IP from a trusted proxy.
     #[arg(long, env = "NESTWATCH_SERVER_TRUST_PROXY")]
     trust_proxy: Option<bool>,
+    /// Networks the reverse proxy connects from, comma-separated CIDRs
+    /// (default: loopback). In Docker, add the proxy container's network.
+    #[arg(long, env = "NESTWATCH_SERVER_TRUSTED_PROXIES", value_delimiter = ',')]
+    trusted_proxies: Option<Vec<ipnet::IpNet>>,
     /// Reject WebSocket upgrades from other web origins.
     #[arg(long, env = "NESTWATCH_SERVER_CHECK_ORIGIN")]
     check_origin: Option<bool>,
@@ -113,7 +120,9 @@ fn config(args: Args) -> Result<Config, String> {
         c.stun = args.stun;
     }
     set(&mut c.state_dir, args.state_dir);
-    if args.site_dir.is_some() {
+    if args.no_site {
+        c.site_dir = None;
+    } else if args.site_dir.is_some() {
         c.site_dir = args.site_dir;
     }
     if args.app_dir.is_some() {
@@ -123,6 +132,7 @@ fn config(args: Args) -> Result<Config, String> {
         c.downloads_dir = args.downloads_dir;
     }
     set(&mut c.trust_proxy, args.trust_proxy);
+    set(&mut c.trusted_proxies, args.trusted_proxies);
     set(&mut c.check_origin, args.check_origin);
     set(&mut c.log_interval, args.log_interval);
     let l = &mut c.limits;

@@ -183,3 +183,9 @@ termination, WebSocket upgrade for `/nwr/1`) and directly on UDP 3478. It
 needs no database; state lives in one directory. A self-hosting guide
 (`docs/self-hosting.md`) shows the reverse-proxy configuration for nginx and
 Caddy, the firewall ports (TCP 443, UDP 3478), and a systemd unit.
+
+The project also publishes the server as a container image for linux/amd64
+and linux/arm64, with the browser listener and the website inside, and
+compose files for running it with or without its own TLS proxy. Behind a
+proxy that is not on loopback (another container), the operator lists the
+proxy's network as trusted so per-address limits see real client addresses.

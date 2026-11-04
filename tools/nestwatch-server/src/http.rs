@@ -140,11 +140,15 @@ fn last_forwarded(headers: &HeaderMap) -> Option<IpAddr> {
 }
 
 /// The client address: the TCP peer, or the proxy's forwarded address when
-/// the peer is a local proxy (`trust_proxy`).
+/// the peer is a trusted proxy (`trust_proxy`, `trusted_proxies`).
 fn client(hub: &Hub, headers: &HeaderMap, peer: SocketAddr) -> Client {
     let peer = SocketAddr::new(peer.ip().to_canonical(), peer.port());
     if hub.cfg.trust_proxy
-        && peer.ip().is_loopback()
+        && hub
+            .cfg
+            .trusted_proxies
+            .iter()
+            .any(|n| n.contains(&peer.ip()))
         && let Some(ip) = last_forwarded(headers)
     {
         let ip = ip.to_canonical();
@@ -255,13 +259,20 @@ async fn handle(req: Request<Incoming>, peer: SocketAddr, hub: &Arc<Hub>, tasks:
         h.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
         return secure(r, None);
     }
-    if path == "/app" {
-        let mut r = simple(StatusCode::MOVED_PERMANENTLY);
+    let cfg = &hub.cfg;
+    // Without a landing page, the front door is the browser app.
+    let app_only = path == "/" && cfg.site_dir.is_none() && cfg.app_dir.is_some();
+    if path == "/app" || app_only {
+        let status = if app_only {
+            StatusCode::FOUND
+        } else {
+            StatusCode::MOVED_PERMANENTLY
+        };
+        let mut r = simple(status);
         r.headers_mut()
             .insert(header::LOCATION, HeaderValue::from_static("/app/"));
         return r;
     }
-    let cfg = &hub.cfg;
     let (area, root, rest) = if let Some(rest) = path.strip_prefix("/app/") {
         (Area::App, cfg.app_dir.as_deref(), rest)
     } else if let Some(rest) = path.strip_prefix("/downloads/") {
