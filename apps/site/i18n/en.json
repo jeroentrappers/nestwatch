@@ -48,7 +48,7 @@
         "lead": "Nestwatch turns the phones, tablets and computers you already own into a baby monitor. Sound and video travel directly from one of your devices to another, end-to-end encrypted. There is no account to make and no cloud in between.",
         "cta_app": "Open the web app",
         "cta_download": "Download the apps",
-        "note": "Listen in any browser, nothing to install. Apps for Linux, macOS, Windows and Android; iPhone and iPad are coming.",
+        "note": "Listen in any browser, nothing to install. Apps for Linux, macOS, Windows and Android; the iPhone and iPad app can be built from source.",
         "shot_alt": "Nestwatch listener on a computer: three station tiles. Nursery shows sound with a live camera view, Leo's room is quiet, Grandma's is reconnecting. A side panel shows the listening settings with a room-level chart and threshold.",
         "shot_caption": "The listener on a computer, following three stations (design preview)."
       },
@@ -262,9 +262,10 @@
           "name": "iPhone and iPad",
           "status": "",
           "roles": "Station and listener.",
-          "requirements": ["iOS 15 or newer (planned)"],
+          "requirements": ["iOS 15 or newer"],
           "notes": [
-            "The iOS app is planned on the same core as the other apps and is not available yet."
+            "The iOS app runs on the same core as the other apps. There is no App Store build yet: build it from source with Xcode and install it on your own iPhone or iPad (see <code>apps/ios/README.md</code>).",
+            "Until then, the web app on this site works in Safari as a listener and as a station."
           ]
         }
       ],
@@ -466,7 +467,7 @@
               ["Desktop apps for Linux, macOS, Windows", "Rust and Dioxus", "First version"],
               ["Browser listener", "Rust compiled to WebAssembly, Dioxus", "First version"],
               ["Android app", "Kotlin and Jetpack Compose on the Rust core (UniFFI)", "First version"],
-              ["iPhone and iPad app", "SwiftUI on the Rust core", "Planned"],
+              ["iPhone and iPad app", "SwiftUI on the Rust core", "First version, build from source"],
               ["Relay server", "Rust", "First version"]
             ]
           },
@@ -526,7 +527,7 @@
         },
         {
           "q": "Is there an iPhone app?",
-          "a": ["Not yet. The iPhone and iPad app is planned. Until then, an iPhone can listen in Safari to a computer that runs the station."]
+          "a": ["Not in the App Store yet. The iPhone and iPad app exists and can be built from source with Xcode. Without it, an iPhone can use the web app on this site in Safari, as a listener or as a station."]
         },
         {
           "q": "Is the camera always on?",

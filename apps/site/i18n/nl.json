@@ -48,7 +48,7 @@
         "lead": "Nestwatch maakt van de telefoons, tablets en computers die je al hebt een babyfoon. Geluid en beeld gaan rechtstreeks van het ene toestel naar het andere, end-to-end versleuteld. Je maakt geen account aan en er zit geen cloud tussen.",
         "cta_app": "Open de web-app",
         "cta_download": "Download de apps",
-        "note": "Luister in elke browser, niets te installeren. Apps voor Linux, macOS, Windows en Android; iPhone en iPad komen eraan. De apps zijn voorlopig in het Engels.",
+        "note": "Luister in elke browser, niets te installeren. Apps voor Linux, macOS, Windows en Android; de app voor iPhone en iPad kun je zelf bouwen uit de broncode. De apps zijn voorlopig in het Engels.",
         "shot_alt": "Nestwatch-luisteraar op een computer: drie zendertegels. Kinderkamer heeft geluid en een live camerabeeld, Leo's kamer is stil, bij Oma wordt opnieuw verbonden. Een zijpaneel toont de luisterinstellingen met een grafiek van het geluidsniveau en de drempel.",
         "shot_caption": "De luisteraar op een computer, met drie zenders (ontwerpvoorbeeld)."
       },
@@ -262,9 +262,10 @@
           "name": "iPhone en iPad",
           "status": "",
           "roles": "Zender en luisteraar.",
-          "requirements": ["iOS 15 of nieuwer (gepland)"],
+          "requirements": ["iOS 15 of nieuwer"],
           "notes": [
-            "De iOS-app is gepland, op dezelfde kern als de andere apps, en is nog niet beschikbaar."
+            "De iOS-app draait op dezelfde kern als de andere apps. Er is nog geen versie in de App Store: bouw hem uit de broncode met Xcode en zet hem op je eigen iPhone of iPad (zie <code>apps/ios/README.md</code>).",
+            "Tot dan werkt de web-app op deze site in Safari als luisteraar en als zender."
           ]
         }
       ],
@@ -466,7 +467,7 @@
               ["Desktop-apps voor Linux, macOS, Windows", "Rust en Dioxus", "Eerste versie"],
               ["Browserluisteraar", "Rust gecompileerd naar WebAssembly, Dioxus", "Eerste versie"],
               ["Android-app", "Kotlin en Jetpack Compose op de Rust-kern (UniFFI)", "Eerste versie"],
-              ["App voor iPhone en iPad", "SwiftUI op de Rust-kern", "Gepland"],
+              ["App voor iPhone en iPad", "SwiftUI op de Rust-kern", "Eerste versie, zelf bouwen"],
               ["Relayserver", "Rust", "Eerste versie"]
             ]
           },
@@ -526,7 +527,7 @@
         },
         {
           "q": "Is er een iPhone-app?",
-          "a": ["Nog niet. De app voor iPhone en iPad is gepland. Tot dan kan een iPhone in Safari luisteren naar een computer die de zender draait."]
+          "a": ["Nog niet in de App Store. De app voor iPhone en iPad bestaat en je kunt hem zelf bouwen met Xcode. Zonder die app kan een iPhone de web-app op deze site gebruiken in Safari, als luisteraar of als zender."]
         },
         {
           "q": "Staat de camera altijd aan?",
