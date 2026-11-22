@@ -199,10 +199,24 @@ jobs:
       FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "30"
       FASTLANE_XCODEBUILD_SETTINGS_RETRIES: "6"
     steps:
-      # Xcode and fastlane write large temp files: keep them in the work
-      # directory (mini4's NVMe disk), not on the small internal disk.
-      - name: Temp files in the work directory
-        run: echo "TMPDIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
+      # Only local paths: the runner service has no access to mini4's external
+      # NVMe volume (macOS privacy), so no login shell (its PATH reaches into
+      # that volume); Homebrew, rbenv's Ruby and cargo are on the system disk.
+      # Temp files, DerivedData and the archive stay in the work directory.
+      - name: Environment
+        run: |
+          {
+            echo "TMPDIR=$RUNNER_TEMP"
+            echo "LANG=en_US.UTF-8"
+            echo "LC_ALL=en_US.UTF-8"
+          } >> "$GITHUB_ENV"
+          {
+            # Each line is prepended: the last one wins.
+            echo "/usr/bin"
+            echo "/opt/homebrew/bin"
+            echo "$HOME/.cargo/bin"
+            echo "$HOME/.rbenv/shims"
+          } >> "$GITHUB_PATH"
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.plan.outputs.sha }}
@@ -215,9 +229,9 @@ jobs:
       - name: Build, test, upload to TestFlight
         working-directory: apps/ios
         run: |
-          env -u CI ../../scripts/release/in-login-shell.sh bash -c '
-            bundle config set --local path vendor/bundle && bundle install --quiet &&
-            bundle exec fastlane release upload:true'
+          bundle config set --local path vendor/bundle
+          bundle install --quiet
+          env -u CI bundle exec fastlane release upload:true
       - name: Submit for App Review
         if: env.SUBMIT == 'true'
-        run: env -u CI scripts/release/in-login-shell.sh scripts/release/app-store-submit.sh "$MARKETING_VERSION" "$BUILD_NUMBER"
+        run: env -u CI scripts/release/app-store-submit.sh "$MARKETING_VERSION" "$BUILD_NUMBER"

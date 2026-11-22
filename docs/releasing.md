@@ -173,8 +173,9 @@ self-hosted runners labelled `nestwatch-release`:
 - **ryzen** (Linux, user `nestwatch-runner`): builds the Rust core for
   Android, `bundleRelease`, signs the bundle with the upload key and sends it
   to Google Play with fastlane (`apps/android/fastlane`, lane `upload`).
-- **mini4** (macOS, `~/actions-runner-nestwatch`, work directory on the NVMe
-  disk): `apps/ios/fastlane` lane `release upload:true` (Rust XCFramework,
+- **mini4** (macOS, `~/actions-runner-nestwatch`, work directory on the
+  system disk: the runner service may not read the external NVMe volume, so
+  the job uses only local tools, without a login shell): `apps/ios/fastlane` lane `release upload:true` (Rust XCFramework,
   unit tests, signed archive, TestFlight), then `submit` (App Review with the
   committed metadata, `scripts/release/app-store-submit.sh`). It uses the
   build Mac's own App Store Connect key, match password and signing keychain
