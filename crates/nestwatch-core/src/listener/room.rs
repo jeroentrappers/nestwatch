@@ -320,12 +320,7 @@ impl Room {
     }
 
     /// Periodic work: escalation, end of a wake-up, end of the pause.
-    pub fn tick(
-        &mut self,
-        escalate: Option<u64>,
-        at: At,
-        limits: &RoomLimits,
-    ) -> RoomOutput {
+    pub fn tick(&mut self, escalate: Option<u64>, at: At, limits: &RoomLimits) -> RoomOutput {
         let mut out = RoomOutput::default();
         if self.paused_until.is_some_and(|p| at.mono >= p.mono) {
             self.paused_until = None;
@@ -475,7 +470,12 @@ mod tests {
         let mut r = Room::default();
         assert_eq!(r.view(), RoomView::Unknown);
         r.on_up(at(1_000), &L);
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(1_000) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(1_000)
+            }
+        );
     }
 
     #[test]
@@ -483,10 +483,20 @@ mod tests {
         let mut r = live();
         loud(&mut r, 1_000, 5_000);
         r.on_sample(false, Some(-70.0), at(6_250), &L);
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(0) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(0)
+            }
+        );
         let out = r.tick(None, at(130_000), &L);
         assert_eq!(out.finished, None);
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(0) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(0)
+            }
+        );
     }
 
     #[test]
@@ -495,7 +505,12 @@ mod tests {
         loud(&mut r, 10_000, 9_000);
         assert!(matches!(r.view(), RoomView::Quiet { .. }));
         loud(&mut r, 19_250, 2_000);
-        assert_eq!(r.view(), RoomView::Awake { since_unix_ms: u(10_000) });
+        assert_eq!(
+            r.view(),
+            RoomView::Awake {
+                since_unix_ms: u(10_000)
+            }
+        );
         assert!(r.ongoing().is_some());
         assert_eq!(r.tick(None, at(100_000), &L).finished, None);
         let out = r.tick(None, at(21_250 + 120_000), &L);
@@ -504,7 +519,12 @@ mod tests {
         assert_eq!(w.end_unix_ms, Some(u(21_250)));
         assert!(w.loud_ms >= 10_000);
         assert_eq!(w.peak_dbfs, Some(-40.0));
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(21_250) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(21_250)
+            }
+        );
     }
 
     #[test]
@@ -524,11 +544,21 @@ mod tests {
         assert_eq!(r.view(), RoomView::Unknown);
         // Short outage keeps "quiet since".
         r.on_up(at(50_000), &L);
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(13_000) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(13_000)
+            }
+        );
         // A long one restarts it.
         r.on_down(at(60_000));
         r.on_up(at(200_000), &L);
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(200_000) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(200_000)
+            }
+        );
     }
 
     #[test]
@@ -536,11 +566,21 @@ mod tests {
         let mut r = live();
         loud(&mut r, 1_000, 2_000);
         r.on_sound_alert(true, at(1_000));
-        assert_eq!(r.alarm(), AlarmView::Pending { since_unix_ms: u(1_000) });
+        assert_eq!(
+            r.alarm(),
+            AlarmView::Pending {
+                since_unix_ms: u(1_000)
+            }
+        );
         loud(&mut r, 3_250, 58_000);
         let out = r.tick(Some(60_000), at(61_000), &L);
         assert!(out.ringing);
-        assert_eq!(r.alarm(), AlarmView::Ringing { since_unix_ms: u(61_000) });
+        assert_eq!(
+            r.alarm(),
+            AlarmView::Ringing {
+                since_unix_ms: u(61_000)
+            }
+        );
         assert!(r.ongoing().unwrap().alarmed);
         // Rings until the room has been quiet for the quiet gap.
         assert!(!r.tick(Some(60_000), at(100_000), &L).ringing);
@@ -601,12 +641,22 @@ mod tests {
         let w = out.finished.unwrap();
         assert!(w.not_the_baby && w.alarmed);
         assert_eq!(r.alarm(), AlarmView::Off);
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(0) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(0)
+            }
+        );
         assert_eq!(r.paused_until(), Some(u(675_000)));
         assert!(r.paused(100_000));
         // Sounds during the pause are ignored.
         loud(&mut r, 100_000, 20_000);
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(0) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(0)
+            }
+        );
         assert!(r.tick(None, at(675_000), &L).changed);
         assert_eq!(r.paused_until(), None);
     }
@@ -619,7 +669,12 @@ mod tests {
         let (out, mark) = r.not_the_baby(at(200_000), &L);
         assert_eq!(out.finished, None);
         assert_eq!(mark, Some(u(5_000)));
-        assert_eq!(r.view(), RoomView::Quiet { since_unix_ms: u(0) });
+        assert_eq!(
+            r.view(),
+            RoomView::Quiet {
+                since_unix_ms: u(0)
+            }
+        );
         assert!(r.resume().changed);
         assert!(!r.paused(200_001));
     }

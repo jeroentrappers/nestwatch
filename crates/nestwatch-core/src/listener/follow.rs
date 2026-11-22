@@ -532,8 +532,14 @@ impl Ctx<'_> {
                 rt.open = open;
                 let s = rt.known.settings.listen;
                 let continuous = s.mode == ListenMode::Continuous;
-                let loud = if continuous { dbfs >= s.threshold_dbfs } else { open };
-                let out = rt.room.on_sample(loud, Some(dbfs), shared.at(), &RoomLimits::default());
+                let loud = if continuous {
+                    dbfs >= s.threshold_dbfs
+                } else {
+                    open
+                };
+                let out = rt
+                    .room
+                    .on_sample(loud, Some(dbfs), shared.at(), &RoomLimits::default());
                 let sound = continuous && rt.alerts.on_level(dbfs, s.threshold_dbfs, now, &limits);
                 shared.room_output(&mut g, &id, out);
                 if sound {
@@ -545,7 +551,8 @@ impl Ctx<'_> {
                 rt.open = open;
                 let activated = rt.known.settings.listen.mode == ListenMode::Activated;
                 let out = if activated {
-                    rt.room.on_sample(open, None, shared.at(), &RoomLimits::default())
+                    rt.room
+                        .on_sample(open, None, shared.at(), &RoomLimits::default())
                 } else {
                     RoomOutput::default()
                 };

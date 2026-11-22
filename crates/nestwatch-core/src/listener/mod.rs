@@ -679,7 +679,9 @@ impl Shared {
     /// the alarm (FR-AL-5).
     pub fn sound_alert(&self, g: &mut Inner, id: &str) {
         let at = self.at();
-        let Some(rt) = g.stations.get_mut(id) else { return };
+        let Some(rt) = g.stations.get_mut(id) else {
+            return;
+        };
         if rt.room.paused(at.mono) {
             return;
         }
@@ -1376,7 +1378,9 @@ impl ListenerEngine {
     /// "Not the baby" (FR-AL-7): acknowledges, marks the wake-up in the
     /// night log and pauses sound alerts for 10 minutes.
     pub fn not_the_baby(&self, station_id: &str) -> Result<(), ListenerError> {
-        self.with_room(station_id, |r, at| r.not_the_baby(at, &RoomLimits::default()))
+        self.with_room(station_id, |r, at| {
+            r.not_the_baby(at, &RoomLimits::default())
+        })
     }
 
     /// Ends a "Not the baby" pause (FR-AL-7).

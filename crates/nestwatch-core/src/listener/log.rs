@@ -197,6 +197,9 @@ mod tests {
             log.push("a", w(now - 1_000_000_000 + i * 1_000), now);
         }
         assert_eq!(log.entries("a").len(), MAX_ENTRIES);
-        assert_eq!(log.entries("a")[0].start_unix_ms, now - 1_000_000_000 + 5_000);
+        assert_eq!(
+            log.entries("a")[0].start_unix_ms,
+            now - 1_000_000_000 + 5_000
+        );
     }
 }
