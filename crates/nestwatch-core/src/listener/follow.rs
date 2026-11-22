@@ -346,8 +346,10 @@ impl Ctx<'_> {
                     ));
                 }
                 let reachable = rt.alerts.on_up();
+                let room = rt.room.on_up(shared.at(), &RoomLimits::default());
                 let name = rt.known.name.clone();
                 self.out.live = true;
+                shared.room_output(&mut g, &id, room);
                 apply_status(shared, &mut g, &id, &status);
                 shared.apply_mixer(&mut g, &id);
                 shared.save(&g);

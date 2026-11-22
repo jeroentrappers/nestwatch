@@ -500,3 +500,71 @@ async fn fr_tb_2_own_playback_muted_while_talking() {
     station.shutdown().await;
     l.shutdown().await;
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn fr_al_6_7_fr_sl_room_status_alarm_and_night_log_end_to_end() {
+    use nestwatch_core::listener::{AlarmView, RoomView};
+    let (station, _) = station("Nursery").await;
+    let (l, _) = listener("Parent");
+    let id = pair(&station, &l).await;
+    l.set_listen(&id, ListenSettings::activated(-30.0, 500, 300))
+        .unwrap();
+    let mut ls = l.state();
+    wait_state(&mut ls, "quiet", |s| {
+        matches!(s.stations[0].room, RoomView::Quiet { .. })
+    })
+    .await;
+    let mut tone = Tone::new(440.0, 48_000);
+    feed(&station, &mut tone, -120.0, 400).await;
+
+    // A sound alert is pending escalation until acknowledged (FR-AL-5/6).
+    feed(&station, &mut tone, -12.0, 600).await;
+    wait_state(&mut ls, "alarm pending", |s| {
+        matches!(s.stations[0].alarm, AlarmView::Pending { .. })
+    })
+    .await;
+    l.acknowledge(&id).unwrap();
+    assert_eq!(l.snapshot().stations[0].alarm, AlarmView::Off);
+
+    // 10 s of sound make a wake-up (FR-SL-1).
+    feed(&station, &mut tone, -12.0, 10_500).await;
+    wait_state(&mut ls, "awake", |s| {
+        matches!(s.stations[0].room, RoomView::Awake { .. })
+    })
+    .await;
+    let log = l.night_log(&id).unwrap();
+    assert_eq!(log.len(), 1);
+    assert_eq!(log[0].end_unix_ms, None, "going on");
+    assert!(log[0].alerted);
+
+    // "Not the baby": logged as such, quiet again, alerts paused (FR-AL-7).
+    let rev = l.snapshot().stations[0].log_revision;
+    l.not_the_baby(&id).unwrap();
+    let s = l.snapshot();
+    assert!(matches!(s.stations[0].room, RoomView::Quiet { .. }));
+    assert!(s.stations[0].paused_until_unix_ms.is_some());
+    assert!(s.stations[0].log_revision > rev);
+    let log = l.night_log(&id).unwrap();
+    assert_eq!(log.len(), 1);
+    assert!(log[0].not_the_baby && log[0].end_unix_ms.is_some());
+    let mut ev = l.events();
+    feed(&station, &mut tone, -120.0, 2_000).await;
+    feed(&station, &mut tone, -12.0, 600).await;
+    let alert = wait_event_for(&mut ev, Duration::from_millis(800), "paused alert", |e| {
+        matches!(
+            e,
+            ListenerEvent::Alert {
+                alert: Alert::SoundStarted,
+                ..
+            }
+        )
+    })
+    .await;
+    assert_eq!(alert, None, "sound alerts paused");
+    l.resume_alerts(&id).unwrap();
+    assert_eq!(l.snapshot().stations[0].paused_until_unix_ms, None);
+    l.clear_night_log(&id).unwrap();
+    assert!(l.night_log(&id).unwrap().is_empty());
+    station.shutdown().await;
+    l.shutdown().await;
+}
