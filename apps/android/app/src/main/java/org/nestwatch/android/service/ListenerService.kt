@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.nestwatch.android.R
+import org.nestwatch.android.audio.AlarmPlayer
 import org.nestwatch.android.audio.MicCapture
 import org.nestwatch.android.audio.SpeakerPlayback
 import org.nestwatch.android.core.Nestwatch
@@ -26,17 +27,21 @@ import org.nestwatch.android.platform.KeepAwake
 import org.nestwatch.android.platform.NetworkWatch
 import org.nestwatch.android.platform.Notifications
 import org.nestwatch.android.platform.NsdBrowser
+import org.nestwatch.ffi.AlarmState
 import org.nestwatch.ffi.AlertKind
 import org.nestwatch.ffi.Connection
 import org.nestwatch.ffi.Listener
 import org.nestwatch.ffi.ListenerEventInfo
+import org.nestwatch.ffi.ListenerSnapshot
 
 /**
  * Keeps a listener receiving and alerting with the screen off (FR-LS-4,
  * FR-AL-4, platforms.md §2.2): a foreground service of type
  * mediaPlayback (plain on API 23–28) that holds a partial wake lock and a
  * Wi-Fi lock, plays the mix, captures talk-back while granted, browses
- * NSD and turns alerts into notifications.
+ * NSD and turns alerts into notifications. While any station's alarm
+ * rings (FR-AL-5) it plays one alarm on the alarm stream and shows an
+ * alarm notification per ringing station.
  */
 class ListenerService : LifecycleService() {
     private lateinit var awake: KeepAwake
@@ -45,6 +50,8 @@ class ListenerService : LifecycleService() {
     private var browser: NsdBrowser? = null
     private var network: NetworkWatch? = null
     private var lastNote: String? = null
+    private var alarm: AlarmPlayer? = null
+    private var ringing: Set<String> = emptySet()
 
     override fun onCreate() {
         super.onCreate()
@@ -74,6 +81,7 @@ class ListenerService : LifecycleService() {
         lifecycleScope.launch {
             Nestwatch.listenerState.collect { s ->
                 s ?: return@collect
+                updateAlarm(s)
                 val followed = s.stations.count { it.prefs.follow }
                 val live = s.stations.count { it.connection == Connection.Live }
                 val text = if (followed == 0) {
@@ -95,6 +103,17 @@ class ListenerService : LifecycleService() {
 
     private fun stationName(id: String): String =
         Nestwatch.listenerState.value?.stations?.firstOrNull { it.id == id }?.name ?: getString(R.string.unnamed)
+
+    /** Plays the alarm while any station rings and keeps its notifications in step. */
+    private fun updateAlarm(s: ListenerSnapshot) {
+        val now = s.stations.filter { it.alarm is AlarmState.Ringing }.map { it.id }.toSet()
+        if (now == ringing) return
+        for (id in now - ringing) Notifications.alarm(this, id, stationName(id))
+        for (id in ringing - now) Notifications.cancelAlarm(this, id)
+        ringing = now
+        val player = alarm ?: AlarmPlayer(this).also { alarm = it }
+        if (now.isEmpty()) player.stop() else player.start()
+    }
 
     private fun onEvent(l: Listener, e: ListenerEventInfo) {
         when (e) {
@@ -118,15 +137,30 @@ class ListenerService : LifecycleService() {
     private fun alert(id: String, kind: AlertKind) {
         val name = stationName(id)
         val (channel, title, slot) = when (kind) {
-            is AlertKind.SoundStarted -> Triple(Notifications.CH_SOUND, getString(R.string.alert_sound, name), 0)
-            is AlertKind.Unreachable -> Triple(Notifications.CH_CONNECTION, getString(R.string.alert_unreachable, name), 1)
-            is AlertKind.Reachable -> Triple(Notifications.CH_CONNECTION, getString(R.string.alert_reachable, name), 1)
-            is AlertKind.BatteryLow ->
-                Triple(Notifications.CH_BATTERY, getString(R.string.alert_battery, name, kind.percent.toInt()), 2)
+            is AlertKind.SoundStarted ->
+                Triple(Notifications.CH_SOUND, getString(R.string.alert_sound, name), Notifications.SLOT_SOUND)
+            is AlertKind.Unreachable ->
+                Triple(Notifications.CH_CONNECTION, getString(R.string.alert_unreachable, name), Notifications.SLOT_CONNECTION)
+            is AlertKind.Reachable ->
+                Triple(Notifications.CH_CONNECTION, getString(R.string.alert_reachable, name), Notifications.SLOT_CONNECTION)
+            is AlertKind.BatteryLow -> Triple(
+                Notifications.CH_BATTERY,
+                getString(R.string.alert_battery, name, kind.percent.toInt()),
+                Notifications.SLOT_BATTERY,
+            )
+            is AlertKind.Alarm -> {
+                // The snapshot drives sound and notification (updateAlarm); this
+                // only makes sure the notification is there.
+                Notifications.alarm(this, id, name)
+                return
+            }
         }
-        val nid = 1000 + (id.hashCode() and 0xffff) * 4 + slot
+        val nid = Notifications.alertId(id, slot)
         if (Notifications.canPost(this)) {
-            Notifications.alert(this, channel, nid, title, getString(R.string.alert_body))
+            Notifications.alert(
+                this, channel, nid, title, getString(R.string.alert_body),
+                stationId = if (kind is AlertKind.SoundStarted) id else null,
+            )
         } else if (channel != Notifications.CH_BATTERY) {
             // Without notification permission an alert still makes a sound,
             // even while muted (FR-AL-1, FR-AL-4).
@@ -143,6 +177,9 @@ class ListenerService : LifecycleService() {
 
     override fun onDestroy() {
         running.value = false
+        alarm?.stop()
+        ringing.forEach { Notifications.cancelAlarm(this, it) }
+        ringing = emptySet()
         playback?.stop()
         talkMic?.stop()
         browser?.stop()

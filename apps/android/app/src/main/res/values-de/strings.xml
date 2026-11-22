@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- German (de) translation of the English reference text (NFR-I18N-2). -->
+<resources>
+    <string name="app_name">Nestwatch</string>
+    <string name="promise">Ein privates Babyfon für die Geräte, die du schon hast. Alles bleibt in deinem Netzwerk.</string>
+    <string name="disclaimer">Nestwatch ist kein Medizinprodukt und ersetzt keine Aufsicht. Sieh immer selbst nach deinem Kind.</string>
+    <string name="role_station">Dieses Gerät wacht</string>
+    <string name="role_station_hint">Stell es ins Kinderzimmer. Es hört zu und zeigt auf Anfrage die Kamera.</string>
+    <string name="role_listener">Dieses Gerät hört zu</string>
+    <string name="role_listener_hint">Folge von hier aus einem oder mehreren Zimmern.</string>
+    <string name="disclaimer_ack">Mit der Wahl einer Rolle bestätigst du, dass du dies gelesen hast.</string>
+
+    <string name="close">Schließen</string>
+    <string name="back">Zurück</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="save">Speichern</string>
+    <string name="settings">Einstellungen</string>
+    <string name="about">Über Nestwatch</string>
+    <string name="theme">Design</string>
+    <string name="theme_system">System</string>
+    <string name="theme_night">Nacht</string>
+    <string name="theme_day">Tag</string>
+    <string name="unnamed">Unbenanntes Gerät</string>
+    <string name="about_body">Nestwatch verbindet deine eigenen Geräte direkt, in deinem Heimnetz oder deinem eigenen VPN. Kein Konto, keine Cloud und kein Tracking. Audio und Video sind Ende-zu-Ende-verschlüsselt.</string>
+    <string name="version">Version</string>
+    <string name="device_id">Geräte-ID</string>
+    <string name="license">Freie Software unter der GNU AGPL 3.0 oder neuer. Quellcode: https://github.com/jeroentrappers/nestwatch</string>
+    <string name="change_role">Rolle ändern</string>
+    <string name="change_role_hint">Beendet, was dieses Gerät gerade tut, und zeigt die Rollenwahl erneut.</string>
+
+    <!-- Permissions (security.md PRIV-4) -->
+    <string name="perm_mic_title">Mikrofon</string>
+    <string name="perm_mic_station">Die Babystation hört ins Zimmer, damit deine Elterngeräte es hören können. Audio geht nur an Geräte, die du gekoppelt hast.</string>
+    <string name="perm_mic_talk">Zurücksprechen sendet deine Stimme an die Babystation, solange du die Taste gedrückt hältst.</string>
+    <string name="perm_camera_title">Kamera</string>
+    <string name="perm_camera_station">Erlaube die Kamera, damit ein gekoppeltes Elterngerät auf Anfrage ein Livebild öffnen kann. Sonst ist die Kamera aus, und dieser Bildschirm zeigt an, wenn sie an ist.</string>
+    <string name="perm_camera_scan">Die Kamera wird zum Scannen des QR-Codes zum Koppeln der Babystation verwendet. Es wird nichts aufgezeichnet.</string>
+    <string name="perm_notifications_title">Benachrichtigungen</string>
+    <string name="perm_notifications">Nestwatch benachrichtigt dich, wenn es in einem Zimmer laut wird, eine Babystation nicht erreichbar ist oder ihr Akku schwach wird.</string>
+    <string name="perm_continue">Weiter</string>
+    <string name="perm_not_now">Nicht jetzt</string>
+    <string name="perm_denied_mic">Ohne Mikrofon kann die Babystation nicht zuhören. Du kannst es in den Systemeinstellungen erlauben.</string>
+    <string name="open_settings">Einstellungen öffnen</string>
+
+    <!-- Battery optimisation (platforms.md §2.2) -->
+    <string name="battery_title">Nestwatch aktiv lassen</string>
+    <string name="battery_body">Android kann Apps pausieren, um Akku zu sparen. Dann stoppt die Überwachung bei ausgeschaltetem Bildschirm. Erlaube Nestwatch, die Akkuoptimierung zu ignorieren, damit es weiterläuft.</string>
+    <string name="battery_allow">Erlauben</string>
+    <string name="battery_dismiss">Nicht jetzt</string>
+
+    <!-- Station -->
+    <string name="station_starting">Babystation wird gestartet…</string>
+    <string name="station_failed">Die Babystation konnte nicht starten</string>
+    <string name="retry">Erneut versuchen</string>
+    <string name="station_stopped">Die Babystation läuft nicht.</string>
+    <string name="station_start">Babystation starten</string>
+    <string name="station_stop">Babystation stoppen</string>
+    <string name="pair_listener">Elterngerät koppeln</string>
+    <string name="dim_screen">Bildschirm dimmen</string>
+    <string name="tap_to_brighten">Irgendwo tippen zum Aufhellen</string>
+    <string name="dimmed_label">Bildschirm gedimmt. Die Überwachung läuft weiter. Aktivieren zum Aufhellen.</string>
+    <string name="no_listeners">Noch hört niemand zu.</string>
+    <string name="listeners_heading">Hört gerade zu</string>
+    <string name="mode_sound_activated">Geräuschaktivierung</string>
+    <string name="mode_always_on">immer an</string>
+    <string name="via_browser">Browser</string>
+    <string name="hearing">hört das Zimmer</string>
+    <string name="talking_now">spricht</string>
+    <string name="watching_now">Kamera</string>
+    <string name="ring_quiet">ruhig</string>
+    <string name="ring_sound">Geräusch</string>
+    <string name="db">dB</string>
+    <string name="ring_label">Pegel im Zimmer</string>
+    <string name="camera_on">Kamera an</string>
+    <string name="camera_off">Kamera aus</string>
+    <string name="talk_off">Zurücksprechen aus</string>
+    <string name="nobody_listening">Niemand hört zu</string>
+    <plurals name="listening_count">
+        <item quantity="one">%d hört zu</item>
+        <item quantity="other">%d hören zu</item>
+    </plurals>
+    <string name="talking_through">%s spricht</string>
+    <string name="station_keeps_running">Die Babystation läuft bei ausgeschaltetem Bildschirm weiter. Wenn du sie hier stoppst, endet die Überwachung.</string>
+    <string name="station_settings">Babystation-Einstellungen</string>
+    <string name="station_name">Name der Babystation</string>
+    <string name="camera_allowed">Kamera erlauben</string>
+    <string name="talk_allowed">Zurücksprechen erlauben</string>
+    <string name="mic_sensitivity">Mikrofonempfindlichkeit</string>
+    <string name="gain_auto">Auto</string>
+    <string name="talkback_volume">Lautstärke Zurücksprechen</string>
+    <string name="trusted_listeners">Gekoppelte Elterngeräte</string>
+    <string name="no_trusted">Noch kein Elterngerät gekoppelt.</string>
+    <string name="revoke">Entfernen</string>
+    <string name="revoke_confirm">%s entfernen? Es muss dann neu gekoppelt werden.</string>
+    <string name="camera_unavailable_here">Keine Kamera gefunden</string>
+    <string name="camera_denied_here">Kameraberechtigung verweigert</string>
+    <string name="battery_here">Akku %d%%</string>
+    <string name="addresses">Adressen</string>
+
+    <!-- Pairing sheet -->
+    <string name="pair_intro">Scanne mit der Nestwatch-App auf dem Elterngerät.</string>
+    <string name="pair_code_intro">Keine Kamera? Gib diesen Code ein</string>
+    <string name="pair_station_id">Babystation-ID</string>
+    <string name="qr_label">QR-Code zum Koppeln</string>
+    <string name="pair_opening">Koppeln wird geöffnet…</string>
+    <string name="pair_closed">Koppeln ist geschlossen.</string>
+    <string name="pair_just_paired">Jetzt gekoppelt. Prüfe, ob das Elterngerät dieselbe Zahl zeigt:</string>
+    <string name="pair_open_for">Offen für %1$s · %2$s</string>
+    <plurals name="pair_devices_left">
+        <item quantity="one">noch 1 Gerät</item>
+        <item quantity="other">bis zu %d Geräte</item>
+    </plurals>
+    <string name="pair_close">Koppeln beenden</string>
+
+    <!-- Add a station -->
+    <string name="add_station">Babystation hinzufügen</string>
+    <string name="scan_qr">QR-Code scannen</string>
+    <string name="scan_hint">Richte die Kamera auf den QR-Code auf der Babystation.</string>
+    <string name="scan_not_nestwatch">Dieser QR-Code ist keine Nestwatch-Einladung.</string>
+    <string name="no_camera_scan">Dieses Gerät hat keine Kamera. Füge stattdessen den Einladungslink ein oder gib den Code ein.</string>
+    <string name="perm_denied_camera">Der Kamerazugriff ist für Nestwatch aus. Du kannst ihn in den Einstellungen erlauben.</string>
+    <string name="nearby">In der Nähe</string>
+    <string name="nearby_searching">Suche Babystationen in diesem Netzwerk…</string>
+    <string name="pairing_open">Koppeln offen</string>
+    <string name="already_paired">schon gekoppelt</string>
+    <string name="not_pairing">Koppeln geschlossen</string>
+    <string name="invite_field">Einladungslink</string>
+    <string name="invite_hint">Füge den nestwatch://-Link ein, den die Babystation zeigt.</string>
+    <string name="invite_submit">Mit Link koppeln</string>
+    <string name="code_field">Kopplungscode</string>
+    <string name="code_field_for">Kopplungscode auf %s</string>
+    <string name="code_submit">Mit Code koppeln</string>
+    <string name="station_id_field">Babystation-ID (unter dem Code)</string>
+    <string name="address_field">Adresse der Babystation (optional, für VPN)</string>
+    <string name="address_hint">Zum Beispiel nursery.tailnet.ts.net:47100 oder 100.101.102.103:47100.</string>
+    <string name="pairing">Koppeln…</string>
+    <string name="verify_prompt">Prüfe, ob die Babystation dieselbe Zahl zeigt</string>
+    <string name="verify_same">Gleich, weiter</string>
+    <string name="verify_different">Anders</string>
+    <string name="verify_removed">Die Babystation wurde wieder entfernt. Kopple noch einmal, nah an der Babystation.</string>
+    <string name="by_code">Code verwenden</string>
+    <string name="by_link">Link verwenden</string>
+    <string name="err_invalid_invite">Dieser Link ist keine Nestwatch-Einladung.</string>
+    <string name="err_invalid_code">Dieser Code ist ungültig. Er hat 10 Buchstaben und Ziffern.</string>
+    <string name="err_invalid_id">Diese Babystation-ID ist ungültig.</string>
+    <string name="err_invalid_address">Diese Adresse ist ungültig. Verwende host:port.</string>
+    <string name="err_unreachable">Die Babystation ist nicht erreichbar. Ist sie an und im selben Netzwerk?</string>
+    <string name="err_refused">Die Babystation koppelt gerade nicht. Öffne das Koppeln auf der Babystation.</string>
+    <string name="err_rejected">Koppeln fehlgeschlagen. Der Code ist vielleicht falsch oder die Einladung abgelaufen.</string>
+    <string name="err_too_many">Du folgst schon 8 Babystationen.</string>
+    <string name="err_not_connected">Die Babystation ist nicht verbunden.</string>
+    <string name="err_generic">Etwas ist schiefgelaufen.</string>
+
+    <!-- Listener home -->
+    <string name="no_stations">Noch keine Babystationen. Füge die Babystation im Kinderzimmer hinzu, um zuzuhören.</string>
+    <string name="keeps_listening">Nestwatch hört bei ausgeschaltetem Bildschirm weiter zu.</string>
+    <string name="status_quiet">Ruhig</string>
+    <string name="status_sound">Geräusch</string>
+    <string name="status_live">Zuhören</string>
+    <string name="status_connecting">Verbinden</string>
+    <string name="status_reconnecting">Neu verbinden</string>
+    <string name="status_paused">Pausiert</string>
+    <string name="status_needs_pairing">Neu koppeln</string>
+    <string name="status_talking">%s spricht</string>
+    <string name="status_you_talk">Du sprichst</string>
+    <string name="path_lan">Heimnetz</string>
+    <string name="path_vpn">über VPN</string>
+    <string name="path_direct">direkt (Internet)</string>
+    <string name="path_relayed">über Relay</string>
+
+    <!-- Relay (rendezvous.md FR-RV-1, §7) -->
+    <string name="relay_title">Über einen Relay-Server erreichbar</string>
+    <string name="relay_server_is">Server: %1$s</string>
+    <string name="relay_explain">Wenn das WLAN zu Hause oder ein VPN diese Babystation nicht erreicht, können Elterngeräte sich über einen Relay-Server verbinden. Alles bleibt Ende-zu-Ende-verschlüsselt zwischen deinen eigenen Geräten.</string>
+    <string name="relay_can_see">Was der Server sieht: dass diese Babystation online ist, ihre öffentliche IP-Adresse, welche Adressen sich wann verbinden und wie viele Daten fließen.</string>
+    <string name="relay_cannot_see">Was er nicht sieht: Audio, Video, Nachrichten, Gerätenamen, Kopplungscodes oder Schlüssel.</string>
+    <string name="relay_server">Serveradresse</string>
+    <string name="relay_server_hint">Zum Beispiel https://nestwatch.appmire.be oder dein eigener Server</string>
+    <string name="relay_server_invalid">Das ist keine Serveradresse (https://host oder https://host:port).</string>
+    <string name="relay_pill">Relay: %1$s</string>
+    <string name="relay_status_off">Aus</string>
+    <string name="relay_status_connecting">Verbinden</string>
+    <string name="relay_status_online">Online</string>
+    <string name="relay_status_error">Nicht erreichbar</string>
+    <string name="relay_reset">Relay-Identität zurücksetzen</string>
+    <string name="relay_reset_confirm">Neue Relay-Identität erstellen? Elterngeräte, die den Relay-Server nutzen, brauchen dann eine neue Einladung von dieser Babystation.</string>
+    <string name="relay_reset_do">Zurücksetzen</string>
+    <string name="relay_setup_title">Relay-Server verwenden?</string>
+    <string name="relay_setup_yes">Erreichbar machen</string>
+    <string name="relay_setup_no">Nicht jetzt</string>
+    <string name="relay_setup_later">Du kannst das später in den Einstellungen ändern.</string>
+    <string name="trying">wird versucht…</string>
+    <plurals name="trying_addresses">
+        <item quantity="one">1 Adresse wird versucht…</item>
+        <item quantity="other">%d Adressen werden versucht…</item>
+    </plurals>
+    <string name="attempt">Versuch %d</string>
+    <string name="needs_pairing_hint">Diese Babystation hat dieses Gerät entfernt. Kopple neu, um zuzuhören.</string>
+    <string name="paused_hint">Du hörst dieser Babystation nicht zu.</string>
+    <string name="resume">Fortsetzen</string>
+    <string name="level_now">jetzt %s</string>
+    <string name="level_last">zuletzt %s</string>
+    <string name="opens_above">öffnet über %s</string>
+    <string name="no_level">noch kein Pegel</string>
+    <string name="battery">Akku %d%%</string>
+    <string name="battery_charging">Akku %d%%, lädt</string>
+    <string name="mute">Stumm</string>
+    <string name="unmute">Ton an</string>
+    <string name="solo">Solo</string>
+    <string name="unsolo">Alle hören</string>
+    <string name="camera">Kamera</string>
+    <string name="hold_to_talk">Halten zum Sprechen</string>
+    <string name="talking">Du sprichst… loslassen zum Beenden</string>
+    <string name="talk_wait">Lautsprecher wird verbunden…</string>
+    <string name="talk_busy">%s spricht</string>
+    <string name="talk_busy_someone">Jemand anderes spricht</string>
+    <string name="talk_disabled">Zurücksprechen ist auf der Babystation aus</string>
+    <string name="talk_state_on">spricht</string>
+    <string name="talk_state_off">spricht nicht</string>
+    <string name="station_settings_of">Einstellungen für %s</string>
+
+    <!-- Per-station settings (listener) -->
+    <string name="listen_mode">Zuhörmodus</string>
+    <string name="mode_always">Immer an</string>
+    <string name="mode_sound">Bei Geräusch</string>
+    <string name="calibrate_hint">Die Linie zeigt den Pegel im Zimmer in der letzten Minute. Zieh die Schwelle knapp über den ruhigen Teil.</string>
+    <string name="calibrate_continuous">Die Linie zeigt den Pegel im Zimmer in der letzten Minute. In diesem Modus zählt die Schwelle nur für Benachrichtigungen.</string>
+    <string name="threshold">Geräuschschwelle</string>
+    <string name="threshold_value">%d dB</string>
+    <string name="hold_time">Nach Geräusch weiter zuhören</string>
+    <plurals name="seconds">
+        <item quantity="one">1 Sekunde</item>
+        <item quantity="other">%d Sekunden</item>
+    </plurals>
+    <string name="volume">Lautstärke</string>
+    <string name="percent">%d %%</string>
+    <string name="alert_sound_toggle">Geräuschwarnung</string>
+    <string name="alert_unreachable_toggle">Warnen, wenn nicht erreichbar</string>
+    <string name="alert_battery_toggle">Warnen bei schwachem Akku</string>
+    <string name="add_address">Adresse hinzufügen</string>
+    <string name="address_added">Adresse hinzugefügt.</string>
+    <string name="pause">Nicht mehr zuhören</string>
+    <string name="forget">Diese Babystation vergessen</string>
+    <string name="forget_confirm">Vergessen? Du musst dann neu koppeln.</string>
+    <string name="forget_yes">Vergessen</string>
+    <string name="connected_via">Verbunden über %s</string>
+
+    <!-- Camera view -->
+    <string name="camera_of">Kamera · %s</string>
+    <string name="camera_live">Kamera live</string>
+    <string name="camera_starting">Kamera wird gestartet…</string>
+    <string name="camera_disabled">Die Kamera ist auf der Babystation ausgeschaltet.</string>
+    <string name="camera_unavailable">Die Babystation hat keine Kamera verfügbar.</string>
+    <string name="camera_denied">Die Kameraberechtigung der Babystation ist verweigert.</string>
+    <string name="camera_stopped">Die Kamera wurde beendet.</string>
+    <string name="night_image">Nachtbild</string>
+    <string name="switch_camera">Kamera wechseln</string>
+    <string name="camera_alt">Live-Kamerabild von %s</string>
+    <string name="frame_info">%1$d×%2$d · %3$d fps</string>
+
+    <!-- Alerts -->
+    <string name="alert_sound">Geräusch in %s</string>
+    <string name="alert_unreachable">%s ist nicht erreichbar</string>
+    <string name="alert_reachable">%s ist wieder da</string>
+    <string name="alert_battery">%1$s: Akku schwach (%2$d %%)</string>
+    <string name="alert_body">Öffne Nestwatch, um zuzuhören.</string>
+
+    <!-- Escalating alarm, Not the baby (product.md FR-AL-5..7) -->
+    <string name="action_on_it">Ich gehe hin</string>
+    <string name="action_not_baby">Nicht das Baby</string>
+    <string name="resume_alerts">Warnungen fortsetzen</string>
+    <string name="alerts_paused_until">Warnungen pausiert bis %s</string>
+    <string name="alarm_notif_title">%s: Das Geräusch hält an</string>
+    <string name="alarm_notif_body">Noch hat niemand auf die Warnung reagiert.</string>
+    <string name="alarm_banner_title">Alarm · %s</string>
+    <string name="alarm_banner_body">Das Geräusch hält an und noch hat niemand reagiert.</string>
+    <string name="pending_banner_title">Geräusch in %s</string>
+    <string name="pending_banner_body">Wenn das Geräusch anhält und niemand reagiert, ertönt ein Alarm.</string>
+    <string name="escalate_toggle">Ansteigender Alarm</string>
+    <string name="escalate_hint">Wenn das Geräusch anhält und niemand auf die Warnung reagiert, ertönt ein Alarm, immer lauter, auch im Lautlos-Modus.</string>
+    <string name="escalate_after">Alarm nach</string>
+    <string name="escalate_needs_sound">Schalte die Geräuschwarnung ein, um den Alarm zu nutzen.</string>
+    <string name="channel_alarm">Alarm</string>
+    <string name="channel_alarm_desc">Das Geräusch hält an und niemand hat auf die Warnung reagiert. Klingelt, bis du reagierst.</string>
+
+    <!-- Room status (product.md FR-SL-3) -->
+    <string name="room_awake_for">Seit %s wach</string>
+    <string name="room_quiet_for">Seit %s ruhig</string>
+    <string name="room_awake_brief">Seit weniger als einer Minute wach</string>
+    <string name="room_quiet_brief">Seit weniger als einer Minute ruhig</string>
+
+    <!-- Durations -->
+    <plurals name="duration_minutes">
+        <item quantity="one">%d Min.</item>
+        <item quantity="other">%d Min.</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%d Std.</item>
+        <item quantity="other">%d Std.</item>
+    </plurals>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <string name="duration_under_minute">unter 1 Min.</string>
+    <plurals name="duration_seconds_short">
+        <item quantity="one">%d Sek.</item>
+        <item quantity="other">%d Sek.</item>
+    </plurals>
+
+    <!-- Night log (product.md FR-SL-4) -->
+    <string name="night_log">Nachtprotokoll</string>
+    <string name="night_log_of">Nachtprotokoll · %s</string>
+    <string name="night_of">Nacht vom %s</string>
+    <plurals name="night_wake_ups">
+        <item quantity="one">%d-mal aufgewacht</item>
+        <item quantity="other">%d-mal aufgewacht</item>
+    </plurals>
+    <string name="night_longest_quiet">längste Ruhe %s</string>
+    <string name="night_entry">%1$s · %2$s</string>
+    <string name="night_going_on">dauert an</string>
+    <string name="night_badge_alarm">Alarm</string>
+    <string name="night_badge_not_baby">Nicht das Baby</string>
+    <string name="night_empty">Noch kein Aufwachen. Ein Aufwachen wird notiert, wenn es im Zimmer 10 Sekunden oder länger laut ist.</string>
+    <string name="night_footer">Nur auf diesem Gerät gespeichert, 30 Tage lang. Nestwatch hört auf Geräusche; ein ruhiges Zimmer heißt nicht, dass dein Kind schläft.</string>
+    <string name="night_clear">Protokoll löschen</string>
+    <string name="night_clear_confirm">Nachtprotokoll von %s löschen?</string>
+    <string name="night_clear_yes">Löschen</string>
+
+    <!-- Time -->
+    <string name="ago_now">gerade eben</string>
+    <string name="ago_minutes">vor %d Min.</string>
+    <string name="ago_hours">vor %d Std.</string>
+    <string name="ago_yesterday">gestern</string>
+    <plurals name="ago_days">
+        <item quantity="one">vor %d Tag</item>
+        <item quantity="other">vor %d Tagen</item>
+    </plurals>
+    <string name="paired_seen">gekoppelt %1$s · zuletzt gesehen %2$s</string>
+
+    <!-- Notifications -->
+    <string name="channel_service">Überwachung</string>
+    <string name="channel_service_desc">Wird angezeigt, solange dieses Gerät Babystation ist oder zuhört.</string>
+    <string name="channel_sound">Geräuschwarnungen</string>
+    <string name="channel_sound_desc">In einem ruhigen Zimmer wird es laut.</string>
+    <string name="channel_connection">Verbindungswarnungen</string>
+    <string name="channel_connection_desc">Eine Babystation ist nicht erreichbar oder wieder da.</string>
+    <string name="channel_battery">Akkuwarnungen</string>
+    <string name="channel_battery_desc">Der Akku einer Babystation wird schwach.</string>
+    <string name="notif_station_title">Nestwatch-Babystation hört zu</string>
+    <string name="notif_station_starting">Wird gestartet…</string>
+    <string name="notif_listener_title">Nestwatch hört zu</string>
+    <string name="notif_listener_idle">Keiner Babystation gefolgt</string>
+    <plurals name="notif_listener_text">
+        <item quantity="one">%1$d Babystation · %2$d live</item>
+        <item quantity="other">%1$d Babystationen · %2$d live</item>
+    </plurals>
+</resources>

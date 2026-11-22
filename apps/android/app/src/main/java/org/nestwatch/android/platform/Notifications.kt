@@ -25,6 +25,18 @@ object Notifications {
     const val CH_CONNECTION = "alert-connection"
     /** Low battery (FR-AL-3). */
     const val CH_BATTERY = "alert-battery"
+    /**
+     * Escalating alarm (FR-AL-5): high importance, category alarm, no
+     * channel sound or vibration (the listener service plays the alarm on
+     * the alarm stream and vibrates itself).
+     */
+    const val CH_ALARM = "alert-alarm"
+
+    /** Notification slots per station. */
+    const val SLOT_SOUND = 0
+    const val SLOT_CONNECTION = 1
+    const val SLOT_BATTERY = 2
+    const val SLOT_ALARM = 3
 
     const val ID_STATION = 1
     const val ID_LISTENER = 2
@@ -55,7 +67,15 @@ object Notifications {
         val battery = NotificationChannel(
             CH_BATTERY, context.getString(R.string.channel_battery), NotificationManager.IMPORTANCE_DEFAULT,
         ).apply { description = context.getString(R.string.channel_battery_desc) }
-        nm.createNotificationChannels(listOf(service, sound, connection, battery))
+        val alarm = NotificationChannel(
+            CH_ALARM, context.getString(R.string.channel_alarm), NotificationManager.IMPORTANCE_HIGH,
+        ).apply {
+            description = context.getString(R.string.channel_alarm_desc)
+            setSound(null, null)
+            enableVibration(false)
+            lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+        }
+        nm.createNotificationChannels(listOf(service, sound, connection, battery, alarm))
     }
 
     fun openApp(context: Context): PendingIntent = PendingIntent.getActivity(
@@ -83,11 +103,45 @@ object Notifications {
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
 
-    /** Posts an alert; `id` groups repeats of the same station and kind. */
-    fun alert(context: Context, channel: String, id: Int, title: String, text: String) {
+    /** Notification ID of a station's alert slot; repeats replace each other. */
+    fun alertId(stationId: String, slot: Int): Int = 1000 + (stationId.hashCode() and 0xffff) * 4 + slot
+
+    /**
+     * Opens the app; with a station, tapping also acknowledges that
+     * station's sound alert or alarm (FR-AL-6, see MainActivity).
+     */
+    private fun openAndAcknowledge(context: Context, stationId: String, slot: Int): PendingIntent =
+        PendingIntent.getActivity(
+            context,
+            alertId(stationId, slot),
+            Intent(context, MainActivity::class.java)
+                .setAction(AlertActionReceiver.ACTION_ACKNOWLEDGE)
+                .putExtra(AlertActionReceiver.EXTRA_STATION, stationId)
+                .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+    private fun NotificationCompat.Builder.stationActions(context: Context, stationId: String) = this
+        .addAction(
+            0,
+            context.getString(R.string.action_on_it),
+            AlertActionReceiver.intent(context, AlertActionReceiver.ACTION_ACKNOWLEDGE, stationId),
+        )
+        .addAction(
+            0,
+            context.getString(R.string.action_not_baby),
+            AlertActionReceiver.intent(context, AlertActionReceiver.ACTION_NOT_THE_BABY, stationId),
+        )
+
+    /**
+     * Posts an alert; `id` groups repeats of the same station and kind. A
+     * sound alert ([stationId] set) carries "I'm on it" and "Not the baby"
+     * and acknowledges when tapped (FR-AL-6, FR-AL-7).
+     */
+    fun alert(context: Context, channel: String, id: Int, title: String, text: String, stationId: String? = null) {
         if (!canPost(context)) return
         val high = channel != CH_BATTERY
-        val n = NotificationCompat.Builder(context, channel)
+        val b = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(text)
@@ -95,8 +149,53 @@ object Notifications {
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setPriority(if (high) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_DEFAULT)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setContentIntent(openApp(context))
+        if (stationId != null) {
+            b.setContentIntent(openAndAcknowledge(context, stationId, SLOT_SOUND)).stationActions(context, stationId)
+        } else {
+            b.setContentIntent(openApp(context))
+        }
+        notify(context, id, b.build())
+    }
+
+    /**
+     * The alarm notification of a station (FR-AL-5): heads-up on its own
+     * channel, category alarm, shown on the lock screen, with "I'm on it"
+     * and "Not the baby". No full-screen intent: Google Play grants
+     * USE_FULL_SCREEN_INTENT by default only to calling and alarm-clock
+     * apps. Swiping it away does not acknowledge; it comes back while the
+     * alarm rings.
+     */
+    fun alarm(context: Context, stationId: String, stationName: String) {
+        if (!canPost(context)) return
+        val n = NotificationCompat.Builder(context, CH_ALARM)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.alarm_notif_title, stationName))
+            .setContentText(context.getString(R.string.alarm_notif_body))
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setSilent(false)
+            .setContentIntent(openAndAcknowledge(context, stationId, SLOT_ALARM))
+            .setDeleteIntent(AlertActionReceiver.intent(context, AlertActionReceiver.ACTION_DISMISSED, stationId))
+            .stationActions(context, stationId)
             .build()
+        notify(context, alertId(stationId, SLOT_ALARM), n)
+    }
+
+    fun cancelAlarm(context: Context, stationId: String) {
+        NotificationManagerCompat.from(context).cancel(alertId(stationId, SLOT_ALARM))
+    }
+
+    /** Removes a station's sound alert and alarm (after an acknowledgement). */
+    fun clearStation(context: Context, stationId: String) {
+        val nm = NotificationManagerCompat.from(context)
+        nm.cancel(alertId(stationId, SLOT_SOUND))
+        nm.cancel(alertId(stationId, SLOT_ALARM))
+    }
+
+    private fun notify(context: Context, id: Int, n: android.app.Notification) {
         try {
             NotificationManagerCompat.from(context).notify(id, n)
         } catch (_: SecurityException) {

@@ -106,12 +106,19 @@ fun SwitchRow(label: String, checked: Boolean, onChange: (Boolean) -> Unit, enab
 
 /** A segmented control (`.segmented`). */
 @Composable
-fun <T> Segmented(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit, modifier: Modifier = Modifier) {
+fun <T> Segmented(
+    options: List<Pair<T, String>>,
+    selected: T,
+    onSelect: (T) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
     SingleChoiceSegmentedButtonRow(modifier.fillMaxWidth()) {
         options.forEachIndexed { i, (value, label) ->
             SegmentedButton(
                 selected = value == selected,
                 onClick = { onSelect(value) },
+                enabled = enabled,
                 shape = SegmentedButtonDefaults.itemShape(i, options.size),
                 colors = SegmentedButtonDefaults.colors(
                     activeContainerColor = nestwatch.lavenderSoft,

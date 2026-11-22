@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Norwegian Bokmål (nb). -->
+<resources>
+    <string name="app_name">Nestwatch</string>
+    <string name="promise">En privat babycall for enhetene du allerede har. Alt blir på nettverket ditt.</string>
+    <string name="disclaimer">Nestwatch er ikke medisinsk utstyr og erstatter ikke tilsyn. Se alltid til barnet ditt selv.</string>
+    <string name="role_station">Denne enheten passer på</string>
+    <string name="role_station_hint">Sett den på barnerommet. Den lytter og viser kameraet når du ber om det.</string>
+    <string name="role_listener">Denne enheten lytter</string>
+    <string name="role_listener_hint">Følg ett eller flere rom herfra.</string>
+    <string name="disclaimer_ack">Når du velger en rolle, bekrefter du at du har lest dette.</string>
+
+    <string name="close">Lukk</string>
+    <string name="back">Tilbake</string>
+    <string name="cancel">Avbryt</string>
+    <string name="save">Lagre</string>
+    <string name="settings">Innstillinger</string>
+    <string name="about">Om Nestwatch</string>
+    <string name="theme">Tema</string>
+    <string name="theme_system">System</string>
+    <string name="theme_night">Natt</string>
+    <string name="theme_day">Dag</string>
+    <string name="unnamed">Enhet uten navn</string>
+    <string name="about_body">Nestwatch kobler dine egne enheter direkte sammen, på hjemmenettverket eller ditt eget VPN. Ingen konto, ingen sky og ingen sporing. Lyd og video er ende-til-ende-kryptert.</string>
+    <string name="version">Versjon</string>
+    <string name="device_id">Enhets-ID</string>
+    <string name="license">Fri programvare under GNU AGPL 3.0 eller nyere. Kildekode: https://github.com/jeroentrappers/nestwatch</string>
+    <string name="change_role">Bytt rolle</string>
+    <string name="change_role_hint">Stopper det enheten gjør nå, og viser rollevalget igjen.</string>
+
+    <!-- Tillatelser (security.md PRIV-4) -->
+    <string name="perm_mic_title">Mikrofon</string>
+    <string name="perm_mic_station">Babystasjonen lytter til rommet så foreldreenhetene dine kan høre det. Lyden går bare til enheter du har koblet til.</string>
+    <string name="perm_mic_talk">Snakk tilbake sender stemmen din til babystasjonen mens du holder inne knappen.</string>
+    <string name="perm_camera_title">Kamera</string>
+    <string name="perm_camera_station">Tillat kameraet så en tilkoblet foreldreenhet kan åpne direktevisning på forespørsel. Ellers er kameraet av, og denne skjermen viser når det er på.</string>
+    <string name="perm_camera_scan">Kameraet brukes til å skanne QR-koden for tilkobling på babystasjonen. Ingenting blir tatt opp.</string>
+    <string name="perm_notifications_title">Varsler</string>
+    <string name="perm_notifications">Nestwatch varsler deg når det blir høyt i et rom, når en babystasjon ikke kan nås, eller når batteriet er i ferd med å gå tomt.</string>
+    <string name="perm_continue">Fortsett</string>
+    <string name="perm_not_now">Ikke nå</string>
+    <string name="perm_denied_mic">Uten mikrofonen kan ikke babystasjonen lytte. Du kan tillate den i systeminnstillingene.</string>
+    <string name="open_settings">Åpne innstillinger</string>
+
+    <!-- Batterioptimalisering (platforms.md §2.2) -->
+    <string name="battery_title">Hold Nestwatch i gang</string>
+    <string name="battery_body">Android kan sette apper på pause for å spare batteri, og da stopper overvåkingen når skjermen er av. La Nestwatch ignorere batterioptimalisering så den fortsetter å kjøre.</string>
+    <string name="battery_allow">Tillat</string>
+    <string name="battery_dismiss">Ikke nå</string>
+
+    <!-- Babystasjon -->
+    <string name="station_starting">Starter babystasjonen…</string>
+    <string name="station_failed">Babystasjonen kunne ikke starte</string>
+    <string name="retry">Prøv igjen</string>
+    <string name="station_stopped">Babystasjonen kjører ikke.</string>
+    <string name="station_start">Start babystasjonen</string>
+    <string name="station_stop">Stopp babystasjonen</string>
+    <string name="pair_listener">Koble til en foreldreenhet</string>
+    <string name="dim_screen">Demp skjermen</string>
+    <string name="tap_to_brighten">Trykk hvor som helst for å lysne</string>
+    <string name="dimmed_label">Skjermen er dempet. Overvåkingen fortsetter. Aktiver for å lysne.</string>
+    <string name="no_listeners">Ingen lytter ennå.</string>
+    <string name="listeners_heading">Lytter nå</string>
+    <string name="mode_sound_activated">lydaktivert</string>
+    <string name="mode_always_on">alltid på</string>
+    <string name="via_browser">nettleser</string>
+    <string name="hearing">hører rommet</string>
+    <string name="talking_now">snakker</string>
+    <string name="watching_now">kamera</string>
+    <string name="ring_quiet">stille</string>
+    <string name="ring_sound">lyd</string>
+    <string name="db">dB</string>
+    <string name="ring_label">Lydnivå i rommet</string>
+    <string name="camera_on">Kamera på</string>
+    <string name="camera_off">Kamera av</string>
+    <string name="talk_off">Snakk tilbake av</string>
+    <string name="nobody_listening">Ingen lytter</string>
+    <plurals name="listening_count">
+        <item quantity="one">%d lytter</item>
+        <item quantity="other">%d lytter</item>
+    </plurals>
+    <string name="talking_through">%s snakker</string>
+    <string name="station_keeps_running">Babystasjonen fortsetter med skjermen av. Stopper du den her, avsluttes overvåkingen.</string>
+    <string name="station_settings">Innstillinger for babystasjon</string>
+    <string name="station_name">Navn på babystasjon</string>
+    <string name="camera_allowed">Tillat kameraet</string>
+    <string name="talk_allowed">Tillat snakk tilbake</string>
+    <string name="mic_sensitivity">Mikrofonfølsomhet</string>
+    <string name="gain_auto">Auto</string>
+    <string name="talkback_volume">Volum for snakk tilbake</string>
+    <string name="trusted_listeners">Tilkoblede foreldreenheter</string>
+    <string name="no_trusted">Ingen foreldreenhet er koblet til ennå.</string>
+    <string name="revoke">Fjern</string>
+    <string name="revoke_confirm">Fjerne %s? Den må kobles til på nytt.</string>
+    <string name="camera_unavailable_here">Fant ikke noe kamera</string>
+    <string name="camera_denied_here">Kameratillatelse avslått</string>
+    <string name="battery_here">Batteri %d%%</string>
+    <string name="addresses">Adresser</string>
+
+    <!-- Tilkobling -->
+    <string name="pair_intro">Skann med Nestwatch-appen på enheten som skal lytte.</string>
+    <string name="pair_code_intro">Ikke kamera? Skriv inn denne koden</string>
+    <string name="pair_station_id">Babystasjons-ID</string>
+    <string name="qr_label">QR-kode for tilkobling</string>
+    <string name="pair_opening">Åpner tilkobling…</string>
+    <string name="pair_closed">Tilkobling er stengt.</string>
+    <string name="pair_just_paired">Koblet til nå. Sjekk at foreldreenheten viser det samme tallet:</string>
+    <string name="pair_open_for">Åpen i %1$s · %2$s</string>
+    <plurals name="pair_devices_left">
+        <item quantity="one">1 enhet til</item>
+        <item quantity="other">opptil %d enheter</item>
+    </plurals>
+    <string name="pair_close">Steng tilkobling</string>
+
+    <!-- Legg til en babystasjon -->
+    <string name="add_station">Legg til en babystasjon</string>
+    <string name="scan_qr">Skann QR-koden</string>
+    <string name="scan_hint">Rett kameraet mot QR-koden på babystasjonen.</string>
+    <string name="scan_not_nestwatch">Den QR-koden er ikke en Nestwatch-invitasjon.</string>
+    <string name="no_camera_scan">Denne enheten har ikke kamera. Lim inn invitasjonslenken eller skriv inn koden i stedet.</string>
+    <string name="perm_denied_camera">Kameratilgang er slått av for Nestwatch. Du kan tillate den i Innstillinger.</string>
+    <string name="nearby">I nærheten</string>
+    <string name="nearby_searching">Ser etter babystasjoner på dette nettverket…</string>
+    <string name="pairing_open">tilkobling åpen</string>
+    <string name="already_paired">allerede tilkoblet</string>
+    <string name="not_pairing">tilkobling stengt</string>
+    <string name="invite_field">Invitasjonslenke</string>
+    <string name="invite_hint">Lim inn nestwatch://-lenken som vises på babystasjonen.</string>
+    <string name="invite_submit">Koble til med lenke</string>
+    <string name="code_field">Tilkoblingskode</string>
+    <string name="code_field_for">Tilkoblingskode vist på %s</string>
+    <string name="code_submit">Koble til med kode</string>
+    <string name="station_id_field">Babystasjons-ID (vises under koden)</string>
+    <string name="address_field">Adresse til babystasjonen (valgfritt, for VPN)</string>
+    <string name="address_hint">For eksempel nursery.tailnet.ts.net:47100 eller 100.101.102.103:47100.</string>
+    <string name="pairing">Kobler til…</string>
+    <string name="verify_prompt">Sjekk at babystasjonen viser det samme tallet</string>
+    <string name="verify_same">Likt, fortsett</string>
+    <string name="verify_different">Forskjellig</string>
+    <string name="verify_removed">Babystasjonen ble fjernet igjen. Koble til én gang til, nær babystasjonen.</string>
+    <string name="by_code">Bruk en kode</string>
+    <string name="by_link">Bruk en lenke</string>
+    <string name="err_invalid_invite">Den lenken er ikke en Nestwatch-invitasjon.</string>
+    <string name="err_invalid_code">Den koden er ikke gyldig. Den har 10 bokstaver og tall.</string>
+    <string name="err_invalid_id">Den babystasjons-ID-en er ikke gyldig.</string>
+    <string name="err_invalid_address">Den adressen er ikke gyldig. Bruk host:port.</string>
+    <string name="err_unreachable">Fikk ikke kontakt med babystasjonen. Er den på og på samme nettverk?</string>
+    <string name="err_refused">Babystasjonen tar ikke imot tilkoblinger nå. Åpne tilkobling på babystasjonen.</string>
+    <string name="err_rejected">Tilkoblingen mislyktes. Koden kan være feil, eller invitasjonen har utløpt.</string>
+    <string name="err_too_many">Du følger allerede 8 babystasjoner.</string>
+    <string name="err_not_connected">Babystasjonen er ikke forbundet.</string>
+    <string name="err_generic">Noe gikk galt.</string>
+
+    <!-- Foreldreenhet, start -->
+    <string name="no_stations">Ingen babystasjoner ennå. Legg til babystasjonen på barnerommet for å begynne å lytte.</string>
+    <string name="keeps_listening">Nestwatch fortsetter å lytte med skjermen av.</string>
+    <string name="status_quiet">Stille</string>
+    <string name="status_sound">Lyd</string>
+    <string name="status_live">Lytt</string>
+    <string name="status_connecting">Forbinder</string>
+    <string name="status_reconnecting">Forbinder igjen</string>
+    <string name="status_paused">På pause</string>
+    <string name="status_needs_pairing">Må kobles til</string>
+    <string name="status_talking">%s snakker</string>
+    <string name="status_you_talk">Du snakker</string>
+    <string name="path_lan">hjemmenettverk</string>
+    <string name="path_vpn">via VPN</string>
+    <string name="path_direct">direkte (internett)</string>
+    <string name="path_relayed">via relé</string>
+
+    <!-- Relé (rendezvous.md FR-RV-1, §7) -->
+    <string name="relay_title">Kan nås via en reléserver</string>
+    <string name="relay_server_is">Server: %1$s</string>
+    <string name="relay_explain">Når Wi-Fi hjemme eller et VPN ikke når denne babystasjonen, kan foreldreenheter koble seg på via en reléserver. Alt forblir ende-til-ende-kryptert mellom dine egne enheter.</string>
+    <string name="relay_can_see">Hva serveren kan se: at denne babystasjonen er på nett, den offentlige IP-adressen, hvilke adresser som kobler seg på og når, og hvor mye data som sendes.</string>
+    <string name="relay_cannot_see">Hva den ikke kan se: lyd, video, meldinger, enhetsnavn, tilkoblingskoder eller nøkler.</string>
+    <string name="relay_server">Serveradresse</string>
+    <string name="relay_server_hint">For eksempel https://nestwatch.appmire.be eller din egen server</string>
+    <string name="relay_server_invalid">Det er ikke en serveradresse (https://host eller https://host:port).</string>
+    <string name="relay_pill">Relé: %1$s</string>
+    <string name="relay_status_off">Av</string>
+    <string name="relay_status_connecting">Forbinder</string>
+    <string name="relay_status_online">På nett</string>
+    <string name="relay_status_error">Kan ikke nås</string>
+    <string name="relay_reset">Tilbakestill relé-identitet</string>
+    <string name="relay_reset_confirm">Lage en ny relé-identitet? Foreldreenheter som bruker reléet, trenger en ny invitasjon fra denne babystasjonen.</string>
+    <string name="relay_reset_do">Tilbakestill</string>
+    <string name="relay_setup_title">Bruke reléserveren?</string>
+    <string name="relay_setup_yes">Gjør den tilgjengelig</string>
+    <string name="relay_setup_no">Ikke nå</string>
+    <string name="relay_setup_later">Du kan endre dette senere i innstillinger.</string>
+    <string name="trying">prøver…</string>
+    <plurals name="trying_addresses">
+        <item quantity="one">prøver 1 adresse…</item>
+        <item quantity="other">prøver %d adresser…</item>
+    </plurals>
+    <string name="attempt">forsøk %d</string>
+    <string name="needs_pairing_hint">Denne babystasjonen har fjernet denne enheten. Koble til på nytt for å lytte.</string>
+    <string name="paused_hint">Lytter ikke til denne babystasjonen.</string>
+    <string name="resume">Fortsett</string>
+    <string name="level_now">%s nå</string>
+    <string name="level_last">sist %s</string>
+    <string name="opens_above">åpner over %s</string>
+    <string name="no_level">ikke noe nivå ennå</string>
+    <string name="battery">Batteri %d%%</string>
+    <string name="battery_charging">Batteri %d%%, lader</string>
+    <string name="mute">Demp</string>
+    <string name="unmute">Slå på lyd</string>
+    <string name="solo">Solo</string>
+    <string name="unsolo">Hør alle</string>
+    <string name="camera">Kamera</string>
+    <string name="hold_to_talk">Hold for å snakke</string>
+    <string name="talking">Snakker… slipp for å stoppe</string>
+    <string name="talk_wait">Kobler opp høyttaleren…</string>
+    <string name="talk_busy">%s snakker</string>
+    <string name="talk_busy_someone">Noen andre snakker</string>
+    <string name="talk_disabled">Snakk tilbake er slått av på babystasjonen</string>
+    <string name="talk_state_on">snakker</string>
+    <string name="talk_state_off">snakker ikke</string>
+    <string name="station_settings_of">Innstillinger for %s</string>
+
+    <!-- Innstillinger per babystasjon (foreldreenhet) -->
+    <string name="listen_mode">Lyttemodus</string>
+    <string name="mode_always">Alltid på</string>
+    <string name="mode_sound">Ved lyd</string>
+    <string name="calibrate_hint">Linjen viser lydnivået i rommet det siste minuttet. Dra terskelen rett over den stille delen.</string>
+    <string name="calibrate_continuous">Linjen viser lydnivået i rommet det siste minuttet. I denne modusen brukes terskelen bare til varsler.</string>
+    <string name="threshold">Lydterskel</string>
+    <string name="threshold_value">%d dB</string>
+    <string name="hold_time">Fortsett å lytte etter lyd</string>
+    <plurals name="seconds">
+        <item quantity="one">1 sekund</item>
+        <item quantity="other">%d sekunder</item>
+    </plurals>
+    <string name="volume">Volum</string>
+    <string name="percent">%d%%</string>
+    <string name="alert_sound_toggle">Varsel ved lyd</string>
+    <string name="alert_unreachable_toggle">Varsel hvis den ikke kan nås</string>
+    <string name="alert_battery_toggle">Varsel ved lavt batteri</string>
+    <string name="add_address">Legg til en adresse</string>
+    <string name="address_added">Adresse lagt til.</string>
+    <string name="pause">Slutt å lytte</string>
+    <string name="forget">Glem denne babystasjonen</string>
+    <string name="forget_confirm">Glemme den? Du må koble til på nytt.</string>
+    <string name="forget_yes">Glem</string>
+    <string name="connected_via">Forbundet via %s</string>
+
+    <!-- Kameravisning -->
+    <string name="camera_of">Kamera · %s</string>
+    <string name="camera_live">Kamera direkte</string>
+    <string name="camera_starting">Starter kameraet…</string>
+    <string name="camera_disabled">Kameraet er slått av på babystasjonen.</string>
+    <string name="camera_unavailable">Babystasjonen har ikke noe kamera tilgjengelig.</string>
+    <string name="camera_denied">Kameratillatelsen på babystasjonen er avslått.</string>
+    <string name="camera_stopped">Kameraet stoppet.</string>
+    <string name="night_image">Nattbilde</string>
+    <string name="switch_camera">Bytt kamera</string>
+    <string name="camera_alt">Direkte kamerabilde fra %s</string>
+    <string name="frame_info">%1$d×%2$d · %3$d fps</string>
+
+    <!-- Varsler -->
+    <string name="alert_sound">Lyd i %s</string>
+    <string name="alert_unreachable">%s kan ikke nås</string>
+    <string name="alert_reachable">%s er tilbake</string>
+    <string name="alert_battery">%1$s: lavt batteri (%2$d%%)</string>
+    <string name="alert_body">Åpne Nestwatch for å lytte.</string>
+
+    <!-- Eskalerende alarm, Ikke babyen (product.md FR-AL-5..7) -->
+    <string name="action_on_it">Jeg går</string>
+    <string name="action_not_baby">Ikke babyen</string>
+    <string name="resume_alerts">Gjenoppta varsler</string>
+    <string name="alerts_paused_until">Varsler satt på pause til %s</string>
+    <string name="alarm_notif_title">%s: lyden fortsetter</string>
+    <string name="alarm_notif_body">Ingen har svart på varselet ennå.</string>
+    <string name="alarm_banner_title">Alarm · %s</string>
+    <string name="alarm_banner_body">Lyden fortsetter, og ingen har svart ennå.</string>
+    <string name="pending_banner_title">Lyd i %s</string>
+    <string name="pending_banner_body">Hvis lyden fortsetter og ingen svarer, går en alarm.</string>
+    <string name="escalate_toggle">Eskalerende alarm</string>
+    <string name="escalate_hint">Hvis lyden fortsetter og ingen svarer på varselet, går en alarm, høyere og høyere, også i lydløs modus.</string>
+    <string name="escalate_after">Alarm etter</string>
+    <string name="escalate_needs_sound">Slå på varsel ved lyd for å bruke alarmen.</string>
+    <string name="channel_alarm">Alarm</string>
+    <string name="channel_alarm_desc">Lyden fortsetter, og ingen har svart på varselet. Ringer til du svarer.</string>
+
+    <!-- Status for rommet (product.md FR-SL-3) -->
+    <string name="room_awake_for">Våken i %s</string>
+    <string name="room_quiet_for">Stille i %s</string>
+    <string name="room_awake_brief">Våken i under ett minutt</string>
+    <string name="room_quiet_brief">Stille i under ett minutt</string>
+
+    <!-- Varigheter -->
+    <plurals name="duration_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%d t</item>
+        <item quantity="other">%d t</item>
+    </plurals>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <string name="duration_under_minute">under 1 min</string>
+    <plurals name="duration_seconds_short">
+        <item quantity="one">%d s</item>
+        <item quantity="other">%d s</item>
+    </plurals>
+
+    <!-- Nattlogg (product.md FR-SL-4) -->
+    <string name="night_log">Nattlogg</string>
+    <string name="night_log_of">Nattlogg · %s</string>
+    <string name="night_of">Natten %s</string>
+    <plurals name="night_wake_ups">
+        <item quantity="one">%d oppvåkning</item>
+        <item quantity="other">%d oppvåkninger</item>
+    </plurals>
+    <string name="night_longest_quiet">lengst stille %s</string>
+    <string name="night_entry">%1$s · %2$s</string>
+    <string name="night_going_on">pågår</string>
+    <string name="night_badge_alarm">Alarm</string>
+    <string name="night_badge_not_baby">Ikke babyen</string>
+    <string name="night_empty">Ingen oppvåkninger ennå. En oppvåkning registreres når det er høyt i rommet i 10 sekunder eller mer.</string>
+    <string name="night_footer">Lagres bare på denne enheten, i 30 dager. Nestwatch lytter etter lyd; et stille rom betyr ikke at barnet ditt sover.</string>
+    <string name="night_clear">Tøm logg</string>
+    <string name="night_clear_confirm">Tømme nattloggen for %s?</string>
+    <string name="night_clear_yes">Tøm</string>
+
+    <!-- Tid -->
+    <string name="ago_now">akkurat nå</string>
+    <string name="ago_minutes">for %d min siden</string>
+    <string name="ago_hours">for %d t siden</string>
+    <string name="ago_yesterday">i går</string>
+    <plurals name="ago_days">
+        <item quantity="one">for %d dag siden</item>
+        <item quantity="other">for %d dager siden</item>
+    </plurals>
+    <string name="paired_seen">tilkoblet %1$s · sist sett %2$s</string>
+
+    <!-- Varsler -->
+    <string name="channel_service">Overvåking</string>
+    <string name="channel_service_desc">Vises mens denne enheten er babystasjon eller lytter.</string>
+    <string name="channel_sound">Lydvarsler</string>
+    <string name="channel_sound_desc">Et stille rom begynner å lage lyd.</string>
+    <string name="channel_connection">Tilkoblingsvarsler</string>
+    <string name="channel_connection_desc">En babystasjon kan ikke nås eller er tilbake.</string>
+    <string name="channel_battery">Batterivarsler</string>
+    <string name="channel_battery_desc">Batteriet på en babystasjon er i ferd med å gå tomt.</string>
+    <string name="notif_station_title">Nestwatch-babystasjonen lytter</string>
+    <string name="notif_station_starting">Starter…</string>
+    <string name="notif_listener_title">Nestwatch lytter</string>
+    <string name="notif_listener_idle">Ingen babystasjon fulgt</string>
+    <plurals name="notif_listener_text">
+        <item quantity="one">%1$d babystasjon · %2$d direkte</item>
+        <item quantity="other">%1$d babystasjoner · %2$d direkte</item>
+    </plurals>
+</resources>

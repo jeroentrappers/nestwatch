@@ -10,7 +10,8 @@ Material 3 (§6).
 | Engines | `core/Nestwatch.kt` owns the `Station` and `Listener` objects and republishes snapshots, events and video frames as flows |
 | Storage (device key, trust, settings) | `core/KeystoreStorage.kt`: AES-256-GCM under an Android Keystore key, files in `noBackupFilesDir`, backups off (ANDROID-2) |
 | Station | `service/StationService.kt`: foreground service (microphone, camera if granted; plain on API 23–29), wake and Wi-Fi locks, `AudioRecord` → `push_capture_i16`, talk-back `AudioTrack`, CameraX on `CameraWanted` only, battery, NSD advertising |
-| Listener | `service/ListenerService.kt`: foreground service (mediaPlayback on API 29+), `pull_playback` → `AudioTrack`, talk-back microphone, NSD browsing under a multicast lock, alert notifications |
+| Listener | `service/ListenerService.kt`: foreground service (mediaPlayback on API 29+), `pull_playback` → `AudioTrack`, talk-back microphone, NSD browsing under a multicast lock, alert notifications; the escalating alarm (`audio/Alarm.kt`, a generated tone on `USAGE_ALARM` with a 30 s ramp and vibration) on the `alert-alarm` channel, "I'm on it" / "Not the baby" through `platform/AlertActions.kt` |
+| Languages | English reference plus nl, fr, de, es, it, pt-BR, pl, sv, da, nb (`res/values-*`), per-app language via `res/xml/locales_config.xml`; `TranslationsTest` checks names, placeholders and plural quantities |
 | mDNS | Android NSD, not the core's responder (ANDROID-1) |
 | QR | shown from the core's `qr_code`; scanned with CameraX + ZXing core (no Google Play services) |
 | Permissions | microphone and camera when the station starts or talk-back / scanning is first used, notifications on API 33+, each with an explanation first |

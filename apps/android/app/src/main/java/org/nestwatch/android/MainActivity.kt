@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.nestwatch.android.platform.AlertActionReceiver
+import org.nestwatch.android.platform.AlertActions
 import org.nestwatch.android.ui.NestwatchRoot
 
 /** The single activity; everything else is Compose (design/README.md §5). */
@@ -19,12 +21,27 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         takeInvite(intent)
+        if (savedInstanceState == null) takeAcknowledge(intent)
         setContent { NestwatchRoot(this) }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         takeInvite(intent)
+        takeAcknowledge(intent)
+    }
+
+    /**
+     * Tapping a sound alert or alarm notification acknowledges that
+     * station (FR-AL-6). Opening the app any other way does not.
+     */
+    private fun takeAcknowledge(intent: Intent?) {
+        if (intent?.action != AlertActionReceiver.ACTION_ACKNOWLEDGE) return
+        val id = intent.getStringExtra(AlertActionReceiver.EXTRA_STATION) ?: return
+        AlertActions.acknowledge(this, id)
+        // Handled once: a later recreation must not acknowledge again.
+        intent.action = null
+        intent.removeExtra(AlertActionReceiver.EXTRA_STATION)
     }
 
     private fun takeInvite(intent: Intent?) {

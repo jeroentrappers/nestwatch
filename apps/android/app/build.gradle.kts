@@ -61,6 +61,12 @@ android {
         jniLibs.useLegacyPackaging = false
     }
 
+    androidResources {
+        // The app's languages (NFR-I18N-2); drops other locales of libraries.
+        // Keep in step with res/xml/locales_config.xml.
+        localeFilters += listOf("en", "nl", "fr", "de", "es", "it", "pt-rBR", "pl", "sv", "da", "nb")
+    }
+
     testOptions {
         unitTests.isReturnDefaultValues = true
     }

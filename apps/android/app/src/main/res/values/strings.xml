@@ -265,6 +265,65 @@
     <string name="alert_battery">%1$s: battery low (%2$d%%)</string>
     <string name="alert_body">Open Nestwatch to listen.</string>
 
+    <!-- Escalating alarm, Not the baby (product.md FR-AL-5..7) -->
+    <string name="action_on_it">I\'m on it</string>
+    <string name="action_not_baby">Not the baby</string>
+    <string name="resume_alerts">Resume alerts</string>
+    <string name="alerts_paused_until">Alerts paused until %s</string>
+    <string name="alarm_notif_title">%s: the sound goes on</string>
+    <string name="alarm_notif_body">Nobody answered the alert yet.</string>
+    <string name="alarm_banner_title">Alarm · %s</string>
+    <string name="alarm_banner_body">The sound goes on and nobody answered yet.</string>
+    <string name="pending_banner_title">Sound in %s</string>
+    <string name="pending_banner_body">If the sound goes on and nobody answers, an alarm rings.</string>
+    <string name="escalate_toggle">Escalating alarm</string>
+    <string name="escalate_hint">If the sound goes on and nobody answers the alert, an alarm rings, louder and louder, also in silent mode.</string>
+    <string name="escalate_after">Alarm after</string>
+    <string name="escalate_needs_sound">Turn on the sound alert to use the alarm.</string>
+    <string name="channel_alarm">Alarm</string>
+    <string name="channel_alarm_desc">The sound goes on and nobody answered the alert. Rings until you answer.</string>
+
+    <!-- Room status (product.md FR-SL-3) -->
+    <string name="room_awake_for">Awake for %s</string>
+    <string name="room_quiet_for">Quiet for %s</string>
+    <string name="room_awake_brief">Awake for less than a minute</string>
+    <string name="room_quiet_brief">Quiet for less than a minute</string>
+
+    <!-- Durations -->
+    <plurals name="duration_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%d h</item>
+        <item quantity="other">%d h</item>
+    </plurals>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <string name="duration_under_minute">under 1 min</string>
+    <plurals name="duration_seconds_short">
+        <item quantity="one">%d s</item>
+        <item quantity="other">%d s</item>
+    </plurals>
+
+    <!-- Night log (product.md FR-SL-4) -->
+    <string name="night_log">Night log</string>
+    <string name="night_log_of">Night log · %s</string>
+    <string name="night_of">Night of %s</string>
+    <plurals name="night_wake_ups">
+        <item quantity="one">%d wake-up</item>
+        <item quantity="other">%d wake-ups</item>
+    </plurals>
+    <string name="night_longest_quiet">longest quiet %s</string>
+    <string name="night_entry">%1$s · %2$s</string>
+    <string name="night_going_on">going on</string>
+    <string name="night_badge_alarm">Alarm</string>
+    <string name="night_badge_not_baby">Not the baby</string>
+    <string name="night_empty">No wake-ups yet. A wake-up is noted when the room is loud for 10 seconds or more.</string>
+    <string name="night_footer">Kept on this device only, for 30 days. Nestwatch listens for sound; a quiet room does not mean your child is asleep.</string>
+    <string name="night_clear">Clear log</string>
+    <string name="night_clear_confirm">Clear the night log of %s?</string>
+    <string name="night_clear_yes">Clear</string>
+
     <!-- Time -->
     <string name="ago_now">just now</string>
     <string name="ago_minutes">%d min ago</string>

@@ -17,6 +17,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -28,7 +30,10 @@ import org.nestwatch.android.R
 import org.nestwatch.android.core.Nestwatch
 import org.nestwatch.android.core.THRESHOLD_MAX
 import org.nestwatch.android.core.THRESHOLD_MIN
+import org.nestwatch.android.core.ESCALATE_CHOICES
 import org.nestwatch.android.core.clampThreshold
+import org.nestwatch.android.core.escalateChoice
+import org.nestwatch.android.ui.formatChoice
 import org.nestwatch.android.ui.components.CalibrationChart
 import org.nestwatch.android.ui.components.Caption
 import org.nestwatch.android.ui.components.DangerButton
@@ -46,7 +51,7 @@ private val HOLD_CHOICES = listOf(2_000, 4_000, 8_000, 15_000, 30_000)
 
 /** Station settings on the listener (README §5.7, FR-AU-2, FR-AU-6). */
 @Composable
-fun ListenerStationSettings(id: String, onBack: () -> Unit) {
+fun ListenerStationSettings(id: String, onBack: () -> Unit, onNightLog: () -> Unit) {
     val state by Nestwatch.listenerState.collectAsStateWithLifecycle()
     val tick by Nestwatch.historyVersion.collectAsStateWithLifecycle()
     val t = state?.stations?.firstOrNull { it.id == id }
@@ -59,6 +64,7 @@ fun ListenerStationSettings(id: String, onBack: () -> Unit) {
     var forgetting by remember { mutableStateOf(false) }
 
     Page(stringResource(R.string.station_settings_of, t.name), onBack) {
+        SecondaryButton(stringResource(R.string.night_log), onNightLog, Modifier.fillMaxWidth())
         NestwatchCard {
             Text(stringResource(R.string.listen_mode), style = MaterialTheme.typography.titleMedium, color = nestwatch.text1)
             Segmented(
@@ -127,6 +133,26 @@ fun ListenerStationSettings(id: String, onBack: () -> Unit) {
             SwitchRow(stringResource(R.string.alert_sound_toggle), a.sound, { setAlerts(a.copy(sound = it)) })
             SwitchRow(stringResource(R.string.alert_unreachable_toggle), a.unreachable, { setAlerts(a.copy(unreachable = it)) })
             SwitchRow(stringResource(R.string.alert_battery_toggle), a.battery, { setAlerts(a.copy(battery = it)) })
+        }
+        NestwatchCard {
+            // Escalating alarm (FR-AL-5): needs the sound alert it escalates.
+            val a = t.prefs.alerts
+            fun setAlerts(n: AlertSettings) = Nestwatch.withListener { it.setAlerts(id, n) }
+            val res = LocalResources.current
+            SwitchRow(
+                stringResource(R.string.escalate_toggle),
+                a.escalate && a.sound,
+                { setAlerts(a.copy(escalate = it)) },
+                enabled = a.sound,
+            )
+            Caption(stringResource(if (a.sound) R.string.escalate_hint else R.string.escalate_needs_sound))
+            Text(stringResource(R.string.escalate_after), color = if (a.sound && a.escalate) nestwatch.text1 else nestwatch.text3)
+            Segmented(
+                ESCALATE_CHOICES.map { it to formatChoice(res, it) },
+                escalateChoice(a.escalateAfterS.toInt()),
+                { s -> setAlerts(a.copy(escalateAfterS = s.toUShort())) },
+                enabled = a.sound && a.escalate,
+            )
         }
         NestwatchCard {
             t.route?.let { if (t.connection is Connection.Live) Caption(stringResource(R.string.connected_via, it)) }

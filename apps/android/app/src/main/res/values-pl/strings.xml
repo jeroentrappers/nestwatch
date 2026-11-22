@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Polish text (NFR-I18N-2). -->
+<resources>
+    <string name="app_name">Nestwatch</string>
+    <string name="promise">Prywatna niania elektroniczna na urządzeniach, które już masz. Wszystko zostaje w Twojej sieci.</string>
+    <string name="disclaimer">Nestwatch nie jest wyrobem medycznym i nie zastępuje opieki. Zawsze sprawdzaj dziecko osobiście.</string>
+    <string name="role_station">To urządzenie czuwa</string>
+    <string name="role_station_hint">Postaw je w pokoju dziecka. Słucha i na żądanie pokazuje obraz z kamery.</string>
+    <string name="role_listener">To urządzenie słucha</string>
+    <string name="role_listener_hint">Śledź stąd jeden lub więcej pokoi.</string>
+    <string name="disclaimer_ack">Wybierając rolę, potwierdzasz zapoznanie się z tą informacją.</string>
+
+    <string name="close">Zamknij</string>
+    <string name="back">Wstecz</string>
+    <string name="cancel">Anuluj</string>
+    <string name="save">Zapisz</string>
+    <string name="settings">Ustawienia</string>
+    <string name="about">O Nestwatch</string>
+    <string name="theme">Motyw</string>
+    <string name="theme_system">Systemowy</string>
+    <string name="theme_night">Nocny</string>
+    <string name="theme_day">Dzienny</string>
+    <string name="unnamed">Urządzenie bez nazwy</string>
+    <string name="about_body">Nestwatch łączy Twoje urządzenia bezpośrednio, w sieci domowej lub przez Twój własny VPN. Bez konta, bez chmury i bez śledzenia. Dźwięk i obraz są szyfrowane end-to-end.</string>
+    <string name="version">Wersja</string>
+    <string name="device_id">ID urządzenia</string>
+    <string name="license">Wolne oprogramowanie na licencji GNU AGPL 3.0 lub nowszej. Kod źródłowy: https://github.com/jeroentrappers/nestwatch</string>
+    <string name="change_role">Zmień rolę</string>
+    <string name="change_role_hint">Zatrzymuje to, co to urządzenie teraz robi, i ponownie pokazuje wybór roli.</string>
+
+    <!-- Uprawnienia (security.md PRIV-4) -->
+    <string name="perm_mic_title">Mikrofon</string>
+    <string name="perm_mic_station">Stacja dziecka słucha pokoju, aby urządzenia rodzica mogły go usłyszeć. Dźwięk trafia tylko do sparowanych urządzeń.</string>
+    <string name="perm_mic_talk">Funkcja „Mów do dziecka” przesyła Twój głos do stacji, dopóki trzymasz przycisk.</string>
+    <string name="perm_camera_title">Kamera</string>
+    <string name="perm_camera_station">Zezwól na kamerę, aby sparowane urządzenie rodzica mogło na żądanie otworzyć podgląd na żywo. W innym przypadku kamera jest wyłączona, a ten ekran pokazuje, kiedy działa.</string>
+    <string name="perm_camera_scan">Kamera służy do zeskanowania kodu QR parowania ze stacji. Nic nie jest nagrywane.</string>
+    <string name="perm_notifications_title">Powiadomienia</string>
+    <string name="perm_notifications">Nestwatch powiadomi Cię, gdy w pokoju zrobi się głośno, stacja stanie się nieosiągalna albo kończy się jej bateria.</string>
+    <string name="perm_continue">Dalej</string>
+    <string name="perm_not_now">Nie teraz</string>
+    <string name="perm_denied_mic">Bez mikrofonu stacja nie może słuchać. Możesz na niego zezwolić w ustawieniach systemu.</string>
+    <string name="open_settings">Otwórz ustawienia</string>
+
+    <!-- Optymalizacja baterii (platforms.md §2.2) -->
+    <string name="battery_title">Nie wyłączaj Nestwatch</string>
+    <string name="battery_body">Android może wstrzymywać aplikacje, aby oszczędzać baterię, co zatrzymałoby czuwanie przy wyłączonym ekranie. Pozwól Nestwatch ignorować optymalizację baterii, aby działała dalej.</string>
+    <string name="battery_allow">Zezwól</string>
+    <string name="battery_dismiss">Nie teraz</string>
+
+    <!-- Stacja -->
+    <string name="station_starting">Uruchamianie stacji…</string>
+    <string name="station_failed">Nie udało się uruchomić stacji</string>
+    <string name="retry">Spróbuj ponownie</string>
+    <string name="station_stopped">Stacja nie działa.</string>
+    <string name="station_start">Uruchom stację</string>
+    <string name="station_stop">Zatrzymaj stację</string>
+    <string name="pair_listener">Sparuj urządzenie rodzica</string>
+    <string name="dim_screen">Przyciemnij ekran</string>
+    <string name="tap_to_brighten">Dotknij w dowolnym miejscu, aby rozjaśnić</string>
+    <string name="dimmed_label">Ekran przyciemniony. Czuwanie trwa. Aktywuj, aby rozjaśnić.</string>
+    <string name="no_listeners">Nikt jeszcze nie słucha.</string>
+    <string name="listeners_heading">Teraz słuchają</string>
+    <string name="mode_sound_activated">aktywacja dźwiękiem</string>
+    <string name="mode_always_on">zawsze włączone</string>
+    <string name="via_browser">przeglądarka</string>
+    <string name="hearing">słyszy pokój</string>
+    <string name="talking_now">mówi</string>
+    <string name="watching_now">kamera</string>
+    <string name="ring_quiet">cisza</string>
+    <string name="ring_sound">dźwięk</string>
+    <string name="db">dB</string>
+    <string name="ring_label">Poziom w pokoju</string>
+    <string name="camera_on">Kamera włączona</string>
+    <string name="camera_off">Kamera wyłączona</string>
+    <string name="talk_off">Mówienie do dziecka wyłączone</string>
+    <string name="nobody_listening">Nikt nie słucha</string>
+    <plurals name="listening_count">
+        <item quantity="one">%d słucha</item>
+        <item quantity="few">%d słuchają</item>
+        <item quantity="many">%d słucha</item>
+        <item quantity="other">%d słucha</item>
+    </plurals>
+    <string name="talking_through">%s mówi</string>
+    <string name="station_keeps_running">Stacja działa dalej przy wyłączonym ekranie. Zatrzymanie jej tutaj kończy czuwanie.</string>
+    <string name="station_settings">Ustawienia stacji</string>
+    <string name="station_name">Nazwa stacji</string>
+    <string name="camera_allowed">Zezwól na kamerę</string>
+    <string name="talk_allowed">Zezwól na mówienie do dziecka</string>
+    <string name="mic_sensitivity">Czułość mikrofonu</string>
+    <string name="gain_auto">Auto</string>
+    <string name="talkback_volume">Głośność mówienia do dziecka</string>
+    <string name="trusted_listeners">Sparowane urządzenia rodzica</string>
+    <string name="no_trusted">Nie sparowano jeszcze żadnego urządzenia rodzica.</string>
+    <string name="revoke">Usuń</string>
+    <string name="revoke_confirm">Usunąć %s? Trzeba będzie sparować je ponownie.</string>
+    <string name="camera_unavailable_here">Nie znaleziono kamery</string>
+    <string name="camera_denied_here">Brak uprawnienia do kamery</string>
+    <string name="battery_here">Bateria %d%%</string>
+    <string name="addresses">Adresy</string>
+
+    <!-- Arkusz parowania -->
+    <string name="pair_intro">Zeskanuj aplikacją Nestwatch na urządzeniu rodzica.</string>
+    <string name="pair_code_intro">Brak kamery? Wpisz ten kod</string>
+    <string name="pair_station_id">ID stacji</string>
+    <string name="qr_label">Kod QR parowania</string>
+    <string name="pair_opening">Otwieranie parowania…</string>
+    <string name="pair_closed">Parowanie jest zamknięte.</string>
+    <string name="pair_just_paired">Sparowano. Sprawdź, czy urządzenie rodzica pokazuje tę samą liczbę:</string>
+    <string name="pair_open_for">Otwarte jeszcze %1$s · %2$s</string>
+    <plurals name="pair_devices_left">
+        <item quantity="one">jeszcze 1 urządzenie</item>
+        <item quantity="few">do %d urządzeń</item>
+        <item quantity="many">do %d urządzeń</item>
+        <item quantity="other">do %d urządzeń</item>
+    </plurals>
+    <string name="pair_close">Zamknij parowanie</string>
+
+    <!-- Dodawanie stacji -->
+    <string name="add_station">Dodaj stację</string>
+    <string name="scan_qr">Zeskanuj kod QR</string>
+    <string name="scan_hint">Skieruj kamerę na kod QR na stacji.</string>
+    <string name="scan_not_nestwatch">Ten kod QR nie jest zaproszeniem Nestwatch.</string>
+    <string name="no_camera_scan">To urządzenie nie ma kamery. Wklej link zaproszenia lub wpisz kod.</string>
+    <string name="perm_denied_camera">Dostęp do kamery dla Nestwatch jest wyłączony. Możesz go włączyć w Ustawieniach.</string>
+    <string name="nearby">W pobliżu</string>
+    <string name="nearby_searching">Szukam stacji w tej sieci…</string>
+    <string name="pairing_open">parowanie otwarte</string>
+    <string name="already_paired">już sparowana</string>
+    <string name="not_pairing">parowanie zamknięte</string>
+    <string name="invite_field">Link zaproszenia</string>
+    <string name="invite_hint">Wklej link nestwatch:// pokazany na stacji.</string>
+    <string name="invite_submit">Sparuj przez link</string>
+    <string name="code_field">Kod parowania</string>
+    <string name="code_field_for">Kod parowania pokazany na %s</string>
+    <string name="code_submit">Sparuj kodem</string>
+    <string name="station_id_field">ID stacji (pod kodem)</string>
+    <string name="address_field">Adres stacji (opcjonalnie, dla VPN)</string>
+    <string name="address_hint">Na przykład nursery.tailnet.ts.net:47100 lub 100.101.102.103:47100.</string>
+    <string name="pairing">Parowanie…</string>
+    <string name="verify_prompt">Sprawdź, czy stacja pokazuje tę samą liczbę</string>
+    <string name="verify_same">Taka sama, dalej</string>
+    <string name="verify_different">Inna</string>
+    <string name="verify_removed">Stacja została znowu usunięta. Sparuj jeszcze raz, blisko stacji.</string>
+    <string name="by_code">Użyj kodu</string>
+    <string name="by_link">Użyj linku</string>
+    <string name="err_invalid_invite">Ten link nie jest zaproszeniem Nestwatch.</string>
+    <string name="err_invalid_code">Ten kod jest nieprawidłowy. Ma 10 liter i cyfr.</string>
+    <string name="err_invalid_id">To ID stacji jest nieprawidłowe.</string>
+    <string name="err_invalid_address">Ten adres jest nieprawidłowy. Użyj formatu host:port.</string>
+    <string name="err_unreachable">Nie udało się połączyć ze stacją. Czy jest włączona i w tej samej sieci?</string>
+    <string name="err_refused">Stacja nie paruje teraz. Otwórz parowanie na stacji.</string>
+    <string name="err_rejected">Parowanie nie powiodło się. Kod może być błędny albo zaproszenie wygasło.</string>
+    <string name="err_too_many">Śledzisz już 8 stacji.</string>
+    <string name="err_not_connected">Stacja nie jest połączona.</string>
+    <string name="err_generic">Coś poszło nie tak.</string>
+
+    <!-- Ekran główny urządzenia rodzica -->
+    <string name="no_stations">Nie ma jeszcze stacji. Dodaj stację z pokoju dziecka, aby zacząć słuchać.</string>
+    <string name="keeps_listening">Nestwatch słucha dalej przy wyłączonym ekranie.</string>
+    <string name="status_quiet">Cisza</string>
+    <string name="status_sound">Dźwięk</string>
+    <string name="status_live">Słuchanie</string>
+    <string name="status_connecting">Łączenie</string>
+    <string name="status_reconnecting">Ponowne łączenie</string>
+    <string name="status_paused">Wstrzymano</string>
+    <string name="status_needs_pairing">Wymaga parowania</string>
+    <string name="status_talking">%s mówi</string>
+    <string name="status_you_talk">Mówisz</string>
+    <string name="path_lan">sieć domowa</string>
+    <string name="path_vpn">przez VPN</string>
+    <string name="path_direct">bezpośrednio (internet)</string>
+    <string name="path_relayed">przez pośrednika</string>
+
+    <!-- Serwer pośredniczący (rendezvous.md FR-RV-1, §7) -->
+    <string name="relay_title">Dostępna przez serwer pośredniczący</string>
+    <string name="relay_server_is">Serwer: %1$s</string>
+    <string name="relay_explain">Gdy domowe Wi-Fi lub VPN nie sięga do tej stacji, urządzenia rodzica mogą połączyć się przez serwer pośredniczący. Wszystko pozostaje szyfrowane end-to-end między Twoimi urządzeniami.</string>
+    <string name="relay_can_see">Co widzi serwer: że ta stacja jest online, jej publiczny adres IP, które adresy się z nią łączą i kiedy oraz ile danych przepływa.</string>
+    <string name="relay_cannot_see">Czego nie widzi: dźwięku, obrazu, wiadomości, nazw urządzeń, kodów parowania ani kluczy.</string>
+    <string name="relay_server">Adres serwera</string>
+    <string name="relay_server_hint">Na przykład https://nestwatch.appmire.be lub Twój własny serwer</string>
+    <string name="relay_server_invalid">To nie jest adres serwera (https://host lub https://host:port).</string>
+    <string name="relay_pill">Pośrednik: %1$s</string>
+    <string name="relay_status_off">Wyłączony</string>
+    <string name="relay_status_connecting">Łączenie</string>
+    <string name="relay_status_online">Online</string>
+    <string name="relay_status_error">Nieosiągalny</string>
+    <string name="relay_reset">Zresetuj tożsamość pośrednika</string>
+    <string name="relay_reset_confirm">Utworzyć nową tożsamość pośrednika? Urządzenia rodzica, które korzystają z serwera pośredniczącego, będą potrzebować nowego zaproszenia z tej stacji.</string>
+    <string name="relay_reset_do">Resetuj</string>
+    <string name="relay_setup_title">Użyć serwera pośredniczącego?</string>
+    <string name="relay_setup_yes">Udostępnij stację</string>
+    <string name="relay_setup_no">Nie teraz</string>
+    <string name="relay_setup_later">Możesz to później zmienić w ustawieniach.</string>
+    <string name="trying">próbuję…</string>
+    <plurals name="trying_addresses">
+        <item quantity="one">próbuję 1 adres…</item>
+        <item quantity="few">próbuję %d adresy…</item>
+        <item quantity="many">próbuję %d adresów…</item>
+        <item quantity="other">próbuję %d adresu…</item>
+    </plurals>
+    <string name="attempt">próba %d</string>
+    <string name="needs_pairing_hint">Ta stacja usunęła to urządzenie. Sparuj ponownie, aby słuchać.</string>
+    <string name="paused_hint">Nie słuchasz tej stacji.</string>
+    <string name="resume">Wznów</string>
+    <string name="level_now">%s teraz</string>
+    <string name="level_last">ostatnio %s</string>
+    <string name="opens_above">włącza się powyżej %s</string>
+    <string name="no_level">brak poziomu</string>
+    <string name="battery">Bateria %d%%</string>
+    <string name="battery_charging">Bateria %d%%, ładowanie</string>
+    <string name="mute">Wycisz</string>
+    <string name="unmute">Włącz dźwięk</string>
+    <string name="solo">Solo</string>
+    <string name="unsolo">Słuchaj wszystkich</string>
+    <string name="camera">Kamera</string>
+    <string name="hold_to_talk">Przytrzymaj, aby mówić</string>
+    <string name="talking">Mówisz… puść, aby skończyć</string>
+    <string name="talk_wait">Łączenie głośnika…</string>
+    <string name="talk_busy">%s mówi</string>
+    <string name="talk_busy_someone">Ktoś inny mówi</string>
+    <string name="talk_disabled">Mówienie do dziecka jest wyłączone na stacji</string>
+    <string name="talk_state_on">mówi</string>
+    <string name="talk_state_off">nie mówi</string>
+    <string name="station_settings_of">Ustawienia: %s</string>
+
+    <!-- Ustawienia stacji (urządzenie rodzica) -->
+    <string name="listen_mode">Tryb słuchania</string>
+    <string name="mode_always">Zawsze włączone</string>
+    <string name="mode_sound">Gdy jest dźwięk</string>
+    <string name="calibrate_hint">Linia pokazuje poziom w pokoju z ostatniej minuty. Przeciągnij próg tuż nad cichą część.</string>
+    <string name="calibrate_continuous">Linia pokazuje poziom w pokoju z ostatniej minuty. W tym trybie próg ma znaczenie tylko dla alertów.</string>
+    <string name="threshold">Próg dźwięku</string>
+    <string name="threshold_value">%d dB</string>
+    <string name="hold_time">Słuchaj dalej po dźwięku</string>
+    <plurals name="seconds">
+        <item quantity="one">1 sekunda</item>
+        <item quantity="few">%d sekundy</item>
+        <item quantity="many">%d sekund</item>
+        <item quantity="other">%d sekundy</item>
+    </plurals>
+    <string name="volume">Głośność</string>
+    <string name="percent">%d%%</string>
+    <string name="alert_sound_toggle">Alert dźwiękowy</string>
+    <string name="alert_unreachable_toggle">Alert przy braku połączenia</string>
+    <string name="alert_battery_toggle">Alert przy słabej baterii</string>
+    <string name="add_address">Dodaj adres</string>
+    <string name="address_added">Dodano adres.</string>
+    <string name="pause">Przestań słuchać</string>
+    <string name="forget">Zapomnij tę stację</string>
+    <string name="forget_confirm">Zapomnieć ją? Trzeba będzie sparować ponownie.</string>
+    <string name="forget_yes">Zapomnij</string>
+    <string name="connected_via">Połączono przez: %s</string>
+
+    <!-- Widok kamery -->
+    <string name="camera_of">Kamera · %s</string>
+    <string name="camera_live">Kamera na żywo</string>
+    <string name="camera_starting">Uruchamianie kamery…</string>
+    <string name="camera_disabled">Kamera jest wyłączona na stacji.</string>
+    <string name="camera_unavailable">Stacja nie ma dostępnej kamery.</string>
+    <string name="camera_denied">Stacja nie ma uprawnienia do kamery.</string>
+    <string name="camera_stopped">Kamera się zatrzymała.</string>
+    <string name="night_image">Obraz nocny</string>
+    <string name="switch_camera">Przełącz kamerę</string>
+    <string name="camera_alt">Obraz na żywo z kamery: %s</string>
+    <string name="frame_info">%1$d×%2$d · %3$d fps</string>
+
+    <!-- Alerty -->
+    <string name="alert_sound">Dźwięk: %s</string>
+    <string name="alert_unreachable">%s jest nieosiągalna</string>
+    <string name="alert_reachable">%s znów działa</string>
+    <string name="alert_battery">%1$s: słaba bateria (%2$d%%)</string>
+    <string name="alert_body">Otwórz Nestwatch, aby posłuchać.</string>
+
+    <!-- Narastający alarm, To nie dziecko (product.md FR-AL-5..7) -->
+    <string name="action_on_it">Już idę</string>
+    <string name="action_not_baby">To nie dziecko</string>
+    <string name="resume_alerts">Wznów alerty</string>
+    <string name="alerts_paused_until">Alerty wstrzymane do %s</string>
+    <string name="alarm_notif_title">%s: dźwięk nie ustaje</string>
+    <string name="alarm_notif_body">Nikt jeszcze nie zareagował na alert.</string>
+    <string name="alarm_banner_title">Alarm · %s</string>
+    <string name="alarm_banner_body">Dźwięk nie ustaje, a nikt jeszcze nie zareagował.</string>
+    <string name="pending_banner_title">Dźwięk: %s</string>
+    <string name="pending_banner_body">Jeśli dźwięk nie ustanie i nikt nie zareaguje, włączy się alarm.</string>
+    <string name="escalate_toggle">Narastający alarm</string>
+    <string name="escalate_hint">Jeśli dźwięk nie ustanie i nikt nie zareaguje na alert, włączy się alarm, coraz głośniejszy, także w trybie cichym.</string>
+    <string name="escalate_after">Alarm po</string>
+    <string name="escalate_needs_sound">Włącz alert dźwiękowy, aby korzystać z alarmu.</string>
+    <string name="channel_alarm">Alarm</string>
+    <string name="channel_alarm_desc">Dźwięk nie ustaje, a nikt nie zareagował na alert. Dzwoni, dopóki nie zareagujesz.</string>
+
+    <!-- Stan pokoju (product.md FR-SL-3) -->
+    <string name="room_awake_for">Nie śpi od %s</string>
+    <string name="room_quiet_for">Cisza od %s</string>
+    <string name="room_awake_brief">Nie śpi od niecałej minuty</string>
+    <string name="room_quiet_brief">Cisza od niecałej minuty</string>
+
+    <!-- Czas trwania -->
+    <plurals name="duration_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="few">%d min</item>
+        <item quantity="many">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%d godz.</item>
+        <item quantity="few">%d godz.</item>
+        <item quantity="many">%d godz.</item>
+        <item quantity="other">%d godz.</item>
+    </plurals>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <string name="duration_under_minute">poniżej 1 min</string>
+    <plurals name="duration_seconds_short">
+        <item quantity="one">%d s</item>
+        <item quantity="few">%d s</item>
+        <item quantity="many">%d s</item>
+        <item quantity="other">%d s</item>
+    </plurals>
+
+    <!-- Dziennik nocy (product.md FR-SL-4) -->
+    <string name="night_log">Dziennik nocy</string>
+    <string name="night_log_of">Dziennik nocy · %s</string>
+    <string name="night_of">Noc %s</string>
+    <plurals name="night_wake_ups">
+        <item quantity="one">%d pobudka</item>
+        <item quantity="few">%d pobudki</item>
+        <item quantity="many">%d pobudek</item>
+        <item quantity="other">%d pobudki</item>
+    </plurals>
+    <string name="night_longest_quiet">najdłuższa cisza %s</string>
+    <string name="night_entry">%1$s · %2$s</string>
+    <string name="night_going_on">trwa</string>
+    <string name="night_badge_alarm">Alarm</string>
+    <string name="night_badge_not_baby">To nie dziecko</string>
+    <string name="night_empty">Nie ma jeszcze pobudek. Pobudka jest zapisywana, gdy w pokoju jest głośno przez 10 sekund lub dłużej.</string>
+    <string name="night_footer">Przechowywane tylko na tym urządzeniu przez 30 dni. Nestwatch nasłuchuje dźwięku; cisza w pokoju nie oznacza, że dziecko śpi.</string>
+    <string name="night_clear">Wyczyść dziennik</string>
+    <string name="night_clear_confirm">Wyczyścić dziennik nocy: %s?</string>
+    <string name="night_clear_yes">Wyczyść</string>
+
+    <!-- Czas -->
+    <string name="ago_now">przed chwilą</string>
+    <string name="ago_minutes">%d min temu</string>
+    <string name="ago_hours">%d godz. temu</string>
+    <string name="ago_yesterday">wczoraj</string>
+    <plurals name="ago_days">
+        <item quantity="one">%d dzień temu</item>
+        <item quantity="few">%d dni temu</item>
+        <item quantity="many">%d dni temu</item>
+        <item quantity="other">%d dnia temu</item>
+    </plurals>
+    <string name="paired_seen">sparowano %1$s · ostatnio widziane %2$s</string>
+
+    <!-- Powiadomienia -->
+    <string name="channel_service">Czuwanie</string>
+    <string name="channel_service_desc">Widoczne, gdy to urządzenie jest stacją lub słucha.</string>
+    <string name="channel_sound">Alerty dźwiękowe</string>
+    <string name="channel_sound_desc">W cichym pokoju pojawia się dźwięk.</string>
+    <string name="channel_connection">Alerty połączenia</string>
+    <string name="channel_connection_desc">Stacja jest nieosiągalna lub znów działa.</string>
+    <string name="channel_battery">Alerty baterii</string>
+    <string name="channel_battery_desc">Kończy się bateria stacji.</string>
+    <string name="notif_station_title">Stacja Nestwatch słucha</string>
+    <string name="notif_station_starting">Uruchamianie…</string>
+    <string name="notif_listener_title">Nestwatch słucha</string>
+    <string name="notif_listener_idle">Nie śledzisz żadnej stacji</string>
+    <plurals name="notif_listener_text">
+        <item quantity="one">%1$d stacja · %2$d na żywo</item>
+        <item quantity="few">%1$d stacje · %2$d na żywo</item>
+        <item quantity="many">%1$d stacji · %2$d na żywo</item>
+        <item quantity="other">%1$d stacji · %2$d na żywo</item>
+    </plurals>
+</resources>

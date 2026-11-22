@@ -32,6 +32,7 @@ import org.nestwatch.android.core.pathLabel
 import org.nestwatch.android.service.ListenerService
 import org.nestwatch.android.ui.hasPermission
 import org.nestwatch.android.ui.notificationPermission
+import org.nestwatch.android.ui.rememberNow
 import org.nestwatch.android.ui.rememberPermissionAsk
 import org.nestwatch.android.ui.startListening
 import org.nestwatch.android.ui.components.Caption
@@ -92,10 +93,12 @@ fun ListenerHome(
             NestwatchCard { Text(stringResource(R.string.no_stations), color = nestwatch.text2) }
         }
         val solo = state?.solo
+        val now = rememberNow()
         stations.forEach { t ->
             StationTileView(
                 t,
                 solo = solo,
+                nowMs = now,
                 onSettings = { onStation(t.id) },
                 onCamera = { onCamera(t.id) },
             )
@@ -124,7 +127,7 @@ fun tileStatus(t: StationTile): Pair<String, PillKind> = when (val c = t.connect
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun StationTileView(t: StationTile, solo: String?, onSettings: () -> Unit, onCamera: () -> Unit) {
+private fun StationTileView(t: StationTile, solo: String?, nowMs: Long, onSettings: () -> Unit, onCamera: () -> Unit) {
     val context = LocalContext.current
     val (status, kind) = tileStatus(t)
     val live = t.connection is Connection.Live
@@ -135,16 +138,18 @@ private fun StationTileView(t: StationTile, solo: String?, onSettings: () -> Uni
         R.string.perm_mic_title,
         R.string.perm_mic_talk,
     ) { }
-    NestwatchCard(alert = sound) {
+    val name = t.name.ifBlank { stringResource(R.string.unnamed) }
+    NestwatchCard(alert = sound || t.alarm !is org.nestwatch.ffi.AlarmState.Off) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                t.name.ifBlank { stringResource(R.string.unnamed) },
+                name,
                 Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
                 color = nestwatch.text1,
             )
             Pill(status, kind)
         }
+        TileAlerts(t, name, nowMs)
         // Level meter with this listener's threshold mark.
         val levelText = t.levelDbfs?.let {
             stringResource(if (live) R.string.level_now else R.string.level_last, "${it.roundToInt()} dB")

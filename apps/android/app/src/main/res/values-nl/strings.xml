@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dutch (nl) translation of the English reference text (NFR-I18N-2). -->
+<resources>
+    <string name="app_name">Nestwatch</string>
+    <string name="promise">Een privé-babyfoon voor de toestellen die je al hebt. Alles blijft op je eigen netwerk.</string>
+    <string name="disclaimer">Nestwatch is geen medisch hulpmiddel en vervangt geen toezicht. Ga altijd zelf bij je kind kijken.</string>
+    <string name="role_station">Dit toestel waakt</string>
+    <string name="role_station_hint">Zet het in de kamer van je kind. Het luistert en toont op verzoek de camera.</string>
+    <string name="role_listener">Dit toestel luistert</string>
+    <string name="role_listener_hint">Volg hiervandaan een of meer kamers.</string>
+    <string name="disclaimer_ack">Door een rol te kiezen, bevestig je dat je dit gelezen hebt.</string>
+
+    <string name="close">Sluiten</string>
+    <string name="back">Terug</string>
+    <string name="cancel">Annuleren</string>
+    <string name="save">Opslaan</string>
+    <string name="settings">Instellingen</string>
+    <string name="about">Over Nestwatch</string>
+    <string name="theme">Thema</string>
+    <string name="theme_system">Systeem</string>
+    <string name="theme_night">Nacht</string>
+    <string name="theme_day">Dag</string>
+    <string name="unnamed">Naamloos toestel</string>
+    <string name="about_body">Nestwatch verbindt je eigen toestellen rechtstreeks, op je thuisnetwerk of je eigen VPN. Geen account, geen cloud en geen tracking. Audio en video zijn end-to-end versleuteld.</string>
+    <string name="version">Versie</string>
+    <string name="device_id">Toestel-ID</string>
+    <string name="license">Vrije software onder de GNU AGPL 3.0 of later. Broncode: https://github.com/jeroentrappers/nestwatch</string>
+    <string name="change_role">Rol wijzigen</string>
+    <string name="change_role_hint">Stopt wat dit toestel nu doet en toont opnieuw de rolkeuze.</string>
+
+    <!-- Permissions (security.md PRIV-4) -->
+    <string name="perm_mic_title">Microfoon</string>
+    <string name="perm_mic_station">Het babystation luistert naar de kamer zodat je ouderapparaten het kunnen horen. Audio gaat alleen naar toestellen die je gekoppeld hebt.</string>
+    <string name="perm_mic_talk">Terugpraten stuurt je stem naar het babystation zolang je de knop ingedrukt houdt.</string>
+    <string name="perm_camera_title">Camera</string>
+    <string name="perm_camera_station">Sta de camera toe zodat een gekoppeld ouderapparaat op verzoek live kan meekijken. Anders staat de camera uit, en dit scherm toont wanneer hij aan staat.</string>
+    <string name="perm_camera_scan">De camera wordt gebruikt om de QR-code voor het koppelen op het babystation te scannen. Er wordt niets opgenomen.</string>
+    <string name="perm_notifications_title">Meldingen</string>
+    <string name="perm_notifications">Nestwatch waarschuwt je als het luid wordt in een kamer, een babystation onbereikbaar wordt of de batterij bijna leeg is.</string>
+    <string name="perm_continue">Doorgaan</string>
+    <string name="perm_not_now">Niet nu</string>
+    <string name="perm_denied_mic">Zonder microfoon kan het babystation niet luisteren. Je kunt hem toestaan in de systeeminstellingen.</string>
+    <string name="open_settings">Instellingen openen</string>
+
+    <!-- Battery optimisation (platforms.md §2.2) -->
+    <string name="battery_title">Laat Nestwatch actief</string>
+    <string name="battery_body">Android kan apps pauzeren om batterij te sparen, waardoor het luisteren stopt als het scherm uit is. Laat Nestwatch de batterijoptimalisatie negeren zodat het blijft werken.</string>
+    <string name="battery_allow">Toestaan</string>
+    <string name="battery_dismiss">Niet nu</string>
+
+    <!-- Station -->
+    <string name="station_starting">Babystation starten…</string>
+    <string name="station_failed">Het babystation kon niet starten</string>
+    <string name="retry">Opnieuw proberen</string>
+    <string name="station_stopped">Het babystation is niet actief.</string>
+    <string name="station_start">Babystation starten</string>
+    <string name="station_stop">Babystation stoppen</string>
+    <string name="pair_listener">Ouderapparaat koppelen</string>
+    <string name="dim_screen">Scherm dimmen</string>
+    <string name="tap_to_brighten">Tik ergens om op te lichten</string>
+    <string name="dimmed_label">Scherm gedimd. Het luisteren gaat door. Activeer om op te lichten.</string>
+    <string name="no_listeners">Er luistert nog niemand.</string>
+    <string name="listeners_heading">Luistert nu</string>
+    <string name="mode_sound_activated">geluidsactivatie</string>
+    <string name="mode_always_on">altijd aan</string>
+    <string name="via_browser">browser</string>
+    <string name="hearing">hoort de kamer</string>
+    <string name="talking_now">praat</string>
+    <string name="watching_now">camera</string>
+    <string name="ring_quiet">stil</string>
+    <string name="ring_sound">geluid</string>
+    <string name="db">dB</string>
+    <string name="ring_label">Geluidsniveau kamer</string>
+    <string name="camera_on">Camera aan</string>
+    <string name="camera_off">Camera uit</string>
+    <string name="talk_off">Terugpraten uit</string>
+    <string name="nobody_listening">Niemand luistert</string>
+    <plurals name="listening_count">
+        <item quantity="one">%d luistert</item>
+        <item quantity="other">%d luisteren</item>
+    </plurals>
+    <string name="talking_through">%s praat</string>
+    <string name="station_keeps_running">Het babystation blijft actief met het scherm uit. Als je het hier stopt, stopt het luisteren.</string>
+    <string name="station_settings">Instellingen babystation</string>
+    <string name="station_name">Naam babystation</string>
+    <string name="camera_allowed">Camera toestaan</string>
+    <string name="talk_allowed">Terugpraten toestaan</string>
+    <string name="mic_sensitivity">Microfoongevoeligheid</string>
+    <string name="gain_auto">Auto</string>
+    <string name="talkback_volume">Volume terugpraten</string>
+    <string name="trusted_listeners">Gekoppelde ouderapparaten</string>
+    <string name="no_trusted">Er is nog geen ouderapparaat gekoppeld.</string>
+    <string name="revoke">Verwijderen</string>
+    <string name="revoke_confirm">%s verwijderen? Het moet dan opnieuw koppelen.</string>
+    <string name="camera_unavailable_here">Geen camera gevonden</string>
+    <string name="camera_denied_here">Cameratoestemming geweigerd</string>
+    <string name="battery_here">Batterij %d%%</string>
+    <string name="addresses">Adressen</string>
+
+    <!-- Pairing sheet -->
+    <string name="pair_intro">Scan met de Nestwatch-app op het ouderapparaat.</string>
+    <string name="pair_code_intro">Geen camera? Voer deze code in</string>
+    <string name="pair_station_id">Babystation-ID</string>
+    <string name="qr_label">QR-code om te koppelen</string>
+    <string name="pair_opening">Koppelen openen…</string>
+    <string name="pair_closed">Koppelen is gesloten.</string>
+    <string name="pair_just_paired">Nu gekoppeld. Controleer of het ouderapparaat hetzelfde nummer toont:</string>
+    <string name="pair_open_for">Open voor %1$s · %2$s</string>
+    <plurals name="pair_devices_left">
+        <item quantity="one">nog 1 toestel</item>
+        <item quantity="other">tot %d toestellen</item>
+    </plurals>
+    <string name="pair_close">Koppelen sluiten</string>
+
+    <!-- Add a station -->
+    <string name="add_station">Babystation toevoegen</string>
+    <string name="scan_qr">QR-code scannen</string>
+    <string name="scan_hint">Richt de camera op de QR-code op het babystation.</string>
+    <string name="scan_not_nestwatch">Die QR-code is geen Nestwatch-uitnodiging.</string>
+    <string name="no_camera_scan">Dit toestel heeft geen camera. Plak de uitnodigingslink of voer de code in.</string>
+    <string name="perm_denied_camera">Cameratoegang staat uit voor Nestwatch. Je kunt het toestaan in Instellingen.</string>
+    <string name="nearby">In de buurt</string>
+    <string name="nearby_searching">Babystations zoeken op dit netwerk…</string>
+    <string name="pairing_open">koppelen open</string>
+    <string name="already_paired">al gekoppeld</string>
+    <string name="not_pairing">koppelen gesloten</string>
+    <string name="invite_field">Uitnodigingslink</string>
+    <string name="invite_hint">Plak de nestwatch://-link die op het babystation staat.</string>
+    <string name="invite_submit">Koppelen met link</string>
+    <string name="code_field">Koppelcode</string>
+    <string name="code_field_for">Koppelcode op %s</string>
+    <string name="code_submit">Koppelen met code</string>
+    <string name="station_id_field">Babystation-ID (onder de code)</string>
+    <string name="address_field">Adres babystation (optioneel, voor VPN)</string>
+    <string name="address_hint">Bijvoorbeeld nursery.tailnet.ts.net:47100 of 100.101.102.103:47100.</string>
+    <string name="pairing">Koppelen…</string>
+    <string name="verify_prompt">Controleer of het babystation hetzelfde nummer toont</string>
+    <string name="verify_same">Hetzelfde, doorgaan</string>
+    <string name="verify_different">Anders</string>
+    <string name="verify_removed">Het babystation is weer verwijderd. Koppel opnieuw, dicht bij het babystation.</string>
+    <string name="by_code">Code gebruiken</string>
+    <string name="by_link">Link gebruiken</string>
+    <string name="err_invalid_invite">Die link is geen Nestwatch-uitnodiging.</string>
+    <string name="err_invalid_code">Die code is niet geldig. Ze heeft 10 letters en cijfers.</string>
+    <string name="err_invalid_id">Dat babystation-ID is niet geldig.</string>
+    <string name="err_invalid_address">Dat adres is niet geldig. Gebruik host:port.</string>
+    <string name="err_unreachable">Het babystation is niet bereikbaar. Staat het aan en op hetzelfde netwerk?</string>
+    <string name="err_refused">Het babystation koppelt nu niet. Open koppelen op het babystation.</string>
+    <string name="err_rejected">Koppelen mislukt. De code is misschien fout of de uitnodiging is verlopen.</string>
+    <string name="err_too_many">Je volgt al 8 babystations.</string>
+    <string name="err_not_connected">Het babystation is niet verbonden.</string>
+    <string name="err_generic">Er ging iets mis.</string>
+
+    <!-- Listener home -->
+    <string name="no_stations">Nog geen babystations. Voeg het babystation in de kamer van je kind toe om te beginnen met luisteren.</string>
+    <string name="keeps_listening">Nestwatch blijft luisteren met het scherm uit.</string>
+    <string name="status_quiet">Stil</string>
+    <string name="status_sound">Geluid</string>
+    <string name="status_live">Luisteren</string>
+    <string name="status_connecting">Verbinden</string>
+    <string name="status_reconnecting">Opnieuw verbinden</string>
+    <string name="status_paused">Gepauzeerd</string>
+    <string name="status_needs_pairing">Opnieuw koppelen</string>
+    <string name="status_talking">%s praat</string>
+    <string name="status_you_talk">Je praat</string>
+    <string name="path_lan">thuisnetwerk</string>
+    <string name="path_vpn">via VPN</string>
+    <string name="path_direct">rechtstreeks (internet)</string>
+    <string name="path_relayed">via relayserver</string>
+
+    <!-- Relay (rendezvous.md FR-RV-1, §7) -->
+    <string name="relay_title">Bereikbaar via een relayserver</string>
+    <string name="relay_server_is">Server: %1$s</string>
+    <string name="relay_explain">Als de Wi-Fi thuis of een VPN dit babystation niet bereikt, kunnen ouderapparaten verbinden via een relayserver. Alles blijft end-to-end versleuteld tussen je eigen toestellen.</string>
+    <string name="relay_can_see">Wat de server kan zien: dat dit babystation online is, zijn publieke IP-adres, welke adressen er wanneer mee verbinden en hoeveel data er stroomt.</string>
+    <string name="relay_cannot_see">Wat hij niet kan zien: audio, video, berichten, toestelnamen, koppelcodes of sleutels.</string>
+    <string name="relay_server">Serveradres</string>
+    <string name="relay_server_hint">Bijvoorbeeld https://nestwatch.appmire.be of je eigen server</string>
+    <string name="relay_server_invalid">Dat is geen serveradres (https://host of https://host:port).</string>
+    <string name="relay_pill">Relay: %1$s</string>
+    <string name="relay_status_off">Uit</string>
+    <string name="relay_status_connecting">Verbinden</string>
+    <string name="relay_status_online">Online</string>
+    <string name="relay_status_error">Niet bereikbaar</string>
+    <string name="relay_reset">Relay-identiteit resetten</string>
+    <string name="relay_reset_confirm">Een nieuwe relay-identiteit maken? Ouderapparaten die de relayserver gebruiken, hebben dan een nieuwe uitnodiging van dit babystation nodig.</string>
+    <string name="relay_reset_do">Resetten</string>
+    <string name="relay_setup_title">De relayserver gebruiken?</string>
+    <string name="relay_setup_yes">Bereikbaar maken</string>
+    <string name="relay_setup_no">Niet nu</string>
+    <string name="relay_setup_later">Je kunt dit later wijzigen in de instellingen.</string>
+    <string name="trying">proberen…</string>
+    <plurals name="trying_addresses">
+        <item quantity="one">1 adres proberen…</item>
+        <item quantity="other">%d adressen proberen…</item>
+    </plurals>
+    <string name="attempt">poging %d</string>
+    <string name="needs_pairing_hint">Dit babystation heeft dit toestel verwijderd. Koppel opnieuw om te luisteren.</string>
+    <string name="paused_hint">Je luistert niet naar dit babystation.</string>
+    <string name="resume">Hervatten</string>
+    <string name="level_now">nu %s</string>
+    <string name="level_last">laatst %s</string>
+    <string name="opens_above">opent boven %s</string>
+    <string name="no_level">nog geen niveau</string>
+    <string name="battery">Batterij %d%%</string>
+    <string name="battery_charging">Batterij %d%%, laadt op</string>
+    <string name="mute">Dempen</string>
+    <string name="unmute">Geluid aan</string>
+    <string name="solo">Solo</string>
+    <string name="unsolo">Alles horen</string>
+    <string name="camera">Camera</string>
+    <string name="hold_to_talk">Ingedrukt houden om te praten</string>
+    <string name="talking">Je praat… loslaten om te stoppen</string>
+    <string name="talk_wait">Luidspreker verbinden…</string>
+    <string name="talk_busy">%s praat</string>
+    <string name="talk_busy_someone">Iemand anders praat</string>
+    <string name="talk_disabled">Terugpraten staat uit op het babystation</string>
+    <string name="talk_state_on">praat</string>
+    <string name="talk_state_off">praat niet</string>
+    <string name="station_settings_of">Instellingen voor %s</string>
+
+    <!-- Per-station settings (listener) -->
+    <string name="listen_mode">Luistermodus</string>
+    <string name="mode_always">Altijd aan</string>
+    <string name="mode_sound">Bij geluid</string>
+    <string name="calibrate_hint">De lijn toont het geluidsniveau in de kamer van de laatste minuut. Sleep de drempel net boven het stille deel.</string>
+    <string name="calibrate_continuous">De lijn toont het geluidsniveau in de kamer van de laatste minuut. In deze modus telt de drempel alleen voor meldingen.</string>
+    <string name="threshold">Geluidsdrempel</string>
+    <string name="threshold_value">%d dB</string>
+    <string name="hold_time">Blijven luisteren na geluid</string>
+    <plurals name="seconds">
+        <item quantity="one">1 seconde</item>
+        <item quantity="other">%d seconden</item>
+    </plurals>
+    <string name="volume">Volume</string>
+    <string name="percent">%d%%</string>
+    <string name="alert_sound_toggle">Melding bij geluid</string>
+    <string name="alert_unreachable_toggle">Melding als onbereikbaar</string>
+    <string name="alert_battery_toggle">Melding bij lage batterij</string>
+    <string name="add_address">Adres toevoegen</string>
+    <string name="address_added">Adres toegevoegd.</string>
+    <string name="pause">Stoppen met luisteren</string>
+    <string name="forget">Dit babystation vergeten</string>
+    <string name="forget_confirm">Vergeten? Je moet dan opnieuw koppelen.</string>
+    <string name="forget_yes">Vergeten</string>
+    <string name="connected_via">Verbonden via %s</string>
+
+    <!-- Camera view -->
+    <string name="camera_of">Camera · %s</string>
+    <string name="camera_live">Camera live</string>
+    <string name="camera_starting">Camera starten…</string>
+    <string name="camera_disabled">De camera staat uit op het babystation.</string>
+    <string name="camera_unavailable">Het babystation heeft geen camera beschikbaar.</string>
+    <string name="camera_denied">De cameratoestemming van het babystation is geweigerd.</string>
+    <string name="camera_stopped">De camera is gestopt.</string>
+    <string name="night_image">Nachtbeeld</string>
+    <string name="switch_camera">Camera wisselen</string>
+    <string name="camera_alt">Live camerabeeld van %s</string>
+    <string name="frame_info">%1$d×%2$d · %3$d fps</string>
+
+    <!-- Alerts -->
+    <string name="alert_sound">Geluid in %s</string>
+    <string name="alert_unreachable">%s is onbereikbaar</string>
+    <string name="alert_reachable">%s is terug</string>
+    <string name="alert_battery">%1$s: batterij bijna leeg (%2$d%%)</string>
+    <string name="alert_body">Open Nestwatch om te luisteren.</string>
+
+    <!-- Escalating alarm, Not the baby (product.md FR-AL-5..7) -->
+    <string name="action_on_it">Ik ga al</string>
+    <string name="action_not_baby">Niet de baby</string>
+    <string name="resume_alerts">Meldingen hervatten</string>
+    <string name="alerts_paused_until">Meldingen gepauzeerd tot %s</string>
+    <string name="alarm_notif_title">%s: het geluid houdt aan</string>
+    <string name="alarm_notif_body">Nog niemand heeft op de melding gereageerd.</string>
+    <string name="alarm_banner_title">Alarm · %s</string>
+    <string name="alarm_banner_body">Het geluid houdt aan en nog niemand heeft gereageerd.</string>
+    <string name="pending_banner_title">Geluid in %s</string>
+    <string name="pending_banner_body">Als het geluid aanhoudt en niemand reageert, gaat er een alarm af.</string>
+    <string name="escalate_toggle">Oplopend alarm</string>
+    <string name="escalate_hint">Als het geluid aanhoudt en niemand op de melding reageert, gaat er een alarm af, steeds luider, ook in de stille modus.</string>
+    <string name="escalate_after">Alarm na</string>
+    <string name="escalate_needs_sound">Zet de melding bij geluid aan om het alarm te gebruiken.</string>
+    <string name="channel_alarm">Alarm</string>
+    <string name="channel_alarm_desc">Het geluid houdt aan en niemand heeft op de melding gereageerd. Gaat af tot je reageert.</string>
+
+    <!-- Room status (product.md FR-SL-3) -->
+    <string name="room_awake_for">Al %s wakker</string>
+    <string name="room_quiet_for">Al %s stil</string>
+    <string name="room_awake_brief">Minder dan een minuut wakker</string>
+    <string name="room_quiet_brief">Minder dan een minuut stil</string>
+
+    <!-- Durations -->
+    <plurals name="duration_minutes">
+        <item quantity="one">%d min</item>
+        <item quantity="other">%d min</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%d u</item>
+        <item quantity="other">%d u</item>
+    </plurals>
+    <string name="duration_hours_minutes">%1$s %2$s</string>
+    <string name="duration_under_minute">minder dan 1 min</string>
+    <plurals name="duration_seconds_short">
+        <item quantity="one">%d s</item>
+        <item quantity="other">%d s</item>
+    </plurals>
+
+    <!-- Night log (product.md FR-SL-4) -->
+    <string name="night_log">Nachtlogboek</string>
+    <string name="night_log_of">Nachtlogboek · %s</string>
+    <string name="night_of">Nacht van %s</string>
+    <plurals name="night_wake_ups">
+        <item quantity="one">%d keer wakker</item>
+        <item quantity="other">%d keer wakker</item>
+    </plurals>
+    <string name="night_longest_quiet">langst stil %s</string>
+    <string name="night_entry">%1$s · %2$s</string>
+    <string name="night_going_on">nog bezig</string>
+    <string name="night_badge_alarm">Alarm</string>
+    <string name="night_badge_not_baby">Niet de baby</string>
+    <string name="night_empty">Nog geen keer wakker. Dat wordt genoteerd als het 10 seconden of langer luid is in de kamer.</string>
+    <string name="night_footer">Alleen op dit toestel bewaard, 30 dagen lang. Nestwatch luistert naar geluid; een stille kamer betekent niet dat je kind slaapt.</string>
+    <string name="night_clear">Logboek wissen</string>
+    <string name="night_clear_confirm">Het nachtlogboek van %s wissen?</string>
+    <string name="night_clear_yes">Wissen</string>
+
+    <!-- Time -->
+    <string name="ago_now">zonet</string>
+    <string name="ago_minutes">%d min geleden</string>
+    <string name="ago_hours">%d u geleden</string>
+    <string name="ago_yesterday">gisteren</string>
+    <plurals name="ago_days">
+        <item quantity="one">%d dag geleden</item>
+        <item quantity="other">%d dagen geleden</item>
+    </plurals>
+    <string name="paired_seen">gekoppeld %1$s · laatst gezien %2$s</string>
+
+    <!-- Notifications -->
+    <string name="channel_service">Luisteren</string>
+    <string name="channel_service_desc">Getoond zolang dit toestel een babystation is of luistert.</string>
+    <string name="channel_sound">Geluidsmeldingen</string>
+    <string name="channel_sound_desc">Een stille kamer begint geluid te maken.</string>
+    <string name="channel_connection">Verbindingsmeldingen</string>
+    <string name="channel_connection_desc">Een babystation is onbereikbaar of weer terug.</string>
+    <string name="channel_battery">Batterijmeldingen</string>
+    <string name="channel_battery_desc">De batterij van een babystation raakt bijna leeg.</string>
+    <string name="notif_station_title">Nestwatch-babystation luistert</string>
+    <string name="notif_station_starting">Starten…</string>
+    <string name="notif_listener_title">Nestwatch luistert</string>
+    <string name="notif_listener_idle">Geen babystation gevolgd</string>
+    <plurals name="notif_listener_text">
+        <item quantity="one">%1$d babystation · %2$d live</item>
+        <item quantity="other">%1$d babystations · %2$d live</item>
+    </plurals>
+</resources>

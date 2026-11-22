@@ -40,6 +40,7 @@ import org.nestwatch.android.ui.screens.AddStationScreen
 import org.nestwatch.android.ui.screens.CameraScreen
 import org.nestwatch.android.ui.screens.ListenerHome
 import org.nestwatch.android.ui.screens.ListenerStationSettings
+import org.nestwatch.android.ui.screens.NightLogScreen
 import org.nestwatch.android.ui.screens.StationHome
 import org.nestwatch.android.ui.screens.StationSettingsScreen
 import org.nestwatch.android.ui.screens.WelcomeScreen
@@ -54,6 +55,7 @@ sealed interface Screen {
     data object StationSettings : Screen
     data object Listener : Screen
     data class StationPrefs(val id: String) : Screen
+    data class NightLog(val id: String) : Screen
     data class Camera(val id: String) : Screen
     data class AddStation(val invite: String? = null) : Screen
     data object About : Screen
@@ -270,7 +272,12 @@ fun NestwatchRoot(activity: MainActivity) {
                         nav.reset(Screen.Welcome)
                     },
                 )
-                is Screen.StationPrefs -> ListenerStationSettings(s.id, onBack = { nav.pop() })
+                is Screen.StationPrefs -> ListenerStationSettings(
+                    s.id,
+                    onBack = { nav.pop() },
+                    onNightLog = { nav.push(Screen.NightLog(s.id)) },
+                )
+                is Screen.NightLog -> NightLogScreen(s.id, onBack = { nav.pop() })
                 is Screen.Camera -> CameraScreen(s.id, onBack = { nav.pop() })
                 is Screen.AddStation -> AddStationScreen(s.invite, onDone = { nav.pop() })
                 Screen.About -> AboutScreen(onBack = { nav.pop() })

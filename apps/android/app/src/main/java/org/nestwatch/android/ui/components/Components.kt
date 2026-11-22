@@ -77,7 +77,7 @@ enum class PillKind { Calm, Sound, Warn, Voice, Cam, Neutral }
 
 /** A status pill: always a word and a dot, never colour alone (NFR-A11Y-1). */
 @Composable
-fun Pill(text: String, kind: PillKind, modifier: Modifier = Modifier) {
+fun Pill(text: String, kind: PillKind, modifier: Modifier = Modifier, pulse: Boolean = kind == PillKind.Sound) {
     val c = nestwatch
     val (fg, bg) = when (kind) {
         PillKind.Calm -> c.sage to c.sageSoft
@@ -87,7 +87,7 @@ fun Pill(text: String, kind: PillKind, modifier: Modifier = Modifier) {
         PillKind.Cam -> c.honey to c.honeySoft
         PillKind.Neutral -> c.text2 to c.ink2
     }
-    val alpha = if (kind == PillKind.Sound) {
+    val alpha = if (pulse) {
         val t = rememberInfiniteTransition(label = "pulse")
         val a by t.animateFloat(0.35f, 1f, infiniteRepeatable(tween(600), RepeatMode.Reverse), label = "pulse")
         a
