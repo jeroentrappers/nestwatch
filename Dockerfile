@@ -20,12 +20,12 @@ RUN apt-get update \
 WORKDIR /src
 # wasm-bindgen-cli must match the wasm-bindgen version in Cargo.lock.
 COPY Cargo.lock ./
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
+RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     v=$(awk '$0 == "name = \"wasm-bindgen\"" { getline; gsub(/"/, "", $3); print $3; exit }' Cargo.lock) \
  && cargo install --locked wasm-bindgen-cli --version "$v"
 COPY . .
 # Use the image's toolchain rather than letting rust-toolchain.toml fetch one.
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
+RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/src/target,id=nestwatch-web-target \
     export RUSTUP_TOOLCHAIN=$(rustup default | cut -d' ' -f1) \
  && sh apps/web/build.sh /out/app \
@@ -35,7 +35,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
 FROM ${RUST_IMAGE} AS server
 WORKDIR /src
 COPY . .
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
+RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
     --mount=type=cache,target=/src/target,id=nestwatch-server-target-$TARGETARCH \
     export RUSTUP_TOOLCHAIN=$(rustup default | cut -d' ' -f1) \
  && CARGO_PROFILE_RELEASE_STRIP=symbols cargo build --release --locked -p nestwatch-server \
