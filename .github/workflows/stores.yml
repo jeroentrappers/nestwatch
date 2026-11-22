@@ -198,6 +198,10 @@ jobs:
       AUTOMATIC_RELEASE: ${{ vars.IOS_AUTOMATIC_RELEASE || 'false' }}
       FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "30"
       FASTLANE_XCODEBUILD_SETTINGS_RETRIES: "6"
+      # Also for tags whose Fastfile predates these options (relative to apps/ios).
+      GYM_ARCHIVE_PATH: build/Nestwatch.xcarchive
+      GYM_DERIVED_DATA_PATH: build/DerivedData
+      SCAN_DERIVED_DATA_PATH: build/DerivedData
     steps:
       # Only local paths: the runner service has no access to mini4's external
       # NVMe volume (macOS privacy), so no login shell (its PATH reaches into
