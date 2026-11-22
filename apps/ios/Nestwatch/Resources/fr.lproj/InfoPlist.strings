@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Permission texts of Info.plist (French). */
+
+"NSCameraUsageDescription" = "La station bébé montre sa caméra à un appareil parent associé sur demande, et l'appareil parent scanne le code QR d'association de la station bébé. Rien n'est enregistré.";
+"NSLocalNetworkUsageDescription" = "Nestwatch trouve vos propres stations bébé et appareils d'écoute sur votre réseau domestique et s'y connecte.";
+"NSMicrophoneUsageDescription" = "La station bébé écoute la pièce pour que vos appareils parents associés l'entendent, et « parler au bébé » envoie votre voix à la station bébé tant que vous maintenez le bouton.";

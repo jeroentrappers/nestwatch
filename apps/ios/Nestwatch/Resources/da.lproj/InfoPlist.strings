@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Tilladelsestekster fra Info.plist. */
+
+"NSCameraUsageDescription" = "Babystationen viser sit kamera til en parret forælderenhed, når den beder om det, og forælderenheden scanner babystationens QR-kode til parring. Intet bliver optaget.";
+"NSLocalNetworkUsageDescription" = "Nestwatch finder og forbinder til din egen babystation og dine forælderenheder på dit hjemmenetværk.";
+"NSMicrophoneUsageDescription" = "Babystationen lytter til værelset, så dine parrede forælderenheder kan høre det, og tal tilbage sender din stemme til babystationen, mens du holder knappen nede.";

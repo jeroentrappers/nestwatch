@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Permission texts of Info.plist (Swedish). */
+
+"NSCameraUsageDescription" = "Babystationen visar sin kamera för en parkopplad föräldraenhet på begäran, och föräldraenheten skannar babystationens QR-kod för parkoppling. Inget spelas in.";
+"NSLocalNetworkUsageDescription" = "Nestwatch hittar och ansluter till dina egna babystationer och lyssnande enheter i ditt hemnätverk.";
+"NSMicrophoneUsageDescription" = "Babystationen lyssnar på rummet så att dina parkopplade föräldraenheter kan höra det, och prata tillbaka skickar din röst till babystationen medan du håller in knappen.";

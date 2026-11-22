@@ -14,8 +14,11 @@ struct ListenerHome: View {
     @State private var menu = false
 
     var body: some View {
-        let stations = model.listenerState?.stations ?? []
-        Page(wide ? tr("all_stations") : tr("app_name"), back: false, maxWidth: wide ? 1200 : 760) {
+        var stations = model.listenerState?.stations ?? []
+        #if DEBUG
+        if let sample = debugTiles() { stations = sample }
+        #endif
+        return Page(wide ? tr("all_stations") : tr("app_name"), back: false, maxWidth: wide ? 1200 : 760) {
             if !wide {
                 IconButton("info.circle", label: tr("about")) { nav.push(.about) }
                 IconButton("gearshape", label: tr("settings")) { menu.toggle() }
@@ -132,6 +135,9 @@ struct StationTileView: View {
                 Spacer()
                 Pill(text: status.text, kind: status.kind)
             }
+            alertBanner
+            if live { roomLine }
+            pausedNotice
             let levelText = t.levelDbfs.map { tr(live ? "level_now" : "level_last", "\(Int($0.rounded())) dB") } ?? tr("no_level")
             LevelMeter(levelDb: live ? t.levelDbfs : nil, thresholdDb: activated ? thr : nil, sound: sound)
                 .accessibilityElement()
@@ -175,6 +181,56 @@ struct StationTileView: View {
             Text(tr("perm_mic_talk"))
         }
     }
+
+    private var displayName: String { t.name.isEmpty ? tr("unnamed") : t.name }
+
+    /// Sound alert nobody answered yet, or the alarm (FR-AL-5..7). Seeing it
+    /// does not acknowledge; only its buttons do.
+    @ViewBuilder private var alertBanner: some View {
+        switch t.alarm {
+        case .off:
+            EmptyView()
+        case .pending:
+            AlertBanner(ringing: false, title: tr("alert_sound", displayName), onAck: acknowledge, onNotTheBaby: notTheBaby)
+        case .ringing:
+            AlertBanner(ringing: true, title: tr("alarm_banner", displayName), detail: tr("alarm_banner_body"), onAck: acknowledge, onNotTheBaby: notTheBaby)
+        }
+    }
+
+    /// "Awake for 4 min" / "Quiet for 1 hr, 20 min" (FR-SL-3), with
+    /// "Not the baby" while awake (FR-AL-7).
+    private var roomLine: some View {
+        TimelineView(.periodic(from: .now, by: 20)) { ctx in
+            let now = UInt64(ctx.date.timeIntervalSince1970 * 1000)
+            if let text = roomText(t.room, nowMs: now) {
+                let awake: Bool = { if case .awake = t.room { return true }; return false }()
+                HStack(spacing: 8) {
+                    Circle().fill(awake ? c.coral : c.sage).frame(width: 8, height: 8).accessibilityHidden(true)
+                    Text(text).font(NWFont.body).foregroundColor(c.text1)
+                    Spacer(minLength: 8)
+                    if awake, case .off = t.alarm {
+                        LinkButton(tr("not_the_baby"), color: c.lavender, action: notTheBaby)
+                    }
+                }
+            }
+        }
+    }
+
+    /// "Alerts paused until 03:40" with "Resume alerts" (FR-AL-7).
+    @ViewBuilder private var pausedNotice: some View {
+        if let until = t.pausedUntilUnixMs {
+            HStack(spacing: 8) {
+                Image(systemName: "bell.slash").foregroundColor(c.amber).accessibilityHidden(true)
+                Text(tr("alerts_paused_until", timeText(unixMs: until))).font(NWFont.bodySmall).foregroundColor(c.amber)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 8)
+                LinkButton(tr("resume_alerts"), color: c.lavender) { model.withListener { try $0.resumeAlerts(stationId: t.id) } }
+            }
+        }
+    }
+
+    private func acknowledge() { ListenerHost.shared.acknowledge(t.id) }
+    private func notTheBaby() { ListenerHost.shared.notTheBaby(t.id) }
 
     private func details(levelText: String, thr: Float, activated: Bool) -> String {
         var bits = [levelText, activated ? tr("opens_above", "\(Int(thr.rounded())) dB") : tr("mode_always_on")]
@@ -236,6 +292,7 @@ struct ListenerStationSettings: View {
         let activated = listen.mode == .activated
         let _ = model.historyVersion
         return Page(tr("station_settings_of", t.name)) {
+            SecondaryButton(tr("night_log")) { nav.push(.nightLog(id)) }
             Card {
                 SectionTitle(tr("listen_mode"))
                 Segmented(options: [(ListenMode.activated, tr("mode_sound")), (.continuous, tr("mode_always"))], selected: listen.mode) { m in
@@ -281,9 +338,18 @@ struct ListenerStationSettings: View {
                 .accessibilityLabel(Text(tr("volume")))
                 SwitchRow(label: tr("mute"), isOn: t.prefs.muted) { m in model.withListener { try $0.setMuted(stationId: id, muted: m) } }
                 let a = t.prefs.alerts
-                SwitchRow(label: tr("alert_sound_toggle"), isOn: a.sound) { v in setAlerts(AlertSettings(sound: v, unreachable: a.unreachable, battery: a.battery)) }
-                SwitchRow(label: tr("alert_unreachable_toggle"), isOn: a.unreachable) { v in setAlerts(AlertSettings(sound: a.sound, unreachable: v, battery: a.battery)) }
-                SwitchRow(label: tr("alert_battery_toggle"), isOn: a.battery) { v in setAlerts(AlertSettings(sound: a.sound, unreachable: a.unreachable, battery: v)) }
+                SwitchRow(label: tr("alert_sound_toggle"), isOn: a.sound) { v in setAlerts(a) { $0.sound = v } }
+                SwitchRow(label: tr("escalate_toggle"), isOn: a.escalate, enabled: a.sound) { v in setAlerts(a) { $0.escalate = v } }
+                Caption(tr("escalate_hint"))
+                let escalating = a.sound && a.escalate
+                Text(tr("escalate_after")).font(NWFont.body).foregroundColor(escalating ? c.text1 : c.text3)
+                let after = escalateChoices.min { abs(Int($0) - Int(a.escalateAfterS)) < abs(Int($1) - Int(a.escalateAfterS)) } ?? 60
+                Segmented(options: escalateChoices.map { ($0, shortDurationText(seconds: Int($0))) }, selected: after, enabled: escalating) { s in
+                    setAlerts(a) { $0.escalateAfterS = s }
+                }
+                .accessibilityLabel(Text(tr("escalate_after")))
+                SwitchRow(label: tr("alert_unreachable_toggle"), isOn: a.unreachable) { v in setAlerts(a) { $0.unreachable = v } }
+                SwitchRow(label: tr("alert_battery_toggle"), isOn: a.battery) { v in setAlerts(a) { $0.battery = v } }
                 Caption(tr("alert_time_sensitive"))
             }
             Card {
@@ -331,7 +397,37 @@ struct ListenerStationSettings: View {
         }
     }
 
-    private func setAlerts(_ a: AlertSettings) {
+    private func setAlerts(_ current: AlertSettings, _ f: (inout AlertSettings) -> Void) {
+        var a = current
+        f(&a)
         model.withListener { try $0.setAlerts(stationId: id, alerts: a) }
     }
 }
+
+#if DEBUG
+/// `NESTWATCH_DEBUG_TILES=1`: sample tiles (ringing alarm, pending alert,
+/// paused, quiet) for screenshots without stations (debug builds only).
+func debugTiles() -> [StationTile]? {
+    guard ProcessInfo.processInfo.environment["NESTWATCH_DEBUG_TILES"] != nil else { return nil }
+    let now = nowUnixMs()
+    func tile(_ id: String, _ name: String, room: RoomStatus, alarm: AlarmState, paused: UInt64? = nil, level: Float) -> StationTile {
+        StationTile(
+            id: id, name: name, connection: .live, path: .lan, route: nil, levelDbfs: level, open: level > -50,
+            battery: 82, charging: false, stationListeners: 1, cameraOn: false, talker: nil, talk: .idle,
+            video: .off, rttMs: 12, canTalk: true, canVideo: true,
+            prefs: StationPrefs(
+                listen: ListenSettingsInfo(mode: .activated, thresholdDbfs: -50, holdMs: 8_000, prerollMs: 1_000),
+                volume: 1, muted: false,
+                alerts: AlertSettings(sound: true, unreachable: true, battery: true, escalate: true, escalateAfterS: 60),
+                follow: true
+            ),
+            audioFrames: 0, room: room, alarm: alarm, pausedUntilUnixMs: paused, logRevision: 0
+        )
+    }
+    return [
+        tile("debug-1", "Nursery", room: .awake(sinceUnixMs: now - 4 * 60_000), alarm: .ringing(sinceUnixMs: now - 20_000), level: -31),
+        tile("debug-2", "Playroom", room: .awake(sinceUnixMs: now - 50_000), alarm: .pending(sinceUnixMs: now - 30_000), level: -38),
+        tile("debug-3", "Guest room", room: .quiet(sinceUnixMs: now - 80 * 60_000), alarm: .off, paused: now + 9 * 60_000, level: -72),
+    ]
+}
+#endif

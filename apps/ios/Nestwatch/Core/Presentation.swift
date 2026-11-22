@@ -86,3 +86,63 @@ func errorText(_ e: Error, invalid: String = "err_generic") -> String {
     default: return tr("err_generic")
     }
 }
+
+/// The room status line of a live tile (FR-SL-3): "Awake for 4 min",
+/// "Quiet for 1 hr, 20 min"; nil while unknown.
+func roomText(_ room: RoomStatus, nowMs: UInt64 = nowUnixMs()) -> String? {
+    switch room {
+    case .unknown: return nil
+    case let .awake(since): return tr("room_awake", durationText(ms: nowMs > since ? nowMs - since : 0))
+    case let .quiet(since): return tr("room_quiet", durationText(ms: nowMs > since ? nowMs - since : 0))
+    }
+}
+
+/// The alarm choices of FR-AL-5, in seconds.
+let escalateChoices: [UInt16] = [30, 60, 120, 300]
+
+/// One night of the night log (FR-SL-4): noon to noon in local time.
+struct NightGroup: Equatable {
+    /// Noon at the start of the night.
+    let start: Date
+    /// Wake-ups of the night, oldest first.
+    let entries: [WakeUpEntry]
+    /// Longest stretch between wake-ups (ms), counting from the last
+    /// wake-up's end to now for a night that goes on; nil without a stretch.
+    let longestQuietMs: UInt64?
+}
+
+/// Groups wake-ups (oldest first, as `night_log` returns them) by night,
+/// newest night first.
+func nightGroups(_ entries: [WakeUpEntry], nowMs: UInt64 = nowUnixMs(), calendar: Calendar = .current) -> [NightGroup] {
+    func noonBefore(_ ms: UInt64) -> Date {
+        let d = Date(timeIntervalSince1970: TimeInterval(ms) / 1000)
+        let noon = calendar.date(bySettingHour: 12, minute: 0, second: 0, of: d) ?? d
+        return noon <= d ? noon : calendar.date(byAdding: .day, value: -1, to: noon) ?? noon
+    }
+    var order: [Date] = []
+    var byNight: [Date: [WakeUpEntry]] = [:]
+    for e in entries.sorted(by: { $0.startUnixMs < $1.startUnixMs }) {
+        let n = noonBefore(e.startUnixMs)
+        if byNight[n] == nil { order.append(n) }
+        byNight[n, default: []].append(e)
+    }
+    let tonight = noonBefore(nowMs)
+    return order.reversed().map { start in
+        let list = byNight[start] ?? []
+        var longest: UInt64?
+        for (a, b) in zip(list, list.dropFirst()) {
+            let end = a.endUnixMs ?? a.startUnixMs
+            if b.startUnixMs > end { longest = max(longest ?? 0, b.startUnixMs - end) }
+        }
+        if start == tonight, let last = list.last, let end = last.endUnixMs, nowMs > end {
+            longest = max(longest ?? 0, nowMs - end)
+        }
+        return NightGroup(start: start, entries: list, longestQuietMs: longest)
+    }
+}
+
+/// How long a wake-up lasted, or lasts so far.
+func wakeUpDurationMs(_ e: WakeUpEntry, nowMs: UInt64 = nowUnixMs()) -> UInt64 {
+    let end = e.endUnixMs ?? nowMs
+    return end > e.startUnixMs ? end - e.startUnixMs : 0
+}

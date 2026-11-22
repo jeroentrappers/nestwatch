@@ -66,6 +66,89 @@ final class LogicTests: XCTestCase {
         XCTAssertNotEqual(tr("station_background_note"), "station_background_note")
     }
 
+    func testPluralsFollowTheStringsdict() {
+        XCTAssertEqual(trp("wake_ups", 1), "1 wake-up")
+        XCTAssertEqual(trp("wake_ups", 3), "3 wake-ups")
+        XCTAssertEqual(trp("seconds", 8), "8 seconds")
+        XCTAssertEqual(trp("trying_addresses", 1), "trying 1 address…")
+    }
+
+    func testDurations() {
+        let en = Locale(identifier: "en_US")
+        XCTAssertEqual(durationText(ms: 59_000, locale: en), "less than a minute")
+        XCTAssertEqual(durationText(ms: 4 * 60_000 + 30_000, locale: en), "4 min")
+        XCTAssertTrue(durationText(ms: 80 * 60_000, locale: en).contains("20 min"))
+        XCTAssertTrue(durationText(ms: 80 * 60_000, locale: en).hasPrefix("1 h"))
+        XCTAssertEqual(shortDurationText(seconds: 30, locale: en), "30 sec")
+        XCTAssertEqual(shortDurationText(seconds: 120, locale: en), "2 min")
+        // Localised by Foundation, not by our strings.
+        XCTAssertTrue(durationText(ms: 4 * 60_000, locale: Locale(identifier: "de_DE")).contains("4"))
+        XCTAssertEqual(roomText(.unknown), nil)
+        XCTAssertEqual(roomText(.awake(sinceUnixMs: 1_000), nowMs: 31_000), "Awake for less than a minute")
+        XCTAssertTrue(roomText(.quiet(sinceUnixMs: 0), nowMs: 4 * 60_000)!.hasPrefix("Quiet for 4"))
+    }
+
+    private func wake(_ start: Date, mins: UInt64?, alarmed: Bool = false) -> WakeUpEntry {
+        let s = UInt64(start.timeIntervalSince1970 * 1000)
+        return WakeUpEntry(startUnixMs: s, endUnixMs: mins.map { s + $0 * 60_000 }, loudMs: 10_000, peakDbfs: nil,
+                           alerted: true, alarmed: alarmed, notTheBaby: false)
+    }
+
+    func testNightsRunFromNoonToNoon() {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Europe/Brussels")!
+        func d(_ day: Int, _ h: Int, _ m: Int = 0) -> Date {
+            cal.date(from: DateComponents(year: 2026, month: 11, day: day, hour: h, minute: m))!
+        }
+        let entries = [
+            wake(d(20, 23), mins: 5), // night of the 20th
+            wake(d(21, 2, 14), mins: 6, alarmed: true), // still the night of the 20th
+            wake(d(21, 11, 59), mins: 1), // still the night of the 20th
+            wake(d(21, 12, 1), mins: 2), // night of the 21st
+        ]
+        let now = UInt64(d(22, 9).timeIntervalSince1970 * 1000)
+        let nights = nightGroups(entries, nowMs: now, calendar: cal)
+        XCTAssertEqual(nights.count, 2)
+        XCTAssertEqual(nights[0].start, d(21, 12), "newest night first")
+        XCTAssertEqual(nights[1].start, d(20, 12))
+        XCTAssertEqual(nights[1].entries.count, 3)
+        // 23:05 → 02:14 is 3 h 9 min; 02:20 → 11:59 is 9 h 39 min.
+        XCTAssertEqual(nights[1].longestQuietMs, (9 * 60 + 39) * 60_000)
+        // Tonight: from the wake-up's end (12:03) to now (09:00).
+        XCTAssertEqual(nights[0].longestQuietMs, (20 * 60 + 57) * 60_000)
+        // A wake-up going on has no end yet.
+        let ongoing = nightGroups([wake(d(21, 3), mins: nil)], nowMs: UInt64(d(21, 3, 5).timeIntervalSince1970 * 1000), calendar: cal)
+        XCTAssertNil(ongoing[0].longestQuietMs)
+        XCTAssertEqual(wakeUpDurationMs(ongoing[0].entries[0], nowMs: UInt64(d(21, 3, 5).timeIntervalSince1970 * 1000)), 5 * 60_000)
+        XCTAssertTrue(nightGroups([], nowMs: now, calendar: cal).isEmpty)
+    }
+
+    func testAlarmRampAndTone() {
+        XCTAssertEqual(alarmVolume(elapsed: 0), 0.3, accuracy: 1e-6)
+        XCTAssertEqual(alarmVolume(elapsed: 15), 0.65, accuracy: 1e-6)
+        XCTAssertEqual(alarmVolume(elapsed: 30), 1, accuracy: 1e-6)
+        XCTAssertEqual(alarmVolume(elapsed: 300), 1, accuracy: 1e-6)
+        let wav = alarmToneWav(rate: 8_000)
+        XCTAssertEqual(String(decoding: wav.prefix(4), as: UTF8.self), "RIFF")
+        XCTAssertEqual(wav.count, 44 + Int(1.6 * 8_000) * 2)
+        // Not silence.
+        XCTAssertTrue(wav.dropFirst(44).contains { $0 > 0x40 && $0 < 0xC0 })
+    }
+
+    func testEveryLanguageHasTheNewStrings() {
+        for lang in ["en", "nl", "fr", "de", "es", "it", "pt-BR", "pl", "sv", "da", "nb"] {
+            guard let path = Bundle.main.path(forResource: lang, ofType: "lproj"), let b = Bundle(path: path) else {
+                return XCTFail("no \(lang).lproj")
+            }
+            for key in ["not_the_baby", "night_log", "im_on_it", "alarm_title"] {
+                XCTAssertNotEqual(b.localizedString(forKey: key, value: "?", table: nil), "?", "\(lang): \(key)")
+            }
+            let plural = String.localizedStringWithFormat(b.localizedString(forKey: "wake_ups", value: "?", table: nil), 3)
+            XCTAssertTrue(plural.contains("3"), "\(lang): \(plural)")
+            XCTAssertNotEqual(b.localizedString(forKey: "NSMicrophoneUsageDescription", value: "?", table: "InfoPlist"), "?", lang)
+        }
+    }
+
     func testInviteUrls() {
         let u = URL(string: "nestwatch://invite?v=1&k=abc&n=Nursery")!
         XCTAssertEqual(invitation(from: u), u.absoluteString)
@@ -97,9 +180,11 @@ final class LogicTests: XCTestCase {
             video: .off, rttMs: nil, canTalk: true, canVideo: true,
             prefs: StationPrefs(
                 listen: ListenSettingsInfo(mode: mode, thresholdDbfs: -50, holdMs: 8_000, prerollMs: 1_000),
-                volume: 1, muted: false, alerts: AlertSettings(sound: true, unreachable: true, battery: true), follow: true
+                volume: 1, muted: false,
+                alerts: AlertSettings(sound: true, unreachable: true, battery: true, escalate: true, escalateAfterS: 60),
+                follow: true
             ),
-            audioFrames: 0
+            audioFrames: 0, room: .unknown, alarm: .off, pausedUntilUnixMs: nil, logRevision: 0
         )
     }
 

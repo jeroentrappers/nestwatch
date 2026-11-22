@@ -7,12 +7,65 @@ func tr(_ key: String, _ args: CVarArg...) -> String {
     return args.isEmpty ? format : String(format: format, arguments: args)
 }
 
-/// A plural string: `<key>.one` for 1, `<key>.other` otherwise (English
-/// rules; other languages add their own forms with a `.stringsdict`).
-func trp(_ key: String, _ n: Int, _ args: CVarArg...) -> String {
-    let format = NSLocalizedString(n == 1 ? "\(key).one" : "\(key).other", comment: "")
-    return String(format: format, arguments: args.isEmpty ? [n] : args)
+/// A plural string from `Localizable.stringsdict`, with the plural rules
+/// of the language (one, few, many, other ...) applied to `n`.
+func trp(_ key: String, _ n: Int) -> String {
+    String.localizedStringWithFormat(NSLocalizedString(key, comment: ""), n)
 }
+
+/// The locale for dates and durations: the app's language (the system
+/// language when the app has it, else English) with the user's region.
+let appLocale: Locale = {
+    let lang = Bundle.main.preferredLocalizations.first ?? "en"
+    guard !lang.contains("-"), let region = Locale.current.regionCode else { return Locale(identifier: lang) }
+    return Locale(identifier: "\(lang)_\(region)")
+}()
+
+/// A duration such as "4 min" or "1 hr, 20 min" in the user's language;
+/// under a minute "less than a minute" (FR-SL-3).
+func durationText(ms: UInt64, locale: Locale = appLocale) -> String {
+    let mins = ms / 60_000
+    guard mins >= 1 else { return tr("less_than_minute") }
+    let f = DateComponentsFormatter()
+    var cal = Calendar.current
+    cal.locale = locale
+    f.calendar = cal
+    f.unitsStyle = .short
+    f.allowedUnits = mins >= 24 * 60 ? [.day, .hour] : [.hour, .minute]
+    f.maximumUnitCount = 2
+    return f.string(from: TimeInterval(mins * 60)) ?? "\(mins)"
+}
+
+/// A short duration choice such as "30 sec" or "2 min" (alarm delay).
+func shortDurationText(seconds: Int, locale: Locale = appLocale) -> String {
+    let f = DateComponentsFormatter()
+    var cal = Calendar.current
+    cal.locale = locale
+    f.calendar = cal
+    f.unitsStyle = .short
+    f.allowedUnits = seconds % 60 == 0 ? [.minute] : [.second]
+    return f.string(from: TimeInterval(seconds)) ?? "\(seconds)"
+}
+
+/// A clock time such as "03:40" or "3:40 AM", as the locale writes it.
+func timeText(unixMs: UInt64, locale: Locale = appLocale) -> String {
+    let f = DateFormatter()
+    f.locale = locale
+    f.dateStyle = .none
+    f.timeStyle = .short
+    return f.string(from: Date(timeIntervalSince1970: TimeInterval(unixMs) / 1000))
+}
+
+/// A night's date such as "Sat 21 Nov" or "Sat, Nov 21".
+func nightDateText(_ date: Date, locale: Locale = appLocale) -> String {
+    let f = DateFormatter()
+    f.locale = locale
+    f.setLocalizedDateFormatFromTemplate("EEEdMMM")
+    return f.string(from: date)
+}
+
+/// Unix milliseconds of now.
+func nowUnixMs() -> UInt64 { UInt64(Date().timeIntervalSince1970 * 1000) }
 
 /// `m:ss` for countdowns.
 func clockText(ms: Int64) -> String {
@@ -21,7 +74,7 @@ func clockText(ms: Int64) -> String {
 }
 
 /// "just now", "5 min ago", ...
-func agoText(unixMs: UInt64, nowMs: UInt64 = UInt64(Date().timeIntervalSince1970 * 1000)) -> String {
+func agoText(unixMs: UInt64, nowMs: UInt64 = nowUnixMs()) -> String {
     let mins = Int(nowMs > unixMs ? (nowMs - unixMs) / 60_000 : 0)
     switch mins {
     case ..<1: return tr("ago_now")

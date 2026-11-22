@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Permission texts of Info.plist (Polish). */
+
+"NSCameraUsageDescription" = "Stacja dziecka na prośbę pokazuje obraz z kamery sparowanemu urządzeniu rodzica, a urządzenie rodzica skanuje kod QR parowania stacji. Nic nie jest nagrywane.";
+"NSLocalNetworkUsageDescription" = "Nestwatch znajduje twoje stacje dziecka i urządzenia do słuchania w sieci domowej i łączy się z nimi.";
+"NSMicrophoneUsageDescription" = "Stacja dziecka słucha pokoju, aby sparowane urządzenia rodzica mogły go słyszeć, a funkcja „mów do dziecka” przesyła twój głos do stacji, gdy przytrzymujesz przycisk.";

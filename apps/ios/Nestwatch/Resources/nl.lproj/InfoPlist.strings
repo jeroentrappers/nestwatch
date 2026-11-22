@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Tekst van de toestemmingen in Info.plist. */
+
+"NSCameraUsageDescription" = "De babystation toont op verzoek haar camera aan een gekoppeld ouderapparaat, en het ouderapparaat scant de koppel-QR-code van de babystation. Er wordt niets opgenomen.";
+"NSLocalNetworkUsageDescription" = "Nestwatch vindt en verbindt met je eigen babystation en ouderapparaten op je thuisnetwerk.";
+"NSMicrophoneUsageDescription" = "De babystation luistert naar de kamer zodat je gekoppelde ouderapparaten het kunnen horen, en terugpraten stuurt je stem naar de babystation zolang je de knop ingedrukt houdt.";

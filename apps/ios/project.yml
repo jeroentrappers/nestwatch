@@ -86,3 +86,6 @@ schemes:
         - NestwatchTests
         - NestwatchUITests
       gatherCoverageData: false
+      # The text tests check the English reference strings.
+      language: en
+      region: US

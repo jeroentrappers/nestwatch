@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Berechtigungstexte aus Info.plist. */
+
+"NSCameraUsageDescription" = "Die Babystation zeigt einem gekoppelten Elterngerät auf Wunsch ihre Kamera, und das Elterngerät scannt den Kopplungs-QR-Code der Babystation. Es wird nichts aufgezeichnet.";
+"NSLocalNetworkUsageDescription" = "Nestwatch findet deine eigene Babystation und deine Elterngeräte in deinem Heimnetz und verbindet sich mit ihnen.";
+"NSMicrophoneUsageDescription" = "Die Babystation hört ins Zimmer, damit deine gekoppelten Elterngeräte es hören können, und Zurücksprechen schickt deine Stimme an die Babystation, solange du die Taste hältst.";

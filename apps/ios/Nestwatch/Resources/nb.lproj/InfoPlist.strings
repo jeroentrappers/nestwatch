@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Tillatelsestekster fra Info.plist. */
+
+"NSCameraUsageDescription" = "Babystasjonen viser kameraet sitt til en tilkoblet foreldreenhet når den ber om det, og foreldreenheten skanner babystasjonens QR-kode for tilkobling. Ingenting blir tatt opp.";
+"NSLocalNetworkUsageDescription" = "Nestwatch finner og kobler til din egen babystasjon og dine foreldreenheter på hjemmenettverket.";
+"NSMicrophoneUsageDescription" = "Babystasjonen lytter til rommet slik at de tilkoblede foreldreenhetene dine kan høre det, og snakk tilbake sender stemmen din til babystasjonen mens du holder inne knappen.";

@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: AGPL-3.0-or-later */
-/* English reference text (NFR-I18N-1). Plurals use the keys <name>.one and <name>.other. */
+/* English reference text (NFR-I18N-1). Plurals live in Localizable.stringsdict. */
 
 "app_name" = "Nestwatch";
 "promise" = "A private baby monitor for the devices you already own. Everything stays on your network.";
@@ -64,8 +64,6 @@
 "camera_off" = "Camera off";
 "talk_off" = "Talk-back off";
 "nobody_listening" = "Nobody listening";
-"listening_count.one" = "%d listening";
-"listening_count.other" = "%d listening";
 "talking_through" = "%@ is talking";
 "station_keeps_running" = "The station keeps running with the screen off. Stopping it here ends monitoring.";
 "station_settings" = "Station settings";
@@ -91,8 +89,6 @@
 "pair_closed" = "Pairing is closed.";
 "pair_just_paired" = "Paired now. Check that the listener shows the same number:";
 "pair_open_for" = "Open for %1$@ · %2$@";
-"pair_devices_left.one" = "1 more device";
-"pair_devices_left.other" = "up to %d devices";
 "pair_close" = "Close pairing";
 "add_station" = "Add a station";
 "scan_qr" = "Scan the QR code";
@@ -165,8 +161,6 @@
 "relay_setup_no" = "Not now";
 "relay_setup_later" = "You can change this later in settings.";
 "trying" = "trying…";
-"trying_addresses.one" = "trying 1 address…";
-"trying_addresses.other" = "trying %d addresses…";
 "attempt" = "attempt %d";
 "needs_pairing_hint" = "This station removed this device. Pair again to listen.";
 "paused_hint" = "Not listening to this station.";
@@ -199,8 +193,6 @@
 "threshold" = "Sound threshold";
 "threshold_value" = "%d dB";
 "hold_time" = "Keep listening after sound";
-"seconds.one" = "1 second";
-"seconds.other" = "%d seconds";
 "volume" = "Volume";
 "percent" = "%d%%";
 "alert_sound_toggle" = "Alert sound";
@@ -233,8 +225,6 @@
 "ago_minutes" = "%d min ago";
 "ago_hours" = "%d h ago";
 "ago_yesterday" = "yesterday";
-"ago_days.one" = "%d day ago";
-"ago_days.other" = "%d days ago";
 "paired_seen" = "paired %1$@ · last seen %2$@";
 
 /* iOS */
@@ -248,3 +238,29 @@
 "perm_denied_notifications" = "Notifications are off for Nestwatch, so alerts only make a sound while the app runs. You can allow them in Settings.";
 "perm_notifications_ask" = "Allow notifications";
 "alert_time_sensitive" = "Alerts are time-sensitive notifications so they can break through a Focus.";
+
+/* Alarm, Not the baby, room status, night log (FR-AL-5..7, FR-SL-1..4) */
+"im_on_it" = "I'm on it";
+"not_the_baby" = "Not the baby";
+"resume_alerts" = "Resume alerts";
+"alerts_paused_until" = "Alerts paused until %@";
+"alarm_title" = "%@: the sound goes on";
+"alarm_body" = "Nobody answered the alert yet.";
+"alarm_banner" = "Alarm · %@";
+"alarm_banner_body" = "The sound goes on and nobody answered yet.";
+"room_awake" = "Awake for %@";
+"room_quiet" = "Quiet for %@";
+"less_than_minute" = "less than a minute";
+"night_log" = "Night log";
+"night_of" = "Night of %@";
+"longest_quiet" = "longest quiet %@";
+"going_on" = "going on";
+"badge_alarm" = "Alarm";
+"clear_log" = "Clear log";
+"clear_log_confirm" = "Clear the night log of %@?";
+"clear" = "Clear";
+"night_log_empty" = "No wake-ups yet. A wake-up is noted when the room is loud for 10 seconds or more.";
+"night_log_footer" = "Kept on this device only, for 30 days. Nestwatch listens for sound; a quiet room does not mean your child is asleep.";
+"escalate_toggle" = "Escalating alarm";
+"escalate_hint" = "If the sound goes on and nobody answers the alert, an alarm rings, louder and louder, also in silent mode.";
+"escalate_after" = "Alarm after";

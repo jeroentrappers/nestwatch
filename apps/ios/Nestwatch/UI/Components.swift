@@ -454,6 +454,7 @@ struct SwitchRow: View {
 struct Segmented<T: Hashable>: View {
     let options: [(T, String)]
     let selected: T
+    var enabled = true
     let onSelect: (T) -> Void
     @Environment(\.palette) private var c
 
@@ -475,6 +476,8 @@ struct Segmented<T: Hashable>: View {
         .background(c.ink2)
         .clipShape(RoundedRectangle(cornerRadius: Radius.small))
         .overlay(RoundedRectangle(cornerRadius: Radius.small).strokeBorder(c.ink3))
+        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.5)
     }
 }
 
@@ -521,5 +524,54 @@ struct PillRow: View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 8, alignment: .leading)], alignment: .leading, spacing: 8) {
             ForEach(Array(pills.enumerated()), id: \.offset) { _, p in Pill(text: p.0, kind: p.1) }
         }
+    }
+}
+
+/// The alert banner of a station tile (FR-AL-6, FR-AL-7): a sound alert
+/// nobody answered yet, or the ringing alarm, which is filled in the alarm
+/// colour and carries a bell icon (never colour alone). "I'm on it" and
+/// "Not the baby" are its actions.
+struct AlertBanner: View {
+    let ringing: Bool
+    let title: String
+    var detail: String?
+    let onAck: () -> Void
+    let onNotTheBaby: () -> Void
+    @Environment(\.palette) private var c
+
+    var body: some View {
+        let fg = ringing ? c.onAccent : c.coral
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: ringing ? "bell.fill" : "waveform").font(.system(size: 17, weight: .semibold))
+                    .accessibilityHidden(true)
+                Text(title).font(NWFont.subtitle).fixedSize(horizontal: false, vertical: true)
+            }
+            .foregroundColor(fg)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isHeader)
+            if let detail {
+                Text(detail).font(NWFont.bodySmall).foregroundColor(fg).fixedSize(horizontal: false, vertical: true)
+            }
+            HStack(spacing: 8) {
+                button(tr("im_on_it"), strong: true, action: onAck)
+                button(tr("not_the_baby"), strong: false, action: onNotTheBaby)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: Radius.medium).fill(ringing ? c.coral : c.coralSoft))
+        .overlay(RoundedRectangle(cornerRadius: Radius.medium).strokeBorder(c.coral, lineWidth: ringing ? 0 : 1))
+    }
+
+    private func button(_ title: String, strong: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title).font(strong ? NWFont.subtitle : NWFont.body).lineLimit(1).minimumScaleFactor(0.7)
+                .foregroundColor(c.text1)
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .padding(.horizontal, 8)
+                .background(RoundedRectangle(cornerRadius: Radius.small).fill(strong ? c.ink1 : c.ink2))
+        }
+        .buttonStyle(.plain)
     }
 }

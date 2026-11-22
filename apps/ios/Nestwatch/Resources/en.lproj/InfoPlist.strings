@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Permission texts of Info.plist (English reference). */
+
+"NSCameraUsageDescription" = "The station shows its camera to a paired listener on request, and the listener scans the station's pairing QR code. Nothing is recorded.";
+"NSLocalNetworkUsageDescription" = "Nestwatch finds and connects to your own station and listening devices on your home network.";
+"NSMicrophoneUsageDescription" = "The station listens to the room so your paired listeners can hear it, and talk-back sends your voice to the station while you hold the button.";

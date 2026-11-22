@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Plural strings (Polish). Keys are read with trp(key, n). -->
+<plist version="1.0">
+<dict>
+	<key>listening_count</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d słucha</string>
+			<key>few</key>
+			<string>%d słuchają</string>
+			<key>many</key>
+			<string>%d słucha</string>
+			<key>other</key>
+			<string>%d słucha</string>
+		</dict>
+	</dict>
+	<key>pair_devices_left</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>jeszcze %d urządzenie</string>
+			<key>few</key>
+			<string>do %d urządzeń</string>
+			<key>many</key>
+			<string>do %d urządzeń</string>
+			<key>other</key>
+			<string>do %d urządzeń</string>
+		</dict>
+	</dict>
+	<key>trying_addresses</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>sprawdzanie %d adresu…</string>
+			<key>few</key>
+			<string>sprawdzanie %d adresów…</string>
+			<key>many</key>
+			<string>sprawdzanie %d adresów…</string>
+			<key>other</key>
+			<string>sprawdzanie %d adresu…</string>
+		</dict>
+	</dict>
+	<key>seconds</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d sekunda</string>
+			<key>few</key>
+			<string>%d sekundy</string>
+			<key>many</key>
+			<string>%d sekund</string>
+			<key>other</key>
+			<string>%d sekundy</string>
+		</dict>
+	</dict>
+	<key>ago_days</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d dzień temu</string>
+			<key>few</key>
+			<string>%d dni temu</string>
+			<key>many</key>
+			<string>%d dni temu</string>
+			<key>other</key>
+			<string>%d dnia temu</string>
+		</dict>
+	</dict>
+	<key>wake_ups</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@n@</string>
+		<key>n</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>one</key>
+			<string>%d pobudka</string>
+			<key>few</key>
+			<string>%d pobudki</string>
+			<key>many</key>
+			<string>%d pobudek</string>
+			<key>other</key>
+			<string>%d pobudki</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

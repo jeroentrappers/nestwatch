@@ -1,0 +1,6 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Permission texts of Info.plist (Brazilian Portuguese). */
+
+"NSCameraUsageDescription" = "A estação do bebê mostra a câmera a um dispositivo dos pais pareado quando ele pede, e o dispositivo dos pais lê o código QR de pareamento da estação. Nada é gravado.";
+"NSLocalNetworkUsageDescription" = "O Nestwatch encontra as suas estações do bebê e os seus aparelhos de escuta na sua rede doméstica e se conecta a eles.";
+"NSMicrophoneUsageDescription" = "A estação do bebê escuta o quarto para que os dispositivos dos pais pareados possam ouvi-lo, e falar com o bebê envia a sua voz para a estação enquanto você segura o botão.";

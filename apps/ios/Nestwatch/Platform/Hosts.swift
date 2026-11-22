@@ -142,8 +142,9 @@ final class StationHost {
 
 /// Keeps a listener receiving and alerting (FR-LS-4, FR-AL-1..4): plays the
 /// mix (which keeps the app alive in the background), captures talk-back
-/// while granted, browses Bonjour, follows network changes and turns
-/// alerts into notifications.
+/// while granted, browses Bonjour, follows network changes, turns alerts
+/// into notifications and rings the alarm while a station's alarm rings
+/// (FR-AL-5).
 final class ListenerHost {
     static let shared = ListenerHost()
 
@@ -152,6 +153,7 @@ final class ListenerHost {
     private var browser: BonjourBrowser?
     private var network: NetworkWatch?
     private var subs: Set<AnyCancellable> = []
+    private let alarm = AlarmPlayer()
 
     private var model: Nestwatch { Nestwatch.shared }
 
@@ -176,6 +178,30 @@ final class ListenerHost {
         model.listenerEvents
             .sink { [weak self] e in self?.onEvent(l, e) }
             .store(in: &subs)
+        model.$listenerState
+            .map { s in s?.stations.contains { if case .ringing = $0.alarm { return true }; return false } ?? false }
+            .removeDuplicates()
+            .sink { [weak self] ringing in self?.alarm.update(ringing: ringing) }
+            .store(in: &subs)
+    }
+
+    /// "I'm on it" (FR-AL-6), from the tile banner or a notification.
+    func acknowledge(_ id: String) {
+        ensureRunning()
+        model.withListener { try $0.acknowledge(stationId: id) }
+        Alerts.shared.clearSound(stationId: id)
+    }
+
+    /// "Not the baby" (FR-AL-7), from the tile or a notification.
+    func notTheBaby(_ id: String) {
+        ensureRunning()
+        model.withListener { try $0.notTheBaby(stationId: id) }
+        Alerts.shared.clearSound(stationId: id)
+    }
+
+    /// A notification action can relaunch the app in the background.
+    private func ensureRunning() {
+        if !running && model.prefs.value.role == .listener { start() }
     }
 
     private func stationName(_ id: String) -> String {
@@ -204,7 +230,9 @@ final class ListenerHost {
         let name = stationName(id)
         switch kind {
         case .soundStarted:
-            Alerts.shared.post(stationId: id, slot: "sound", title: tr("alert_sound", name), body: tr("alert_body"), urgent: true)
+            Alerts.shared.post(stationId: id, slot: "sound", title: tr("alert_sound", name), body: tr("alert_body"), urgent: true, actions: true)
+        case .alarm:
+            Alerts.shared.post(stationId: id, slot: "alarm", title: tr("alarm_title", name), body: tr("alarm_body"), urgent: true, actions: true)
         case .unreachable:
             Alerts.shared.post(stationId: id, slot: "connection", title: tr("alert_unreachable", name), body: tr("alert_body"), urgent: true)
         case .reachable:
@@ -216,6 +244,7 @@ final class ListenerHost {
 
     func stop() {
         subs = []
+        alarm.update(ringing: false)
         playback?.stop()
         playback = nil
         talk?.stop()

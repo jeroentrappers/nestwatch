@@ -9,6 +9,7 @@ enum Screen: Hashable {
     case listener
     case stationPrefs(String)
     case camera(String)
+    case nightLog(String)
     case addStation(String?)
     case about
 }
@@ -81,7 +82,8 @@ struct RootView: View {
     #if DEBUG
     /// Opens a screen named by `NESTWATCH_DEBUG_SCREEN` (simulator
     /// screenshots; debug builds only): about, stationSettings, addStation,
-    /// pairing, dim, stationPrefs, camera (the last two use the first station).
+    /// pairing, dim, stationPrefs, camera, nightLog (the last three use the
+    /// first station; nightLog shows sample data with NESTWATCH_DEBUG_NIGHT_LOG).
     private func debugScreen() {
         guard let name = ProcessInfo.processInfo.environment["NESTWATCH_DEBUG_SCREEN"] else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -94,6 +96,7 @@ struct RootView: View {
             case "dim": dimmed = true
             case "stationPrefs": if let first { nav.show(.stationPrefs(first)) }
             case "camera": if let first { nav.push(.camera(first)) }
+            case "nightLog": nav.push(.nightLog(first ?? "debug"))
             default: break
             }
         }
@@ -145,6 +148,8 @@ struct RootView: View {
             ListenerStationSettings(id: id)
         case let .camera(id):
             CameraScreen(id: id)
+        case let .nightLog(id):
+            NightLogScreen(id: id)
         case let .addStation(invite):
             AddStationScreen(initialInvite: invite)
         case .about:
