@@ -5,11 +5,11 @@
 
 use dioxus::prelude::*;
 
-use super::app::Nav;
+use super::app::{Nav, Screen};
 use super::common::{Segmented, SwitchRow};
 use crate::backend::{BackendHandle, Ui};
 use crate::logic::{self, ThresholdKey};
-use crate::model::{Conn, Mode, NoticeKind, Tile};
+use crate::model::{AlertSettings, Conn, Mode, NoticeKind, Tile};
 use crate::strings as s;
 
 /// The side panel (desktop) / bottom sheet (phone width).
@@ -33,8 +33,8 @@ pub fn SettingsPanel(tile: Tile) -> Element {
         .unwrap_or(logic::volume_percent(set.volume));
 
     let mode_opts = vec![
-        (s::MODE_ALWAYS.to_owned(), set.mode == Mode::Continuous),
-        (s::MODE_SOUND.to_owned(), set.mode == Mode::Activated),
+        (s::mode_always().to_owned(), set.mode == Mode::Continuous),
+        (s::mode_sound().to_owned(), set.mode == Mode::Activated),
     ];
     let b = backend.clone();
     let i = id.clone();
@@ -48,27 +48,52 @@ pub fn SettingsPanel(tile: Tile) -> Element {
     };
     let (bh, ih) = (backend.clone(), id.clone());
     let (bv, iv) = (backend.clone(), id.clone());
-    let on_sound = {
+    let alerts = set.alerts;
+    let set_alerts = {
         let b = backend.clone();
         let i = id.clone();
-        move |v: bool| {
-            let _ = b.set_alerts(&i, v, set.alert_unreachable, set.alert_battery);
+        move |a: AlertSettings| {
+            let _ = b.set_alerts(&i, a);
         }
     };
-    let on_unreach = {
-        let b = backend.clone();
-        let i = id.clone();
-        move |v: bool| {
-            let _ = b.set_alerts(&i, set.alert_sound, v, set.alert_battery);
-        }
+    let (sa1, sa2, sa3, sa4, sa5) = (
+        set_alerts.clone(),
+        set_alerts.clone(),
+        set_alerts.clone(),
+        set_alerts.clone(),
+        set_alerts,
+    );
+    let on_sound = move |v: bool| sa1(AlertSettings { sound: v, ..alerts });
+    let on_unreach = move |v: bool| {
+        sa2(AlertSettings {
+            unreachable: v,
+            ..alerts
+        })
     };
-    let on_battery = {
-        let b = backend.clone();
-        let i = id.clone();
-        move |v: bool| {
-            let _ = b.set_alerts(&i, set.alert_sound, set.alert_unreachable, v);
-        }
+    let on_battery = move |v: bool| {
+        sa3(AlertSettings {
+            battery: v,
+            ..alerts
+        })
     };
+    let on_escalate = move |v: bool| {
+        sa4(AlertSettings {
+            escalate: v,
+            ..alerts
+        })
+    };
+    let on_after = move |i: usize| {
+        sa5(AlertSettings {
+            escalate_after_s: AlertSettings::ESCALATE_CHOICES[i],
+            ..alerts
+        })
+    };
+    let after_opts: Vec<(String, bool)> = AlertSettings::ESCALATE_CHOICES
+        .iter()
+        .map(|&c| (logic::escalate_label(c), c == alerts.escalate_after_s))
+        .collect();
+    let after_disabled = !alerts.escalate || !alerts.sound;
+    let log_id = id.clone();
     let (ba, ia) = (backend.clone(), id.clone());
     let (bf, idf) = (backend.clone(), id.clone());
     let (bp, ip) = (backend.clone(), id.clone());
@@ -79,28 +104,28 @@ pub fn SettingsPanel(tile: Tile) -> Element {
             div { class: "row-between",
                 div { class: "title",
                     h3 { "{tile.name}" }
-                    span { class: "caption", "{s::LISTENING_SETTINGS}" }
+                    span { class: "caption", "{s::listening_settings()}" }
                 }
                 button {
                     class: "btn icon ghost",
                     r#type: "button",
-                    aria_label: s::CLOSE,
+                    aria_label: s::close(),
                     onclick: move |_| nav.panel.set(None),
                     "×"
                 }
             }
-            Segmented { label: s::LISTEN_MODE.to_owned(), options: mode_opts, onselect: on_mode }
+            Segmented { label: s::listen_mode().to_owned(), options: mode_opts, onselect: on_mode }
             Calibration { tile: tile.clone() }
             p { class: "caption",
                 if set.mode == Mode::Activated {
-                    "{s::CALIBRATE_HINT}"
+                    "{s::calibrate_hint()}"
                 } else {
-                    "{s::CALIBRATE_CONTINUOUS}"
+                    "{s::calibrate_continuous()}"
                 }
             }
             if set.mode == Mode::Activated {
                 div { class: "field",
-                    label { r#for: "hold-{tile.id}", "{s::HOLD_TIME}" }
+                    label { r#for: "hold-{tile.id}", "{s::hold_time()}" }
                     input {
                         id: "hold-{tile.id}",
                         class: "range",
@@ -109,7 +134,7 @@ pub fn SettingsPanel(tile: Tile) -> Element {
                         max: "15",
                         step: "1",
                         value: "{hold_s}",
-                        aria_valuetext: "{s::seconds(hold_s)}",
+                        aria_valuetext: "{s::seconds(u64::from(hold_s))}",
                         oninput: move |e: FormEvent| hold_draft.set(e.value().parse().ok()),
                         onchange: move |e: FormEvent| {
                             if let Ok(v) = e.value().parse::<u32>() {
@@ -118,11 +143,11 @@ pub fn SettingsPanel(tile: Tile) -> Element {
                             hold_draft.set(None);
                         },
                     }
-                    span { class: "caption", "{s::seconds(hold_s)}" }
+                    span { class: "caption", "{s::seconds(u64::from(hold_s))}" }
                 }
             }
             div { class: "field",
-                label { r#for: "vol-{tile.id}", "{s::VOLUME}" }
+                label { r#for: "vol-{tile.id}", "{s::volume()}" }
                 input {
                     id: "vol-{tile.id}",
                     class: "range",
@@ -142,9 +167,31 @@ pub fn SettingsPanel(tile: Tile) -> Element {
                 }
             }
             hr { class: "divider" }
-            SwitchRow { label: s::ALERT_SOUND.to_owned(), checked: set.alert_sound, onchange: on_sound }
-            SwitchRow { label: s::ALERT_UNREACHABLE.to_owned(), checked: set.alert_unreachable, onchange: on_unreach }
-            SwitchRow { label: s::ALERT_BATTERY.to_owned(), checked: set.alert_battery, onchange: on_battery }
+            SwitchRow { label: s::alert_sound_toggle().to_owned(), checked: alerts.sound, onchange: on_sound }
+            SwitchRow {
+                label: s::escalating_alarm().to_owned(),
+                checked: alerts.escalate,
+                disabled: !alerts.sound,
+                onchange: on_escalate,
+            }
+            p { class: "caption", "{s::escalating_alarm_hint()}" }
+            div { class: "field",
+                span { class: "label", "{s::alarm_after()}" }
+                Segmented {
+                    label: s::alarm_after().to_owned(),
+                    options: after_opts,
+                    disabled: after_disabled,
+                    onselect: on_after,
+                }
+            }
+            SwitchRow { label: s::alert_unreachable_toggle().to_owned(), checked: alerts.unreachable, onchange: on_unreach }
+            SwitchRow { label: s::alert_battery_toggle().to_owned(), checked: alerts.battery, onchange: on_battery }
+            button {
+                class: "btn ghost",
+                r#type: "button",
+                onclick: move |_| nav.screen.set(Screen::NightLog(log_id.clone())),
+                "{s::night_log()}"
+            }
             hr { class: "divider" }
             if let Some(r) = &tile.route {
                 p { class: "caption", "{s::connected_via(r)}" }
@@ -161,12 +208,12 @@ pub fn SettingsPanel(tile: Tile) -> Element {
                         Ok(()) => {
                             address.set(String::new());
                             address_error.set(None);
-                            ui.notify(NoticeKind::Info(s::ADDRESS_ADDED.into()));
+                            ui.notify(NoticeKind::Info(s::address_added().into()));
                         }
                         Err(err) => address_error.set(Some(err.message())),
                     }
                 },
-                label { r#for: "addr-{tile.id}", "{s::ADD_ADDRESS}" }
+                label { r#for: "addr-{tile.id}", "{s::add_address()}" }
                 div { class: "row",
                     input {
                         id: "addr-{tile.id}",
@@ -177,9 +224,9 @@ pub fn SettingsPanel(tile: Tile) -> Element {
                         value: "{address}",
                         oninput: move |e: FormEvent| address.set(e.value()),
                     }
-                    button { class: "btn", r#type: "submit", "{s::SAVE}" }
+                    button { class: "btn", r#type: "submit", "{s::save()}" }
                 }
-                span { class: "caption", "{s::ADDRESS_HINT}" }
+                span { class: "caption", "{s::address_hint()}" }
                 if let Some(err) = address_error.read().as_ref() {
                     span { class: "error", role: "alert", "{err}" }
                 }
@@ -188,17 +235,17 @@ pub fn SettingsPanel(tile: Tile) -> Element {
                 class: "btn ghost",
                 r#type: "button",
                 onclick: move |_| { let _ = bp.set_follow(&ip, !following); },
-                if following { "{s::PAUSE}" } else { "{s::RESUME}" }
+                if following { "{s::pause()}" } else { "{s::resume()}" }
             }
             if *confirm_forget.read() {
-                div { class: "card stack-s confirm", role: "alertdialog", aria_label: s::FORGET_CONFIRM,
-                    p { "{s::FORGET_CONFIRM}" }
+                div { class: "card stack-s confirm", role: "alertdialog", aria_label: s::forget_confirm(),
+                    p { "{s::forget_confirm()}" }
                     div { class: "row",
                         button {
                             class: "btn ghost grow",
                             r#type: "button",
                             onclick: move |_| confirm_forget.set(false),
-                            "{s::CANCEL}"
+                            "{s::cancel()}"
                         }
                         button {
                             class: "btn danger grow",
@@ -207,7 +254,7 @@ pub fn SettingsPanel(tile: Tile) -> Element {
                                 let _ = bf.forget(&idf);
                                 nav.panel.set(None);
                             },
-                            "{s::FORGET_YES}"
+                            "{s::forget_yes()}"
                         }
                     }
                 }
@@ -216,7 +263,7 @@ pub fn SettingsPanel(tile: Tile) -> Element {
                     class: "btn ghost",
                     r#type: "button",
                     onclick: move |_| confirm_forget.set(true),
-                    "{s::FORGET}"
+                    "{s::forget()}"
                 }
             }
         }
@@ -261,7 +308,7 @@ fn Calibration(tile: Tile) -> Element {
             class: "calibrate",
             role: "slider",
             tabindex: "0",
-            aria_label: s::THRESHOLD,
+            aria_label: s::threshold(),
             aria_orientation: "vertical",
             aria_valuemin: "{logic::THRESHOLD_MIN_DBFS}",
             aria_valuemax: "{logic::THRESHOLD_MAX_DBFS}",

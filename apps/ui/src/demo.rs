@@ -3,6 +3,7 @@
 //! never touches the network or devices.
 
 use std::cell::{Cell, RefCell};
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use base64::Engine as _;
@@ -11,9 +12,10 @@ use dioxus::prelude::*;
 
 use crate::backend::{Backend, LocalFuture, Ui};
 use crate::model::{
-    CameraHere, Capabilities, Conn, Frame, Gain, LevelHistory, ListenerModel, ListenerRow, Mode,
-    Nearby, NetPath, PairOutcome, PairingModel, Platform, Prefs, RelayView, StationModel,
-    StationRun, StationSettingsModel, Talk, Theme, Tile, TileSettings, TrustedRow, UiError, Video,
+    Alarm, AlertSettings, CameraHere, Capabilities, Conn, Frame, Gain, LevelHistory, ListenerModel,
+    ListenerRow, Mode, Nearby, NetPath, PairOutcome, PairingModel, Platform, Prefs, RelayView,
+    Room, StationModel, StationRun, StationSettingsModel, Talk, Theme, Tile, TileSettings,
+    TrustedRow, UiError, Video, WakeUpEntry,
 };
 
 /// Timer of the hosting platform.
@@ -26,6 +28,7 @@ pub struct DemoBackend {
     theme: Rc<dyn Fn(Theme)>,
     prefs: RefCell<Prefs>,
     ui: Cell<Option<Ui>>,
+    logs: RefCell<HashMap<String, Vec<WakeUpEntry>>>,
 }
 
 impl std::fmt::Debug for DemoBackend {
@@ -52,6 +55,7 @@ impl DemoBackend {
             theme: apply_theme,
             prefs: RefCell::new(prefs),
             ui: Cell::new(None),
+            logs: RefCell::new(demo_logs()),
         }
     }
 
@@ -93,7 +97,53 @@ fn tile(id: &str, name: &str) -> Tile {
         down_for_ms: None,
         routes: 3,
         alerting: false,
+        room: Room::Quiet {
+            since_unix_ms: DEMO_NOW - 80 * MIN,
+        },
+        alarm: Alarm::Off,
+        paused_until_unix_ms: None,
+        log_revision: 1,
     }
+}
+
+/// The demo's wall clock (Unix ms).
+pub const DEMO_NOW: u64 = 1_700_000_600_000;
+const MIN: u64 = 60_000;
+
+fn wake(start: u64, minutes: u64) -> WakeUpEntry {
+    WakeUpEntry {
+        start_unix_ms: start,
+        end_unix_ms: Some(start + minutes * MIN),
+        loud_ms: minutes * 20_000,
+        peak_dbfs: Some(-22.0),
+        alerted: true,
+        alarmed: false,
+        not_the_baby: false,
+    }
+}
+
+/// Night logs: the Nursery's last two nights with a wake-up going on, an
+/// alarm and a "Not the baby"; Leo's room none.
+pub fn demo_logs() -> HashMap<String, Vec<WakeUpEntry>> {
+    let h = 60 * MIN;
+    let yesterday = DEMO_NOW - 24 * h;
+    let nursery = vec![
+        wake(yesterday - 3 * h, 6),
+        WakeUpEntry {
+            alarmed: true,
+            ..wake(yesterday + h + 14 * MIN, 12)
+        },
+        WakeUpEntry {
+            not_the_baby: true,
+            ..wake(yesterday + 4 * h, 2)
+        },
+        wake(DEMO_NOW - 2 * h, 9),
+        WakeUpEntry {
+            end_unix_ms: None,
+            ..wake(DEMO_NOW - 3 * MIN, 3)
+        },
+    ];
+    HashMap::from([(NURSERY.to_owned(), nursery), (LEO.to_owned(), Vec::new())])
 }
 
 /// The demo listener: three stations as in the design mockups.
@@ -111,9 +161,18 @@ pub fn demo_listener() -> ListenerModel {
         fps: 10,
     };
     nursery.alerting = true;
+    // FR-AL-5: an unanswered alert escalated; the room is awake.
+    nursery.room = Room::Awake {
+        since_unix_ms: DEMO_NOW - 3 * MIN,
+    };
+    nursery.alarm = Alarm::Ringing {
+        since_unix_ms: DEMO_NOW - 20_000,
+    };
     let mut leo = tile(LEO, "Leo's room");
     leo.charging = Some(true);
     leo.path = Some(NetPath::Relayed);
+    // FR-AL-7: "Not the baby" paused its alerts.
+    leo.paused_until_unix_ms = Some(DEMO_NOW + 7 * MIN);
     let mut grandma = tile(GRANDMA, "Grandma's");
     grandma.conn = Conn::Reconnecting {
         attempt: 3,
@@ -122,6 +181,7 @@ pub fn demo_listener() -> ListenerModel {
     grandma.path = None;
     grandma.level_dbfs = None;
     grandma.down_for_ms = Some(42_000);
+    grandma.room = Room::Unknown;
     ListenerModel {
         name: "Living room laptop".into(),
         device_id: "k3m9q2x7a4b8c5d6".into(),
@@ -322,7 +382,7 @@ impl Backend for DemoBackend {
     }
 
     fn unix_ms(&self) -> u64 {
-        1_700_000_600_000
+        DEMO_NOW
     }
 
     fn pair_invitation(&self, _input: String) -> LocalFuture<Result<PairOutcome, UiError>> {
@@ -390,18 +450,41 @@ impl Backend for DemoBackend {
         self.edit(station, |t| t.settings.muted = muted)
     }
 
-    fn set_alerts(
-        &self,
-        station: &str,
-        sound: bool,
-        unreachable: bool,
-        battery: bool,
-    ) -> Result<(), UiError> {
+    fn set_alerts(&self, station: &str, alerts: AlertSettings) -> Result<(), UiError> {
+        self.edit(station, |t| t.settings.alerts = alerts)
+    }
+
+    fn acknowledge(&self, station: &str) -> Result<(), UiError> {
+        self.edit(station, |t| t.alarm = Alarm::Off)
+    }
+
+    fn not_the_baby(&self, station: &str) -> Result<(), UiError> {
+        if let Some(l) = self.logs.borrow_mut().get_mut(station)
+            && let Some(last) = l.last_mut()
+        {
+            last.not_the_baby = true;
+        }
         self.edit(station, |t| {
-            t.settings.alert_sound = sound;
-            t.settings.alert_unreachable = unreachable;
-            t.settings.alert_battery = battery;
+            t.alarm = Alarm::Off;
+            t.room = Room::Quiet {
+                since_unix_ms: DEMO_NOW - 80 * MIN,
+            };
+            t.paused_until_unix_ms = Some(DEMO_NOW + 10 * MIN);
+            t.log_revision += 1;
         })
+    }
+
+    fn resume_alerts(&self, station: &str) -> Result<(), UiError> {
+        self.edit(station, |t| t.paused_until_unix_ms = None)
+    }
+
+    fn night_log(&self, station: &str) -> Result<Vec<WakeUpEntry>, UiError> {
+        Ok(self.logs.borrow().get(station).cloned().unwrap_or_default())
+    }
+
+    fn clear_night_log(&self, station: &str) -> Result<(), UiError> {
+        self.logs.borrow_mut().remove(station);
+        self.edit(station, |t| t.log_revision += 1)
     }
 
     fn set_solo(&self, station: Option<&str>) -> Result<(), UiError> {
@@ -513,7 +596,9 @@ impl Backend for DemoBackend {
 
     fn set_relay_server(&self, origin: &str) -> Result<(), UiError> {
         if !origin.starts_with("https://") && !origin.starts_with("http://") {
-            return Err(UiError::Other(crate::strings::RELAY_SERVER_INVALID.into()));
+            return Err(UiError::Other(
+                crate::strings::relay_server_invalid().into(),
+            ));
         }
         if let Some(mut ui) = self.ui.get()
             && let StationRun::Running(m) = &mut *ui.station.write()

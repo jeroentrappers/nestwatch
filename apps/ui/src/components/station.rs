@@ -43,8 +43,8 @@ pub fn StationScreen() -> Element {
         StationRun::Running(m) => rsx! { RunningStation { model: *m } },
         StationRun::Starting => rsx! {
             main { class: "page stack",
-                header { class: "app-top", Brand { title: s::APP.to_owned() } RoleSwitch {} }
-                p { class: "muted", role: "status", "{s::STATION_STARTING}" }
+                header { class: "app-top", Brand { title: s::app().to_owned() } RoleSwitch {} }
+                p { class: "muted", role: "status", "{s::station_starting()}" }
             }
         },
         StationRun::Stopped | StationRun::Failed(_) => {
@@ -54,12 +54,12 @@ pub fn StationScreen() -> Element {
             };
             rsx! {
                 main { class: "page stack",
-                    header { class: "app-top", Brand { title: s::APP.to_owned() } RoleSwitch {} }
+                    header { class: "app-top", Brand { title: s::app().to_owned() } RoleSwitch {} }
                     div { class: "card stack",
                         if let Some(e) = failed {
-                            p { role: "alert", strong { "{s::STATION_FAILED}" } " ({e})" }
+                            p { role: "alert", strong { "{s::station_failed()}" } " ({e})" }
                         } else {
-                            p { "{s::STATION_STOPPED}" }
+                            p { "{s::station_stopped()}" }
                         }
                         button {
                             class: "btn primary",
@@ -71,7 +71,7 @@ pub fn StationScreen() -> Element {
                                     let _ = f.await;
                                 });
                             },
-                            "{s::STATION_START}"
+                            "{s::station_start()}"
                         }
                     }
                 }
@@ -102,12 +102,12 @@ fn RunningStation(model: StationModel) -> Element {
                 class: "dim-screen dimmed",
                 role: "button",
                 tabindex: "0",
-                aria_label: s::DIMMED_LABEL,
+                aria_label: s::dimmed_label(),
                 onclick: move |_| dimmed.set(false),
                 onkeydown: move |_| dimmed.set(false),
                 Ring { level: model.level_dbfs, threshold, sound: hearing, small: true }
                 span { class: "{count_pill}", "{logic::listening_count(count)}" }
-                p { class: "caption", "{s::TAP_TO_BRIGHTEN}" }
+                p { class: "caption", "{s::tap_to_brighten()}" }
             }
         };
     }
@@ -130,7 +130,7 @@ fn RunningStation(model: StationModel) -> Element {
                     button {
                         class: "btn icon ghost",
                         r#type: "button",
-                        aria_label: s::SETTINGS,
+                        aria_label: s::settings(),
                         aria_expanded: "{settings.read()}",
                         onclick: move |_| settings.set(true),
                         "⚙︎"
@@ -143,12 +143,12 @@ fn RunningStation(model: StationModel) -> Element {
                 if model.camera_on {
                     span { class: "pill cam", "{logic::camera_pill(&model.listeners)}" }
                 } else {
-                    span { class: "pill plain", "{s::CAMERA_OFF}" }
+                    span { class: "pill plain", "{s::camera_off()}" }
                 }
                 if let Some(t) = &model.talker {
                     span { class: "pill voice", "{s::talking_through(t)}" }
                 } else if !model.settings.talk_enabled {
-                    span { class: "pill plain", "{s::TALK_OFF}" }
+                    span { class: "pill plain", "{s::talk_off()}" }
                 }
                 if let Some(b) = logic::battery_caption(model.battery, model.charging) {
                     span { class: "chip", "{b}" }
@@ -164,18 +164,18 @@ fn RunningStation(model: StationModel) -> Element {
                         class: "card audio-prompt",
                         r#type: "button",
                         onclick: move |_| unlock.unlock_audio(),
-                        strong { "{s::STATION_TAP_TO_START}" }
-                        span { class: "caption", "{s::STATION_TAP_HINT}" }
+                        strong { "{s::station_tap_to_start()}" }
+                        span { class: "caption", "{s::station_tap_hint()}" }
                     }
                 }
                 if devices.mic == Some(false) {
-                    p { class: "card error", role: "alert", "{s::MIC_UNAVAILABLE}" }
+                    p { class: "card error", role: "alert", "{s::mic_unavailable()}" }
                 }
                 div { class: "card stack-s keep-visible", role: "note",
-                    strong { "{s::STATION_WEB_KEEP_VISIBLE}" }
+                    strong { "{s::station_web_keep_visible()}" }
                     if let Some(w) = devices.wake_lock {
                         span { class: "caption",
-                            if w { "{s::WAKE_LOCK_ON}" } else { "{s::WAKE_LOCK_OFF}" }
+                            if w { "{s::wake_lock_on()}" } else { "{s::wake_lock_off()}" }
                         }
                     }
                 }
@@ -183,9 +183,9 @@ fn RunningStation(model: StationModel) -> Element {
             div { class: "hero",
                 Ring { level: model.level_dbfs, threshold, sound: hearing }
             }
-            section { class: "card stack-s listeners", aria_label: s::LISTENERS_HEADING,
+            section { class: "card stack-s listeners", aria_label: s::listeners_heading(),
                 if model.listeners.is_empty() {
-                    p { class: "muted", "{s::NO_LISTENERS}" }
+                    p { class: "muted", "{s::no_listeners()}" }
                 }
                 for l in model.listeners.iter() {
                     div { key: "{l.session}", class: "row-between",
@@ -205,22 +205,22 @@ fn RunningStation(model: StationModel) -> Element {
                             let _ = f.await;
                         });
                     },
-                    "{s::PAIR_LISTENER}"
+                    "{s::pair_listener()}"
                 }
                 button {
                     class: "btn ghost block",
                     r#type: "button",
                     onclick: move |_| dimmed.set(true),
-                    "{s::DIM_SCREEN}"
+                    "{s::dim_screen()}"
                 }
                 p { class: "caption footnote",
-                    if web { "{s::STATION_KEEPS_RUNNING_WEB}" } else { "{s::STATION_KEEPS_RUNNING}" }
+                    if web { "{s::station_keeps_running_web()}" } else { "{s::station_keeps_running()}" }
                 }
                 button {
                     class: "btn ghost",
                     r#type: "button",
                     onclick: move |_| nav.screen.set(Screen::About),
-                    "{s::ABOUT}"
+                    "{s::about()}"
                 }
             }
         }
@@ -256,13 +256,13 @@ fn PairingSheet(
     let close = backend.clone();
     let copy = backend.clone();
     rsx! {
-        div { class: "overlay", role: "dialog", aria_modal: "true", aria_label: s::PAIR_LISTENER,
+        div { class: "overlay", role: "dialog", aria_modal: "true", aria_label: s::pair_listener(),
             div { class: "sheet stack pairing",
-                h2 { "{s::PAIR_LISTENER}" }
+                h2 { "{s::pair_listener()}" }
                 match pairing {
                     None => rsx! {
                         p { class: "muted", role: "status",
-                            if paired.is_empty() { "{s::PAIR_OPENING}" } else { "{s::PAIR_CLOSED}" }
+                            if paired.is_empty() { "{s::pair_opening()}" } else { "{s::pair_closed()}" }
                         }
                     },
                     Some(p) => {
@@ -274,7 +274,7 @@ fn PairingSheet(
                         let (label, link, second) = logic::pairing_links(&p);
                         let link2 = link.clone();
                         rsx! {
-                            p { class: "muted", "{s::PAIR_INTRO}" }
+                            p { class: "muted", "{s::pair_intro()}" }
                             if let Some(q) = qr {
                                 div { class: "qr",
                                     svg {
@@ -283,7 +283,7 @@ fn PairingSheet(
                                         height: "190",
                                         shape_rendering: "crispEdges",
                                         role: "img",
-                                        "aria-label": s::QR_LABEL,
+                                        "aria-label": s::qr_label(),
                                         rect { width: "{q.size}", height: "{q.size}", fill: "#fff" }
                                         path { fill: "#17161d", d: "{q.path}" }
                                     }
@@ -291,12 +291,12 @@ fn PairingSheet(
                             }
                             if code_usable {
                                 div { class: "stack-s centered",
-                                    span { class: "caption", "{s::PAIR_CODE_INTRO}" }
+                                    span { class: "caption", "{s::pair_code_intro()}" }
                                     span { class: "code-display", "{p.code}" }
-                                    span { class: "caption", "{s::PAIR_STATION_ID} " span { class: "mono", "{logic::grouped_id(&device_id)}" } }
+                                    span { class: "caption", "{s::pair_station_id()} " span { class: "mono", "{logic::grouped_id(&device_id)}" } }
                                 }
                             } else {
-                                p { class: "caption", "{s::PAIR_CODE_RELAY_ONLY}" }
+                                p { class: "caption", "{s::pair_code_relay_only()}" }
                             }
                             p { class: "caption", role: "timer",
                                 "{s::pairing_open_for(&logic::remaining(p.remaining_ms), left)}"
@@ -312,7 +312,7 @@ fn PairingSheet(
                                             copied.set(true);
                                         }
                                     },
-                                    if *copied.read() { "{s::COPIED}" } else { "{s::COPY}" }
+                                    if *copied.read() { "{s::copied()}" } else { "{s::copy()}" }
                                 }
                             }
                             if let Some((label2, r)) = second {
@@ -326,7 +326,7 @@ fn PairingSheet(
                 }
                 if !paired.is_empty() {
                     div { class: "card stack-s just-paired", role: "status",
-                        span { class: "caption", "{s::PAIR_JUST_PAIRED}" }
+                        span { class: "caption", "{s::pair_just_paired()}" }
                         for (i, (name, number)) in paired.iter().enumerate() {
                             div { key: "{i}", class: "row-between",
                                 span { "{name}" }
@@ -342,7 +342,7 @@ fn PairingSheet(
                         close.close_pairing();
                         onclose.call(());
                     },
-                    "{s::DONE}"
+                    "{s::done()}"
                 }
             }
         }
@@ -371,9 +371,9 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
         .iter()
         .map(|g| {
             let label = match g {
-                Gain::Auto => s::GAIN_AUTO.to_owned(),
-                Gain::Db(0) => format!("0 {}", s::DB),
-                Gain::Db(n) => format!("+{n} {}", s::DB),
+                Gain::Auto => s::gain_auto().to_owned(),
+                Gain::Db(0) => format!("0 {}", s::db()),
+                Gain::Db(n) => format!("+{n} {}", s::db()),
             };
             (label, *g == set.gain)
         })
@@ -389,18 +389,18 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
     );
     let cam_note = match model.camera_here {
         CameraHere::Available => None,
-        CameraHere::Unavailable => Some(s::CAMERA_UNAVAILABLE_HERE),
-        CameraHere::Denied => Some(s::CAMERA_DENIED_HERE),
+        CameraHere::Unavailable => Some(s::camera_unavailable_here()),
+        CameraHere::Denied => Some(s::camera_denied_here()),
     };
     rsx! {
-        div { class: "overlay", role: "dialog", aria_modal: "true", aria_label: s::STATION_SETTINGS,
+        div { class: "overlay", role: "dialog", aria_modal: "true", aria_label: s::station_settings(),
             div { class: "sheet stack settings-sheet",
                 div { class: "row-between",
-                    h2 { "{s::STATION_SETTINGS}" }
+                    h2 { "{s::station_settings()}" }
                     button {
                         class: "btn icon ghost",
                         r#type: "button",
-                        aria_label: s::CLOSE,
+                        aria_label: s::close(),
                         onclick: move |_| onclose.call(()),
                         "×"
                     }
@@ -411,7 +411,7 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                         e.prevent_default();
                         let _ = b_name.rename_station(&name.peek());
                     },
-                    label { r#for: "station-name", "{s::STATION_NAME}" }
+                    label { r#for: "station-name", "{s::station_name()}" }
                     div { class: "row",
                         input {
                             id: "station-name",
@@ -420,11 +420,11 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                             value: "{name}",
                             oninput: move |e: FormEvent| name.set(e.value()),
                         }
-                        button { class: "btn", r#type: "submit", "{s::SAVE}" }
+                        button { class: "btn", r#type: "submit", "{s::save()}" }
                     }
                 }
                 SwitchRow {
-                    label: s::CAMERA_ALLOWED.to_owned(),
+                    label: s::camera_allowed().to_owned(),
                     checked: set.camera_enabled,
                     onchange: move |v: bool| b_cam.set_camera_enabled(v),
                 }
@@ -432,20 +432,20 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                     span { class: "caption", "{n}" }
                 }
                 SwitchRow {
-                    label: s::TALK_ALLOWED.to_owned(),
+                    label: s::talk_allowed().to_owned(),
                     checked: set.talk_enabled,
                     onchange: move |v: bool| b_talk.set_talk_enabled(v),
                 }
                 div { class: "field",
-                    span { class: "label", "{s::MIC_SENSITIVITY}" }
+                    span { class: "label", "{s::mic_sensitivity()}" }
                     Segmented {
-                        label: s::MIC_SENSITIVITY.to_owned(),
+                        label: s::mic_sensitivity().to_owned(),
                         options: gain_opts,
                         onselect: move |i: usize| b_gain.set_gain(gains[i]),
                     }
                 }
                 div { class: "field",
-                    label { r#for: "tb-volume", "{s::TALKBACK_VOLUME}" }
+                    label { r#for: "tb-volume", "{s::talkback_volume()}" }
                     input {
                         id: "tb-volume",
                         class: "range",
@@ -466,9 +466,9 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                 hr { class: "divider" }
                 RelaySettings { model: model.clone() }
                 hr { class: "divider" }
-                h3 { "{s::TRUSTED_LISTENERS}" }
+                h3 { "{s::trusted_listeners()}" }
                 if model.trusted.is_empty() {
-                    p { class: "muted", "{s::NO_TRUSTED}" }
+                    p { class: "muted", "{s::no_trusted()}" }
                 }
                 div { class: "list",
                     for t in model.trusted.iter() {
@@ -479,7 +479,7 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                                 &logic::ago(t.paired_unix_ms, now),
                                 &logic::ago(t.last_seen_unix_ms, now),
                             );
-                            let name = if t.name.is_empty() { s::UNNAMED.to_owned() } else { t.name.clone() };
+                            let name = if t.name.is_empty() { s::unnamed().to_owned() } else { t.name.clone() };
                             rsx! {
                                 div { key: "{t.id}", class: "item",
                                     div { class: "grow list-title",
@@ -489,9 +489,9 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                                     button {
                                         class: "btn danger",
                                         r#type: "button",
-                                        aria_label: "{s::REVOKE} {name}",
+                                        aria_label: "{s::revoke()} {name}",
                                         onclick: move |_| b.revoke(&id),
-                                        "{s::REVOKE}"
+                                        "{s::revoke()}"
                                     }
                                 }
                             }
@@ -501,7 +501,7 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                 hr { class: "divider" }
                 if let Some(u) = &model.http_url {
                     div { class: "field",
-                        span { class: "label", "{s::BROWSER_ADDRESS}" }
+                        span { class: "label", "{s::browser_address()}" }
                         span { class: "mono", "{u}" }
                         if let Some(h) = &model.https_url {
                             span { class: "mono", "{h}" }
@@ -510,13 +510,13 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                 }
                 if let Some(f) = &model.fingerprint {
                     div { class: "field",
-                        span { class: "label", "{s::HTTPS_FINGERPRINT}" }
+                        span { class: "label", "{s::https_fingerprint()}" }
                         span { class: "mono fingerprint", "{f}" }
-                        span { class: "caption", "{s::HTTPS_FINGERPRINT_HINT}" }
+                        span { class: "caption", "{s::https_fingerprint_hint()}" }
                     }
                 }
                 if backend.capabilities().platform == Platform::Web {
-                    p { class: "caption", "{s::BROWSER_STATION_STORAGE}" }
+                    p { class: "caption", "{s::browser_station_storage()}" }
                 }
                 ThemePicker {}
                 button {
@@ -528,7 +528,7 @@ fn StationSettings(model: StationModel, onclose: EventHandler<()>) -> Element {
                         spawn_forever(f);
                         onclose.call(());
                     },
-                    "{s::STATION_STOP}"
+                    "{s::station_stop()}"
                 }
             }
         }

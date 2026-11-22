@@ -17,15 +17,15 @@ pub fn ThemePicker() -> Element {
     let nav = use_context::<Nav>();
     let theme = nav.prefs.read().theme;
     let options = vec![
-        (s::THEME_SYSTEM.to_owned(), theme == Theme::System),
-        (s::THEME_NIGHT.to_owned(), theme == Theme::Night),
-        (s::THEME_DAY.to_owned(), theme == Theme::Day),
+        (s::theme_system().to_owned(), theme == Theme::System),
+        (s::theme_night().to_owned(), theme == Theme::Night),
+        (s::theme_day().to_owned(), theme == Theme::Day),
     ];
     rsx! {
         div { class: "row-between wrap",
-            span { "{s::THEME}" }
+            span { "{s::theme()}" }
             Segmented {
-                label: s::THEME.to_owned(),
+                label: s::theme().to_owned(),
                 options,
                 onselect: move |i: usize| {
                     let t = [Theme::System, Theme::Night, Theme::Day][i];
@@ -53,29 +53,29 @@ pub fn About() -> Element {
                 button {
                     class: "btn icon ghost",
                     r#type: "button",
-                    aria_label: s::BACK,
+                    aria_label: s::back(),
                     onclick: move |_| nav.screen.set(Screen::Home),
                     "‹"
                 }
-                h1 { "{s::ABOUT}" }
+                h1 { "{s::about()}" }
             }
             div { class: "card stack",
                 div { class: "row",
                     Logo { size: 48 }
                     div {
-                        h2 { "{s::APP}" }
-                        span { class: "caption", "{s::VERSION} {backend.version()}" }
+                        h2 { "{s::app()}" }
+                        span { class: "caption", "{s::version()} {backend.version()}" }
                     }
                 }
-                p { "{s::ABOUT_BODY}" }
-                p { class: "disclaimer", role: "note", strong { "{s::DISCLAIMER}" } }
+                p { "{s::about_body()}" }
+                p { class: "disclaimer", role: "note", strong { "{s::disclaimer()}" } }
                 if !device_id.is_empty() {
                     div { class: "field",
-                        span { class: "caption", "{s::DEVICE_ID}" }
+                        span { class: "caption", "{s::device_id()}" }
                         span { class: "mono", "{logic::grouped_id(&device_id)}" }
                     }
                 }
-                p { class: "caption", "{s::LICENSE}" }
+                p { class: "caption", "{s::license()}" }
             }
             div { class: "card stack", ThemePicker {} }
         }

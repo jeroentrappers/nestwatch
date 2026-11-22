@@ -17,8 +17,8 @@ use std::rc::Rc;
 use dioxus::prelude::*;
 
 use crate::model::{
-    Capabilities, Frame, Gain, LevelHistory, ListenerModel, Mode, Notice, NoticeKind, PairOutcome,
-    Prefs, StationDevices, StationRun, Theme, UiError,
+    AlertSettings, Capabilities, Frame, Gain, LevelHistory, ListenerModel, Mode, Notice,
+    NoticeKind, PairOutcome, Prefs, StationDevices, StationRun, Theme, UiError, WakeUpEntry,
 };
 
 /// A boxed, single-threaded future (UI tasks run on the UI thread).
@@ -47,6 +47,8 @@ pub struct Ui {
     pub audio_locked: Signal<bool>,
     /// Notifications can be enabled with a gesture (browser).
     pub notifications_askable: Signal<bool>,
+    /// Unix time in ms, refreshed every few seconds (room status, pauses).
+    pub now_unix_ms: Signal<u64>,
     next_notice: Signal<u64>,
 }
 
@@ -66,6 +68,7 @@ impl Ui {
             just_paired: Signal::new(Vec::new()),
             audio_locked: Signal::new(false),
             notifications_askable: Signal::new(false),
+            now_unix_ms: Signal::new(0),
             next_notice: Signal::new(1),
         }
     }
@@ -154,14 +157,18 @@ pub trait Backend {
     fn set_volume(&self, station: &str, volume: f32) -> Result<(), UiError>;
     /// Mute (FR-AU-6).
     fn set_muted(&self, station: &str, muted: bool) -> Result<(), UiError>;
-    /// Alert toggles.
-    fn set_alerts(
-        &self,
-        station: &str,
-        sound: bool,
-        unreachable: bool,
-        battery: bool,
-    ) -> Result<(), UiError>;
+    /// Alert toggles (product.md §3.5, FR-AL-5).
+    fn set_alerts(&self, station: &str, alerts: AlertSettings) -> Result<(), UiError>;
+    /// "I'm on it": acknowledges the sound alert or alarm (FR-AL-6).
+    fn acknowledge(&self, station: &str) -> Result<(), UiError>;
+    /// "Not the baby" (FR-AL-7).
+    fn not_the_baby(&self, station: &str) -> Result<(), UiError>;
+    /// Ends a "Not the baby" pause.
+    fn resume_alerts(&self, station: &str) -> Result<(), UiError>;
+    /// The night log, oldest first, the ongoing wake-up last (FR-SL-4).
+    fn night_log(&self, station: &str) -> Result<Vec<WakeUpEntry>, UiError>;
+    /// Clears the night log.
+    fn clear_night_log(&self, station: &str) -> Result<(), UiError>;
     /// Solo one station or none (FR-LS-2).
     fn set_solo(&self, station: Option<&str>) -> Result<(), UiError>;
     /// Push-to-talk (FR-TB-1).

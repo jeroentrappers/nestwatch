@@ -6,13 +6,28 @@ use std::collections::HashMap;
 use nestwatch_core::ListenMode;
 use nestwatch_core::VideoStateKind;
 use nestwatch_core::listener::{
-    ConnStatus, ListenerState, NetPath as CoreNetPath, StationView, TalkView, VideoView,
+    AlarmView, ConnStatus, ListenerState, NetPath as CoreNetPath, RoomView, StationView, TalkView,
+    VideoView, WakeUp,
 };
 
 use crate::logic;
 use crate::model::{
-    Conn, ListenerModel, Mode, Nearby, NetPath, Talk, Tile, TileSettings, Video, VideoProblem,
+    Alarm, AlertSettings, Conn, ListenerModel, Mode, Nearby, NetPath, Room, Talk, Tile,
+    TileSettings, Video, VideoProblem, WakeUpEntry,
 };
+
+/// A night log entry of the core.
+pub fn map_wake_up(w: WakeUp) -> WakeUpEntry {
+    WakeUpEntry {
+        start_unix_ms: w.start_unix_ms,
+        end_unix_ms: w.end_unix_ms,
+        loud_ms: w.loud_ms,
+        peak_dbfs: w.peak_dbfs,
+        alerted: w.alerted,
+        alarmed: w.alarmed,
+        not_the_baby: w.not_the_baby,
+    }
+}
 
 /// Remembers what snapshots do not carry: when a station went down.
 #[derive(Debug, Default)]
@@ -95,9 +110,13 @@ fn map_tile(v: &StationView, tracker: &mut Tracker, now_ms: u64, talk_possible: 
         preroll_ms: s.listen.preroll_ms,
         volume: s.volume,
         muted: s.muted,
-        alert_sound: s.alerts.sound,
-        alert_unreachable: s.alerts.unreachable,
-        alert_battery: s.alerts.battery,
+        alerts: AlertSettings {
+            sound: s.alerts.sound,
+            unreachable: s.alerts.unreachable,
+            battery: s.alerts.battery,
+            escalate: s.alerts.escalate,
+            escalate_after_s: s.alerts.escalate_after_s,
+        },
     };
     let has = |c: &str| v.caps.iter().any(|x| x == c);
     let live = conn == Conn::Live;
@@ -149,6 +168,18 @@ fn map_tile(v: &StationView, tracker: &mut Tracker, now_ms: u64, talk_possible: 
         down_for_ms,
         routes: 0,
         alerting: false,
+        room: match v.room {
+            RoomView::Unknown => Room::Unknown,
+            RoomView::Quiet { since_unix_ms } => Room::Quiet { since_unix_ms },
+            RoomView::Awake { since_unix_ms } => Room::Awake { since_unix_ms },
+        },
+        alarm: match v.alarm {
+            AlarmView::Off => Alarm::Off,
+            AlarmView::Pending { since_unix_ms } => Alarm::Pending { since_unix_ms },
+            AlarmView::Ringing { since_unix_ms } => Alarm::Ringing { since_unix_ms },
+        },
+        paused_until_unix_ms: v.paused_until_unix_ms,
+        log_revision: v.log_revision,
     };
     // The talker in `status` is ourselves while granted.
     if tile.talk == Talk::Granted {
@@ -184,6 +215,14 @@ mod tests {
             settings: StationSettings::default(),
             audio_frames: 0,
             preroll_frames: 0,
+            room: RoomView::Awake {
+                since_unix_ms: 1_000,
+            },
+            alarm: AlarmView::Ringing {
+                since_unix_ms: 2_000,
+            },
+            paused_until_unix_ms: Some(3_000),
+            log_revision: 4,
         }
     }
 
@@ -212,6 +251,17 @@ mod tests {
         assert!(t.alerting);
         assert_eq!(t.down_for_ms, None);
         assert_eq!(t.settings.threshold_dbfs, -50.0);
+        assert_eq!(
+            t.room,
+            Room::Awake {
+                since_unix_ms: 1_000
+            }
+        );
+        assert!(t.alarm.is_ringing());
+        assert_eq!(t.paused_until_unix_ms, Some(3_000));
+        assert_eq!(t.log_revision, 4);
+        assert!(t.settings.alerts.escalate);
+        assert_eq!(t.settings.alerts.escalate_after_s, 60);
     }
 
     #[test]

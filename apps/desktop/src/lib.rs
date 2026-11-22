@@ -83,6 +83,23 @@ pub fn prefs_path() -> PathBuf {
         .join("ui-prefs.txt")
 }
 
+/// Follows the system language (NFR-I18N-2) and time zone: call once at
+/// start, before the UI renders.
+pub fn init_locale() {
+    let lang = nestwatch_ui::i18n::Lang::from_tags(sys_locale::get_locales());
+    nestwatch_ui::i18n::set_language(lang);
+    nestwatch_ui::i18n::set_utc_offset(local_utc_offset);
+}
+
+/// The local UTC offset in minutes at a Unix time (the system time zone).
+pub fn local_utc_offset(unix_ms: u64) -> i32 {
+    use chrono::{Local, Offset, TimeZone};
+    i64::try_from(unix_ms)
+        .ok()
+        .and_then(|ms| Local.timestamp_millis_opt(ms).single())
+        .map_or(0, |d| d.offset().fix().local_minus_utc() / 60)
+}
+
 /// The desktop [`Host`].
 pub struct DesktopHost {
     /// Devices and OS services.

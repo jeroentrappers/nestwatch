@@ -28,7 +28,8 @@ use nestwatch_core::{CameraFacing, ListenMode};
 
 use crate::backend::{Backend, LocalFuture, Ui, race};
 use crate::model::{
-    AlertKind, Capabilities, Frame, Mode, NoticeKind, PairOutcome, Prefs, Theme, UiError,
+    AlertKind, AlertSettings, Capabilities, Frame, Mode, NoticeKind, PairOutcome, Prefs, Theme,
+    UiError, WakeUpEntry,
 };
 use crate::model::{Gain, StationRun};
 
@@ -152,6 +153,7 @@ fn alert_kind(a: nestwatch_core::listener::Alert) -> AlertKind {
         Alert::Unreachable => AlertKind::Unreachable,
         Alert::Reachable => AlertKind::Reachable,
         Alert::BatteryLow { percent } => AlertKind::BatteryLow(percent),
+        Alert::Alarm => AlertKind::Alarm,
     }
 }
 
@@ -383,23 +385,42 @@ impl Backend for EngineBackend {
         self.listener.set_muted(station, muted).map_err(plain)
     }
 
-    fn set_alerts(
-        &self,
-        station: &str,
-        sound: bool,
-        unreachable: bool,
-        battery: bool,
-    ) -> Result<(), UiError> {
+    fn set_alerts(&self, station: &str, a: AlertSettings) -> Result<(), UiError> {
         self.listener
             .set_alerts(
                 station,
                 AlertToggles {
-                    sound,
-                    unreachable,
-                    battery,
+                    sound: a.sound,
+                    unreachable: a.unreachable,
+                    battery: a.battery,
+                    escalate: a.escalate,
+                    escalate_after_s: a.escalate_after_s,
                 },
             )
             .map_err(plain)
+    }
+
+    fn acknowledge(&self, station: &str) -> Result<(), UiError> {
+        self.listener.acknowledge(station).map_err(plain)
+    }
+
+    fn not_the_baby(&self, station: &str) -> Result<(), UiError> {
+        self.listener.not_the_baby(station).map_err(plain)
+    }
+
+    fn resume_alerts(&self, station: &str) -> Result<(), UiError> {
+        self.listener.resume_alerts(station).map_err(plain)
+    }
+
+    fn night_log(&self, station: &str) -> Result<Vec<WakeUpEntry>, UiError> {
+        self.listener
+            .night_log(station)
+            .map(|v| v.into_iter().map(listener::map_wake_up).collect())
+            .map_err(plain)
+    }
+
+    fn clear_night_log(&self, station: &str) -> Result<(), UiError> {
+        self.listener.clear_night_log(station).map_err(plain)
     }
 
     fn set_solo(&self, station: Option<&str>) -> Result<(), UiError> {
@@ -556,7 +577,7 @@ impl Backend for EngineBackend {
             .station()
             .ok_or(UiError::Other("station not running".into()))?;
         s.set_relay_server(origin)
-            .map_err(|_| UiError::Other(crate::strings::RELAY_SERVER_INVALID.into()))
+            .map_err(|_| UiError::Other(crate::strings::relay_server_invalid().into()))
     }
 
     fn reset_relay_identity(&self) -> Result<(), UiError> {

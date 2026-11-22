@@ -10,11 +10,14 @@
 //! - [`NESTWATCH_CSS`] is `design/nestwatch.css` verbatim; [`APP_CSS`] holds the few
 //!   app-only additions. Hosts load both (as files on the web, where the
 //!   station's CSP forbids inline styles; in the head on desktop).
-//! - All English text lives in [`strings`] (NFR-I18N-1).
+//! - All text lives in [`strings`] (English, the reference) and the
+//!   translation files read by [`i18n`] (NFR-I18N-1/2).
 
+pub mod alarm;
 pub mod backend;
 pub mod components;
 pub mod demo;
+pub mod i18n;
 pub mod logic;
 pub mod model;
 pub mod qr;

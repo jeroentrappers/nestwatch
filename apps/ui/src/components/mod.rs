@@ -7,6 +7,7 @@ pub mod app;
 pub mod camera;
 pub mod common;
 pub mod listener;
+pub mod night_log;
 pub mod notices;
 pub mod relay;
 pub mod settings_panel;

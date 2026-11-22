@@ -67,12 +67,12 @@ pub fn Meter(level: Option<f32>, threshold: Option<f32>) -> Element {
     let now = level.unwrap_or(logic::METER_FLOOR_DBFS).round();
     let text = level
         .map(logic::db)
-        .unwrap_or_else(|| s::NO_LEVEL.to_owned());
+        .unwrap_or_else(|| s::no_level().to_owned());
     rsx! {
         div {
             class: "meter",
             role: "meter",
-            aria_label: s::METER_LABEL,
+            aria_label: s::meter_label(),
             aria_valuemin: "{logic::METER_FLOOR_DBFS}",
             aria_valuemax: "{logic::METER_CEIL_DBFS}",
             aria_valuenow: "{now}",
@@ -106,18 +106,22 @@ pub fn Ring(
     if small {
         class.push_str(" small");
     }
-    let word = if sound { s::RING_SOUND } else { s::RING_QUIET };
+    let word = if sound {
+        s::ring_sound()
+    } else {
+        s::ring_quiet()
+    };
     let caption = if small {
         word.to_owned()
     } else {
-        format!("{} · {word}", s::DB)
+        format!("{} · {word}", s::db())
     };
     let text = format!("{} · {word}", logic::db(level));
     rsx! {
         div {
             class: "{class}",
             role: "meter",
-            aria_label: s::RING_LABEL,
+            aria_label: s::ring_label(),
             aria_valuemin: "{logic::METER_FLOOR_DBFS}",
             aria_valuemax: "{logic::METER_CEIL_DBFS}",
             aria_valuenow: "{level.round()}",
@@ -185,6 +189,7 @@ pub fn Segmented(
     label: String,
     options: Vec<(String, bool)>,
     onselect: EventHandler<usize>,
+    #[props(default)] disabled: bool,
 ) -> Element {
     rsx! {
         div { class: "segmented", role: "group", aria_label: "{label}",
@@ -193,6 +198,7 @@ pub fn Segmented(
                     key: "{i}",
                     r#type: "button",
                     aria_pressed: "{on}",
+                    disabled,
                     onclick: move |_| onselect.call(i),
                     "{text}"
                 }

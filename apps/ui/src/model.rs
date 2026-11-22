@@ -199,12 +199,102 @@ pub struct TileSettings {
     pub volume: f32,
     /// Muted.
     pub muted: bool,
+    /// Alert toggles.
+    pub alerts: AlertSettings,
+}
+
+/// Per-station alert toggles (product.md §3.5, FR-AL-5).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AlertSettings {
     /// Sound alerts.
-    pub alert_sound: bool,
+    pub sound: bool,
     /// Unreachable alerts.
-    pub alert_unreachable: bool,
+    pub unreachable: bool,
     /// Battery alerts.
-    pub alert_battery: bool,
+    pub battery: bool,
+    /// Escalate unanswered sound alerts to the alarm.
+    pub escalate: bool,
+    /// Seconds after the sound alert (30, 60, 120 or 300).
+    pub escalate_after_s: u16,
+}
+
+impl AlertSettings {
+    /// The "Alarm after" choices in seconds.
+    pub const ESCALATE_CHOICES: [u16; 4] = [30, 60, 120, 300];
+}
+
+impl Default for AlertSettings {
+    fn default() -> Self {
+        Self {
+            sound: true,
+            unreachable: true,
+            battery: true,
+            escalate: true,
+            escalate_after_s: 60,
+        }
+    }
+}
+
+/// Room status of a live station (FR-SL-3).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Room {
+    /// Not live: nothing shown.
+    #[default]
+    Unknown,
+    /// No wake-up since this Unix time.
+    Quiet {
+        /// Unix ms.
+        since_unix_ms: u64,
+    },
+    /// A wake-up going on since this Unix time.
+    Awake {
+        /// Unix ms.
+        since_unix_ms: u64,
+    },
+}
+
+/// Alarm state of a station (FR-AL-5, FR-AL-6).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Alarm {
+    /// Nothing to answer.
+    #[default]
+    Off,
+    /// A sound alert nobody answered yet.
+    Pending {
+        /// Unix ms of the sound alert.
+        since_unix_ms: u64,
+    },
+    /// The alarm rings.
+    Ringing {
+        /// Unix ms when it started ringing.
+        since_unix_ms: u64,
+    },
+}
+
+impl Alarm {
+    /// The alarm rings.
+    pub fn is_ringing(self) -> bool {
+        matches!(self, Self::Ringing { .. })
+    }
+}
+
+/// One wake-up of the night log (FR-SL-4).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct WakeUpEntry {
+    /// First loud moment (Unix ms).
+    pub start_unix_ms: u64,
+    /// Last loud moment; `None` while it goes on.
+    pub end_unix_ms: Option<u64>,
+    /// Total loud time.
+    pub loud_ms: u64,
+    /// Loudest level.
+    pub peak_dbfs: Option<f32>,
+    /// It raised a sound alert.
+    pub alerted: bool,
+    /// It escalated to the alarm.
+    pub alarmed: bool,
+    /// Marked "Not the baby".
+    pub not_the_baby: bool,
 }
 
 impl Default for TileSettings {
@@ -216,9 +306,7 @@ impl Default for TileSettings {
             preroll_ms: 500,
             volume: 1.0,
             muted: false,
-            alert_sound: true,
-            alert_unreachable: true,
-            alert_battery: true,
+            alerts: AlertSettings::default(),
         }
     }
 }
@@ -266,6 +354,14 @@ pub struct Tile {
     pub routes: usize,
     /// The station is in the sound alert halo (sound flowing / loud).
     pub alerting: bool,
+    /// Room status (FR-SL-3).
+    pub room: Room,
+    /// Alarm state (FR-AL-5).
+    pub alarm: Alarm,
+    /// Sound alerts paused by "Not the baby" until this Unix time (FR-AL-7).
+    pub paused_until_unix_ms: Option<u64>,
+    /// Changes whenever the night log of this station changes.
+    pub log_revision: u64,
 }
 
 /// A station found on the local network (protocol.md §3.4).
@@ -492,6 +588,8 @@ pub enum AlertKind {
     Reachable,
     /// Battery low.
     BatteryLow(u8),
+    /// The escalating alarm started ringing (FR-AL-5).
+    Alarm,
 }
 
 /// Something to tell the user in the notice area.
@@ -569,17 +667,17 @@ impl UiError {
     pub fn message(&self) -> String {
         use crate::strings as s;
         match self {
-            Self::InvalidInvite => s::ERR_INVALID_INVITE.into(),
-            Self::InvalidCode => s::ERR_INVALID_CODE.into(),
-            Self::InvalidId => s::ERR_INVALID_ID.into(),
-            Self::InvalidAddress => s::ERR_INVALID_ADDRESS.into(),
-            Self::Unreachable => s::ERR_UNREACHABLE.into(),
-            Self::Refused => s::ERR_REFUSED.into(),
-            Self::Rejected => s::ERR_REJECTED.into(),
-            Self::TooMany => s::ERR_TOO_MANY.into(),
-            Self::NotConnected => s::ERR_NOT_CONNECTED.into(),
-            Self::Unsupported => s::ERR_GENERIC.into(),
-            Self::Other(m) => format!("{} ({m})", s::ERR_GENERIC),
+            Self::InvalidInvite => s::err_invalid_invite().into(),
+            Self::InvalidCode => s::err_invalid_code().into(),
+            Self::InvalidId => s::err_invalid_id().into(),
+            Self::InvalidAddress => s::err_invalid_address().into(),
+            Self::Unreachable => s::err_unreachable().into(),
+            Self::Refused => s::err_refused().into(),
+            Self::Rejected => s::err_rejected().into(),
+            Self::TooMany => s::err_too_many().into(),
+            Self::NotConnected => s::err_not_connected().into(),
+            Self::Unsupported => s::err_generic().into(),
+            Self::Other(m) => format!("{} ({m})", s::err_generic()),
         }
     }
 }

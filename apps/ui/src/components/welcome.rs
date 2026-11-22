@@ -37,11 +37,11 @@ pub fn Welcome() -> Element {
         main { class: "page welcome stack",
             div { class: "stack hero-brand",
                 Logo { size: 64 }
-                h1 { "{s::APP}" }
-                p { class: "muted", "{s::PROMISE}" }
+                h1 { "{s::app()}" }
+                p { class: "muted", "{s::promise()}" }
             }
             div { class: "card disclaimer", role: "note",
-                p { "{s::DISCLAIMER}" }
+                p { "{s::disclaimer()}" }
             }
             if cards {
                 div { class: "role-choice",
@@ -49,15 +49,15 @@ pub fn Welcome() -> Element {
                         class: "card role-card",
                         r#type: "button",
                         onclick: move |_| choose(Role::Station),
-                        h2 { "{s::ROLE_STATION}" }
-                        p { class: "muted", "{s::ROLE_STATION_HINT}" }
+                        h2 { "{s::role_station()}" }
+                        p { class: "muted", "{s::role_station_hint()}" }
                     }
                     button {
                         class: "card role-card",
                         r#type: "button",
                         onclick: move |_| choose2(Role::Listener),
-                        h2 { "{s::ROLE_LISTENER}" }
-                        p { class: "muted", "{s::ROLE_LISTENER_HINT}" }
+                        h2 { "{s::role_listener()}" }
+                        p { class: "muted", "{s::role_listener_hint()}" }
                     }
                 }
             } else {
@@ -65,7 +65,7 @@ pub fn Welcome() -> Element {
                     class: "btn primary block",
                     r#type: "button",
                     onclick: move |_| choose(Role::Listener),
-                    "{s::DISCLAIMER_ACCEPT}"
+                    "{s::disclaimer_accept()}"
                 }
                 if caps.station {
                     div { class: "stack-s web-station-entry",
@@ -73,9 +73,9 @@ pub fn Welcome() -> Element {
                             class: "btn ghost block",
                             r#type: "button",
                             onclick: move |_| choose3(Role::Station),
-                            "{s::STATION_USE_THIS_DEVICE}"
+                            "{s::station_use_this_device()}"
                         }
-                        p { class: "caption", "{s::ROLE_STATION_HINT_WEB}" }
+                        p { class: "caption", "{s::role_station_hint_web()}" }
                     }
                 }
             }

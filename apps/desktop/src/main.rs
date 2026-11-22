@@ -61,7 +61,7 @@ fn js_string(s: &str) -> String {
 
 /// The tray tooltip: state in words (platforms.md §2.4).
 fn tray_state(ui: &Ui) -> String {
-    let mut parts = vec![nestwatch_ui::strings::APP.to_owned()];
+    let mut parts = vec![nestwatch_ui::strings::app().to_owned()];
     if let StationRun::Running(m) = &*ui.station.read() {
         parts.push(format!(
             "{}: {}",
@@ -110,13 +110,30 @@ fn App() -> Element {
 fn Tray(backend: BackendHandle) -> Element {
     let tray = use_hook(|| {
         let menu = Menu::new();
-        let show = MenuItem::with_id("show", "Show Nestwatch", true, None);
-        let quit = MenuItem::with_id("quit", "Quit Nestwatch", true, None);
+        let show = MenuItem::with_id("show", nestwatch_ui::strings::tray_show(), true, None);
+        let quit = MenuItem::with_id("quit", nestwatch_ui::strings::tray_quit(), true, None);
         let _ = menu.append_items(&[&show, &PredefinedMenuItem::separator(), &quit]);
         let icon = TrayIcon::from_rgba(nestwatch_desktop::logo_rgba(32), 32, 32).ok();
         init_tray_icon(menu, icon)
     });
     let ui = use_context::<Ui>();
+    // FR-AL-5 (platforms.md, desktop): a ringing alarm brings the window
+    // to the front; the alarm itself plays in `listener_host`.
+    {
+        let mut was_ringing = use_signal(|| false);
+        use_effect(move || {
+            let ringing = logic::any_ringing(&ui.listener.read().tiles);
+            if ringing && !*was_ringing.peek() {
+                let w = window();
+                w.set_visible(true);
+                w.set_minimized(false);
+                w.set_focus();
+            }
+            if ringing != *was_ringing.peek() {
+                was_ringing.set(ringing);
+            }
+        });
+    }
     {
         let tray = tray.clone();
         use_effect(move || {
@@ -150,6 +167,7 @@ fn Tray(backend: BackendHandle) -> Element {
 }
 
 fn main() {
+    nestwatch_desktop::init_locale();
     let rt = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()
@@ -181,7 +199,10 @@ fn main() {
     let icon =
         dioxus::desktop::tao::window::Icon::from_rgba(nestwatch_desktop::logo_rgba(64), 64, 64)
             .ok();
-    let head = format!("<style>{NESTWATCH_CSS}</style><style>{APP_CSS}</style>");
+    let head = format!(
+        "<style>{NESTWATCH_CSS}</style><style>{APP_CSS}</style><script>document.documentElement.lang = '{}';</script>",
+        nestwatch_ui::i18n::language().tag()
+    );
     let config = Config::new()
         .with_window(
             WindowBuilder::new()

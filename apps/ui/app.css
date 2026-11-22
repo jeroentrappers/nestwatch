@@ -97,3 +97,20 @@ body { min-height: 100vh; }
   .station .bottom-actions { margin-top: var(--space-4); }
   .segmented button { padding: 8px 10px; }
 }
+
+/* Alert banner, room status, pause and night log (FR-AL-5..7, §3.11). */
+.alert-banner { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border-radius: 12px; background: var(--coral-soft); border: 1px solid color-mix(in srgb, var(--coral) 45%, transparent); }
+.alert-banner .banner-icon { font-size: var(--text-l); line-height: 1; }
+.alert-banner.ringing { background: var(--coral); color: var(--ink-0); border-color: var(--coral); }
+.alert-banner.ringing .caption { color: inherit; opacity: 0.9; }
+.card.tile.ringing { box-shadow: 0 0 0 6px var(--coral-soft), var(--shadow); }
+.btn.alarm { background: var(--ink-0); color: var(--coral); font-weight: 700; }
+.room-status, .paused-notice { min-height: 32px; }
+.pill.alarm { background: var(--coral-soft); color: var(--coral); }
+.pill.muted, .wake-up.not-baby > span:first-child { opacity: 0.7; }
+.wake-ups { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.wake-up { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: no-preference) {
+  .alert-banner.ringing .banner-icon { animation: nw-ring 1s ease-in-out infinite; }
+  @keyframes nw-ring { 50% { transform: rotate(-12deg); } }
+}

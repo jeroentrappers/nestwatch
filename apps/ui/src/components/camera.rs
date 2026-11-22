@@ -19,13 +19,13 @@ pub fn CameraView(tile: Tile) -> Element {
     let frame = ui.frames.read().get(&tile.id).cloned();
     let streaming = matches!(tile.video, Video::Streaming { .. });
     let message = match &tile.video {
-        Video::Starting | Video::Off => Some(s::CAMERA_STARTING),
-        Video::Streaming { .. } if frame.is_none() => Some(s::CAMERA_STARTING),
+        Video::Starting | Video::Off => Some(s::camera_starting()),
+        Video::Streaming { .. } if frame.is_none() => Some(s::camera_starting()),
         Video::Streaming { .. } => None,
-        Video::Problem(VideoProblem::Disabled) => Some(s::CAMERA_DISABLED),
-        Video::Problem(VideoProblem::Unavailable) => Some(s::CAMERA_UNAVAILABLE),
-        Video::Problem(VideoProblem::Denied) => Some(s::CAMERA_DENIED),
-        Video::Problem(VideoProblem::Stopped) => Some(s::CAMERA_STOPPED),
+        Video::Problem(VideoProblem::Disabled) => Some(s::camera_disabled()),
+        Video::Problem(VideoProblem::Unavailable) => Some(s::camera_unavailable()),
+        Video::Problem(VideoProblem::Denied) => Some(s::camera_denied()),
+        Video::Problem(VideoProblem::Stopped) => Some(s::camera_stopped()),
     };
     let info = match &tile.video {
         Video::Streaming { w, h, fps } => Some(s::frame_info(*w, *h, *fps)),
@@ -43,7 +43,7 @@ pub fn CameraView(tile: Tile) -> Element {
                     div { class: "placeholder" }
                 }
                 if streaming {
-                    span { class: "pill cam badge", "{s::CAMERA_LIVE}" }
+                    span { class: "pill cam badge", "{s::camera_live()}" }
                 }
                 if let Some(m) = message {
                     p { class: "video-message", role: "status", "{m}" }
@@ -52,7 +52,7 @@ pub fn CameraView(tile: Tile) -> Element {
             div { class: "row-between wrap",
                 div { class: "row",
                     Toggle {
-                        label: s::NIGHT_IMAGE.to_owned(),
+                        label: s::night_image().to_owned(),
                         pressed: *night.read(),
                         onclick: move |_| {
                             let n = !*night.peek();
@@ -68,7 +68,7 @@ pub fn CameraView(tile: Tile) -> Element {
                             front.set(f);
                             let _ = b2.set_video_options(&id2, f, *night.peek());
                         },
-                        "{s::SWITCH_CAMERA}"
+                        "{s::switch_camera()}"
                     }
                 }
                 if let Some(i) = info {

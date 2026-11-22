@@ -9,6 +9,8 @@
 //! - Talk-back: `getUserMedia` (secure contexts only) into a separate
 //!   context at the device rate, blocks fed to `push_talk_capture`.
 //! - Alert sound: two short tones on the playback context.
+//! - Alarm (FR-AL-5): `nestwatch_ui::alarm` mixed into the pulled frames
+//!   while any station's alarm rings, whatever the stations' mute.
 //!
 //! Counters are mirrored to `window.__nestwatchAudio` for diagnostics and tests
 //! (headless browsers cannot be heard).
@@ -68,6 +70,8 @@ pub struct Audio {
     stats: Object,
     mic_gen: Cell<u64>,
     on_unlocked: RefCell<Option<Box<dyn Fn()>>>,
+    alarm_on: Cell<bool>,
+    alarm_pos: Cell<u64>,
 }
 
 impl std::fmt::Debug for Audio {
@@ -99,6 +103,8 @@ impl Audio {
             stats,
             mic_gen: Cell::new(0),
             on_unlocked: RefCell::new(None),
+            alarm_on: Cell::new(false),
+            alarm_pos: Cell::new(0),
         })
     }
 
@@ -188,6 +194,22 @@ impl Audio {
             c.non_silent += 1.0;
         }
         c.peak = c.peak.max(f64::from(peak) / 32768.0);
+        drop(c);
+        if self.alarm_on.get() {
+            let mut pos = self.alarm_pos.get();
+            nestwatch_ui::alarm::mix_f32(out, &mut pos);
+            self.alarm_pos.set(pos);
+        }
+    }
+
+    /// Starts or stops the alarm (FR-AL-5); a new alarm starts its ramp
+    /// again. It plays once audio is unlocked.
+    pub fn set_alarm(&self, on: bool) {
+        if on && !self.alarm_on.get() {
+            self.alarm_pos.set(0);
+        }
+        self.alarm_on.set(on);
+        set(&self.stats, "alarm", on);
     }
 
     fn publish_counters(&self) {

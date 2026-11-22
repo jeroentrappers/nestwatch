@@ -2,7 +2,7 @@
 //! Listener devices on desktop: speaker, talk-back microphone, alert
 //! notifications and the alert tone (product.md §3.2, §3.5, §3.6).
 
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
 use nestwatch_core::listener::{Alert, ListenerEngine, ListenerEvent};
@@ -10,7 +10,7 @@ use nestwatch_platform::{
     AudioStream, CaptureRequest, DesktopPlatform, Notification, PlaybackRequest, PlaybackSource,
     Samples, StreamFormat, Urgency,
 };
-use nestwatch_ui::strings as s;
+use nestwatch_ui::{alarm, strings as s};
 
 /// Samples of the alert tone at 16 kHz (two 200 ms tones).
 const TONE_SAMPLES: u32 = 6_720;
@@ -45,11 +45,53 @@ pub fn mix_tone(frame: &mut [i16], left: &AtomicU32) {
     left.store(n, Ordering::Relaxed);
 }
 
+/// The escalating alarm (FR-AL-5): rings while any station's alarm rings,
+/// mixed into the speaker output whatever the stations' volume or mute.
+#[derive(Debug, Default)]
+pub struct AlarmPlayer {
+    ringing: AtomicBool,
+    pos: AtomicU64,
+}
+
+impl AlarmPlayer {
+    /// Starts or stops ringing; a new alarm starts the ramp again.
+    pub fn set_ringing(&self, on: bool) {
+        if on && !self.ringing.load(Ordering::Relaxed) {
+            self.pos.store(0, Ordering::Relaxed);
+        }
+        self.ringing.store(on, Ordering::Relaxed);
+    }
+
+    /// Whether it rings.
+    pub fn is_ringing(&self) -> bool {
+        self.ringing.load(Ordering::Relaxed)
+    }
+
+    /// Adds the alarm to a 16 kHz frame while ringing.
+    pub fn mix(&self, frame: &mut [i16]) {
+        if !self.is_ringing() {
+            return;
+        }
+        let mut pos = self.pos.load(Ordering::Relaxed);
+        alarm::mix_i16(frame, &mut pos);
+        self.pos.store(pos, Ordering::Relaxed);
+    }
+}
+
+/// Whether any station's alarm rings in a listener snapshot.
+pub fn any_ringing(state: &nestwatch_core::listener::ListenerState) -> bool {
+    state
+        .stations
+        .iter()
+        .any(|v| matches!(v.alarm, nestwatch_core::listener::AlarmView::Ringing { .. }))
+}
+
 /// The listener's running devices; dropping it stops them.
 pub struct ListenerDevices {
     _speaker: Option<Box<dyn AudioStream>>,
     mic: Arc<Mutex<Option<Box<dyn AudioStream>>>>,
     task: tokio::task::JoinHandle<()>,
+    alarm_task: tokio::task::JoinHandle<()>,
 }
 
 impl std::fmt::Debug for ListenerDevices {
@@ -61,6 +103,7 @@ impl std::fmt::Debug for ListenerDevices {
 impl Drop for ListenerDevices {
     fn drop(&mut self) {
         self.task.abort();
+        self.alarm_task.abort();
         if let Ok(mut m) = self.mic.lock() {
             m.take();
         }
@@ -71,12 +114,15 @@ impl Drop for ListenerDevices {
 /// tokio runtime).
 pub fn start(platform: &DesktopPlatform, engine: &ListenerEngine) -> ListenerDevices {
     let tone = Arc::new(AtomicU32::new(0));
+    let player = Arc::new(AlarmPlayer::default());
     let speaker = {
         let e = engine.clone();
         let tone = tone.clone();
+        let player = player.clone();
         let src = PlaybackSource::Pcm16k(Box::new(move |frame| {
             e.pull_playback(frame);
             mix_tone(frame, &tone);
+            player.mix(frame);
             true
         }));
         match platform
@@ -92,10 +138,24 @@ pub fn start(platform: &DesktopPlatform, engine: &ListenerEngine) -> ListenerDev
     };
     let mic = Arc::new(Mutex::new(None));
     let task = tokio::spawn(events(platform.clone(), engine.clone(), mic.clone(), tone));
+    let alarm_task = {
+        let engine = engine.clone();
+        tokio::spawn(async move {
+            let mut rx = engine.state();
+            loop {
+                player.set_ringing(any_ringing(&rx.borrow_and_update()));
+                if rx.changed().await.is_err() {
+                    break;
+                }
+            }
+            player.set_ringing(false);
+        })
+    };
     ListenerDevices {
         _speaker: speaker,
         mic,
         task,
+        alarm_task,
     }
 }
 
@@ -106,10 +166,16 @@ pub fn alert_notification(station: &str, alert: Alert) -> Notification {
         Alert::Unreachable => (s::alert_unreachable(station), Urgency::Critical),
         Alert::Reachable => (s::alert_reachable(station), Urgency::Low),
         Alert::BatteryLow { percent } => (s::alert_battery(station, percent), Urgency::Critical),
+        Alert::Alarm => (s::alarm_title(station), Urgency::Critical),
+    };
+    let body = if alert == Alert::Alarm {
+        s::alarm_body()
+    } else {
+        s::alert_body()
     };
     Notification {
         title,
-        body: s::ALERT_BODY.to_owned(),
+        body: body.to_owned(),
         urgency,
     }
 }
@@ -167,7 +233,8 @@ async fn events(
                     .find(|v| v.id == station_id)
                     .map(|v| v.name.clone())
                     .unwrap_or_default();
-                if !matches!(alert, Alert::Reachable) {
+                // The alarm has its own sound (AlarmPlayer).
+                if !matches!(alert, Alert::Reachable | Alert::Alarm) {
                     tone.store(TONE_SAMPLES, Ordering::Relaxed);
                 }
                 if let Err(e) = platform.notifier.notify(&alert_notification(&name, alert)) {
@@ -210,5 +277,26 @@ mod tests {
             alert_notification("Nursery", Alert::Reachable).urgency,
             Urgency::Low
         );
+        let a = alert_notification("Nursery", Alert::Alarm);
+        assert_eq!(a.title, s::alarm_title("Nursery"));
+        assert_eq!(a.body, s::alarm_body());
+        assert_eq!(a.urgency, Urgency::Critical);
+    }
+
+    #[test]
+    fn the_alarm_plays_only_while_ringing_and_restarts_its_ramp() {
+        let p = AlarmPlayer::default();
+        let mut f = [0i16; 320];
+        p.mix(&mut f);
+        assert!(f.iter().all(|&x| x == 0));
+        p.set_ringing(true);
+        p.mix(&mut f);
+        assert!(f.iter().any(|&x| x != 0));
+        assert_eq!(p.pos.load(Ordering::Relaxed), 320);
+        p.set_ringing(true);
+        assert_eq!(p.pos.load(Ordering::Relaxed), 320, "still the same alarm");
+        p.set_ringing(false);
+        p.set_ringing(true);
+        assert_eq!(p.pos.load(Ordering::Relaxed), 0, "a new alarm ramps again");
     }
 }

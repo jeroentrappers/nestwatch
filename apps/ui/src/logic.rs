@@ -2,7 +2,9 @@
 //! Pure presentation logic: level mapping, formatting, status pills and
 //! calibration chart geometry. No Dioxus, no engines; unit tested.
 
-use crate::model::{Conn, ListenerRow, Mode, NetPath, PairingModel, RelayView, Talk, Tile};
+use crate::model::{
+    Alarm, Conn, ListenerRow, Mode, NetPath, PairingModel, RelayView, Room, Talk, Tile, WakeUpEntry,
+};
 use crate::strings as s;
 
 /// dBFS shown at the left end of meters (0 %).
@@ -54,7 +56,7 @@ pub fn db_number(dbfs: f32) -> String {
 
 /// `−56 dB`.
 pub fn db(dbfs: f32) -> String {
-    format!("{} {}", db_number(dbfs), s::DB)
+    format!("{} {}", db_number(dbfs), s::db())
 }
 
 /// `0:42`, `9:12`, `1:02:03`.
@@ -77,7 +79,7 @@ pub fn remaining(ms: u64) -> String {
 pub fn ago(then_unix_ms: u64, now_unix_ms: u64) -> String {
     let d = now_unix_ms.saturating_sub(then_unix_ms) / 1000;
     match d {
-        0..60 => s::AGO_NOW.into(),
+        0..60 => s::ago_now().into(),
         60..3_600 => s::ago_minutes(d / 60),
         3_600..86_400 => s::ago_hours(d / 3_600),
         _ => s::ago_days(d / 86_400),
@@ -174,19 +176,19 @@ pub fn tile_pill(tile: &Tile) -> Pill {
     match &tile.conn {
         Conn::Live => {
             if tile.talk == Talk::Granted {
-                Pill::new("voice", s::STATUS_YOU_TALK)
+                Pill::new("voice", s::status_you_talk())
             } else if let Some(t) = &tile.talker {
                 Pill::new("voice", s::status_talking(Some(t)))
             } else if has_sound(tile) {
-                Pill::new("sound", s::STATUS_SOUND)
+                Pill::new("sound", s::status_sound())
             } else {
-                Pill::new("calm", s::STATUS_QUIET)
+                Pill::new("calm", s::status_quiet())
             }
         }
-        Conn::Connecting { .. } => Pill::new("warn", s::STATUS_CONNECTING),
-        Conn::Reconnecting { .. } => Pill::new("warn", s::STATUS_RECONNECTING),
-        Conn::NeedsPairing => Pill::new("warn", s::STATUS_NEEDS_PAIRING),
-        Conn::Paused => Pill::new("", s::STATUS_PAUSED),
+        Conn::Connecting { .. } => Pill::new("warn", s::status_connecting()),
+        Conn::Reconnecting { .. } => Pill::new("warn", s::status_reconnecting()),
+        Conn::NeedsPairing => Pill::new("warn", s::status_needs_pairing()),
+        Conn::Paused => Pill::new("", s::status_paused()),
     }
 }
 
@@ -194,10 +196,10 @@ pub fn tile_pill(tile: &Tile) -> Pill {
 pub fn tile_subtitle(tile: &Tile) -> String {
     match &tile.conn {
         Conn::Live => match tile.path {
-            Some(NetPath::Vpn) => s::PATH_VPN.into(),
-            Some(NetPath::Lan) => s::PATH_LAN.into(),
-            Some(NetPath::Direct) => s::PATH_DIRECT.into(),
-            Some(NetPath::Relayed) => s::PATH_RELAYED.into(),
+            Some(NetPath::Vpn) => s::path_vpn().into(),
+            Some(NetPath::Lan) => s::path_lan().into(),
+            Some(NetPath::Direct) => s::path_direct().into(),
+            Some(NetPath::Relayed) => s::path_relayed().into(),
             None => String::new(),
         },
         Conn::Connecting { tried, .. } | Conn::Reconnecting { tried, .. } => {
@@ -210,7 +212,7 @@ pub fn tile_subtitle(tile: &Tile) -> String {
 /// "−18 dB now · opens above −50 dB".
 pub fn level_caption(tile: &Tile) -> String {
     let Some(level) = tile.level_dbfs else {
-        return s::NO_LEVEL.into();
+        return s::no_level().into();
     };
     let level = if tile.open {
         s::level_now(&db(level))
@@ -222,7 +224,7 @@ pub fn level_caption(tile: &Tile) -> String {
             "{level} · {}",
             s::opens_above(&db(tile.settings.threshold_dbfs))
         ),
-        Mode::Continuous => format!("{level} · {}", s::ALWAYS_ON_CAPTION),
+        Mode::Continuous => format!("{level} · {}", s::always_on_caption()),
     }
 }
 
@@ -231,7 +233,7 @@ pub fn battery_caption(battery: Option<u8>, charging: Option<bool>) -> Option<St
     match (battery, charging) {
         (Some(p), Some(true)) => Some(s::battery_charging(p)),
         (Some(p), _) => Some(s::battery(p)),
-        (None, Some(true)) => Some(s::CHARGING.into()),
+        (None, Some(true)) => Some(s::charging().into()),
         _ => None,
     }
 }
@@ -349,23 +351,23 @@ pub fn volume_percent(v: f32) -> u32 {
 /// The text of the station's mode chip for one listener row.
 pub fn listener_row_caption(l: &ListenerRow) -> String {
     let mut parts: Vec<&str> = vec![match l.mode {
-        Mode::Activated => s::MODE_SOUND_ACTIVATED,
-        Mode::Continuous => s::MODE_ALWAYS_ON,
+        Mode::Activated => s::mode_sound_activated(),
+        Mode::Continuous => s::mode_always_on(),
     }];
     if l.open {
-        parts.push(s::HEARING);
+        parts.push(s::hearing());
     }
     if l.talking {
-        parts.push(s::TALKING_NOW);
+        parts.push(s::talking_now());
     }
     if l.watching {
-        parts.push(s::WATCHING_NOW);
+        parts.push(s::watching_now());
     }
     if l.web {
-        parts.push(s::VIA_BROWSER);
+        parts.push(s::via_browser());
     }
     if l.relayed {
-        parts.push(s::VIA_RELAY);
+        parts.push(s::via_relay());
     }
     parts.join(" · ")
 }
@@ -373,13 +375,13 @@ pub fn listener_row_caption(l: &ListenerRow) -> String {
 /// The station's relay status pill (rendezvous.md FR-RV-1).
 pub fn relay_pill(r: &RelayView) -> Pill {
     match r {
-        RelayView::Off => Pill::new("plain", s::RELAY_OFF),
-        RelayView::Connecting => Pill::new("warn", s::RELAY_CONNECTING),
-        RelayView::Online => Pill::new("calm", s::RELAY_ONLINE),
+        RelayView::Off => Pill::new("plain", s::relay_off()),
+        RelayView::Connecting => Pill::new("warn", s::relay_connecting()),
+        RelayView::Online => Pill::new("calm", s::relay_online()),
         RelayView::Error {
             permanent: true, ..
-        } => Pill::new("warn", s::RELAY_REFUSED),
-        RelayView::Error { .. } => Pill::new("warn", s::RELAY_ERROR),
+        } => Pill::new("warn", s::relay_refused()),
+        RelayView::Error { .. } => Pill::new("warn", s::relay_error()),
     }
 }
 
@@ -391,9 +393,9 @@ pub fn camera_pill(listeners: &[ListenerRow]) -> String {
         .map(|l| l.name.as_str())
         .collect();
     if watchers.is_empty() {
-        s::CAMERA_ON.into()
+        s::camera_on().into()
     } else {
-        format!("{} · {}", s::CAMERA_ON, watchers.join(", "))
+        format!("{} · {}", s::camera_on(), watchers.join(", "))
     }
 }
 
@@ -404,16 +406,16 @@ pub fn camera_pill(listeners: &[ListenerRow]) -> String {
 pub fn pairing_links(p: &PairingModel) -> (&'static str, String, Option<(&'static str, String)>) {
     match (&p.web_url, &p.relay_web_url) {
         (Some(w), relay) => (
-            s::PAIR_LINK,
+            s::pair_link(),
             w.clone(),
-            relay.clone().map(|r| (s::PAIR_RELAY_LINK, r)),
+            relay.clone().map(|r| (s::pair_relay_link(), r)),
         ),
         (None, Some(r)) => (
-            s::PAIR_RELAY_LINK,
+            s::pair_relay_link(),
             r.clone(),
-            Some((s::PAIR_APP_LINK, p.invite_uri.clone())),
+            Some((s::pair_app_link(), p.invite_uri.clone())),
         ),
-        (None, None) => (s::PAIR_APP_LINK, p.invite_uri.clone(), None),
+        (None, None) => (s::pair_app_link(), p.invite_uri.clone(), None),
     }
 }
 
@@ -433,6 +435,250 @@ pub fn percent_encode(input: &str) -> String {
             out.push_str(&format!("%{b:02X}"));
         }
     }
+    out
+}
+
+// ----- local time, durations, room status and night log (§3.11) -------------
+
+const MINUTE_MS: u64 = 60_000;
+const HOUR_MS: u64 = 3_600_000;
+const DAY_MS: i64 = 86_400_000;
+
+/// A local calendar date and time.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Civil {
+    /// Year.
+    pub year: i64,
+    /// Month 1..=12.
+    pub month: u32,
+    /// Day of the month 1..=31.
+    pub day: u32,
+    /// Weekday, 0 = Sunday.
+    pub weekday: u32,
+    /// Hour 0..=23.
+    pub hour: u32,
+    /// Minute 0..=59.
+    pub minute: u32,
+}
+
+/// The date of `days` since 1970-01-01 (proleptic Gregorian).
+pub fn civil_from_days(days: i64) -> (i64, u32, u32) {
+    // H. Hinnant's `civil_from_days`.
+    let z = days + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z.rem_euclid(146_097);
+    let yoe = (doe - doe / 1_460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = (doy - (153 * mp + 2) / 5 + 1) as u32;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 } as u32;
+    let y = yoe + era * 400 + i64::from(m <= 2);
+    (y, m, d)
+}
+
+/// Local milliseconds since the epoch (Unix time plus the UTC offset).
+pub fn local_ms(unix_ms: u64) -> i64 {
+    unix_ms as i64 + i64::from(crate::i18n::utc_offset_minutes(unix_ms)) * 60_000
+}
+
+/// Local date and time of a Unix time.
+pub fn civil(unix_ms: u64) -> Civil {
+    let local = local_ms(unix_ms);
+    let days = local.div_euclid(DAY_MS);
+    let in_day = local.rem_euclid(DAY_MS);
+    let (year, month, day) = civil_from_days(days);
+    Civil {
+        year,
+        month,
+        day,
+        weekday: (days + 4).rem_euclid(7) as u32,
+        hour: (in_day / 3_600_000) as u32,
+        minute: ((in_day / 60_000) % 60) as u32,
+    }
+}
+
+/// Local time of day, 24 hours (`03:40`).
+pub fn time_of_day(unix_ms: u64) -> String {
+    let c = civil(unix_ms);
+    s::time_hm(&format!("{:02}", c.hour), &format!("{:02}", c.minute))
+}
+
+/// Short date of a day number (days since 1970-01-01): `Sat 21 Nov`.
+pub fn date_of_day(days: i64) -> String {
+    let (_, m, d) = civil_from_days(days);
+    let weekday = (days + 4).rem_euclid(7) as u32;
+    s::date_short(s::weekday_short(weekday), d, s::month_short(m))
+}
+
+/// A human duration: "less than a minute", "4 min", "1 h 20 min", "2 h".
+pub fn span(ms: u64) -> String {
+    if ms < MINUTE_MS {
+        return s::less_than_a_minute().to_owned();
+    }
+    let (h, m) = (ms / HOUR_MS, (ms % HOUR_MS) / MINUTE_MS);
+    match (h, m) {
+        (0, m) => s::duration_minutes(m),
+        (h, 0) => s::duration_hours(h),
+        (h, m) => s::duration_hours_minutes(h, m),
+    }
+}
+
+/// An "Alarm after" choice: `30 s`, `1 min`, `5 min`.
+pub fn escalate_label(seconds: u16) -> String {
+    if seconds < 60 || seconds % 60 != 0 {
+        s::duration_seconds(u32::from(seconds))
+    } else {
+        s::duration_minutes(u64::from(seconds / 60))
+    }
+}
+
+/// "Awake for 4 min" / "Quiet for 1 h 20 min" while live (FR-SL-3).
+pub fn room_caption(tile: &Tile, now_unix_ms: u64) -> Option<String> {
+    if tile.conn != Conn::Live {
+        return None;
+    }
+    match tile.room {
+        Room::Unknown => None,
+        Room::Quiet { since_unix_ms } => Some(s::quiet_for(&span(
+            now_unix_ms.saturating_sub(since_unix_ms),
+        ))),
+        Room::Awake { since_unix_ms } => Some(s::awake_for(&span(
+            now_unix_ms.saturating_sub(since_unix_ms),
+        ))),
+    }
+}
+
+/// "Alerts paused until 03:40" while a "Not the baby" pause runs (FR-AL-7).
+pub fn paused_caption(tile: &Tile, now_unix_ms: u64) -> Option<String> {
+    tile.paused_until_unix_ms
+        .filter(|&u| u > now_unix_ms)
+        .map(|u| s::alerts_paused_until(&time_of_day(u)))
+}
+
+/// What the alert banner of a tile shows (FR-AL-6).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Banner {
+    /// No banner.
+    None,
+    /// A sound alert nobody answered yet.
+    Pending(String),
+    /// The alarm rings: title and explanation.
+    Ringing(String, String),
+}
+
+/// The alert banner of a tile.
+pub fn banner(tile: &Tile) -> Banner {
+    match tile.alarm {
+        Alarm::Off => Banner::None,
+        Alarm::Pending { .. } => Banner::Pending(s::alert_sound(&tile.name)),
+        Alarm::Ringing { .. } => Banner::Ringing(
+            s::alarm_banner(&tile.name),
+            s::alarm_banner_hint().to_owned(),
+        ),
+    }
+}
+
+/// Whether any tile's alarm rings (the apps play one alarm for all).
+pub fn any_ringing(tiles: &[Tile]) -> bool {
+    tiles.iter().any(|t| t.alarm.is_ringing())
+}
+
+/// The night (noon to noon, local time) a Unix time belongs to, as the day
+/// number of its evening.
+pub fn night_of(unix_ms: u64) -> i64 {
+    (local_ms(unix_ms) - DAY_MS / 2).div_euclid(DAY_MS)
+}
+
+/// One wake-up as shown in the night log.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NightEntry {
+    /// "02:14 · 6 min".
+    pub text: String,
+    /// Still going on.
+    pub ongoing: bool,
+    /// It made the alarm ring.
+    pub alarm: bool,
+    /// Marked "Not the baby".
+    pub not_the_baby: bool,
+    /// Stable key (start time).
+    pub key: u64,
+}
+
+/// One night of the night log.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Night {
+    /// Day number of the evening.
+    pub day: i64,
+    /// "Night of Sat 21 Nov".
+    pub title: String,
+    /// "3 wake-ups · longest quiet 4 h 10 min".
+    pub summary: String,
+    /// Wake-ups, in time order.
+    pub entries: Vec<NightEntry>,
+}
+
+/// Longest time between wake-ups of one night (sorted by start); for the
+/// current night also from the last finished wake-up to now.
+pub fn longest_quiet(entries: &[WakeUpEntry], current: bool, now_unix_ms: u64) -> Option<u64> {
+    let mut best: Option<u64> = None;
+    for w in entries.windows(2) {
+        let end = w[0].end_unix_ms.unwrap_or(w[0].start_unix_ms);
+        let gap = w[1].start_unix_ms.saturating_sub(end);
+        best = Some(best.map_or(gap, |b| b.max(gap)));
+    }
+    if current
+        && let Some(end) = entries.last().and_then(|l| l.end_unix_ms)
+        && entries.len() > 1
+    {
+        let gap = now_unix_ms.saturating_sub(end);
+        best = Some(best.map_or(gap, |b| b.max(gap)));
+    }
+    best
+}
+
+/// The night log grouped by night, newest night first (FR-SL-4).
+pub fn nights(entries: &[WakeUpEntry], now_unix_ms: u64) -> Vec<Night> {
+    let mut sorted = entries.to_vec();
+    sorted.sort_by_key(|e| e.start_unix_ms);
+    let today = night_of(now_unix_ms);
+    let mut out: Vec<Night> = Vec::new();
+    let mut i = 0;
+    while i < sorted.len() {
+        let day = night_of(sorted[i].start_unix_ms);
+        let mut j = i;
+        while j < sorted.len() && night_of(sorted[j].start_unix_ms) == day {
+            j += 1;
+        }
+        let group = &sorted[i..j];
+        let mut summary = s::wake_ups(group.len() as u64);
+        if let Some(q) = longest_quiet(group, day == today, now_unix_ms) {
+            summary = format!("{summary} · {}", s::longest_quiet(&span(q)));
+        }
+        let entries = group
+            .iter()
+            .map(|e| {
+                let end = e.end_unix_ms.unwrap_or(now_unix_ms);
+                NightEntry {
+                    text: s::wake_up_entry(
+                        &time_of_day(e.start_unix_ms),
+                        &span(end.saturating_sub(e.start_unix_ms)),
+                    ),
+                    ongoing: e.end_unix_ms.is_none(),
+                    alarm: e.alarmed,
+                    not_the_baby: e.not_the_baby,
+                    key: e.start_unix_ms,
+                }
+            })
+            .collect();
+        out.push(Night {
+            day,
+            title: s::night_of(&date_of_day(day)),
+            summary,
+            entries,
+        });
+        i = j;
+    }
+    out.reverse();
     out
 }
 
@@ -463,7 +709,138 @@ mod tests {
             down_for_ms: None,
             routes: 2,
             alerting: false,
+            room: Room::Unknown,
+            alarm: Alarm::Off,
+            paused_until_unix_ms: None,
+            log_revision: 0,
         }
+    }
+
+    // 2026-11-21 (a Saturday) 00:00 UTC.
+    const SAT: u64 = 1_795_219_200_000;
+    const H: u64 = 3_600_000;
+    const M: u64 = 60_000;
+
+    fn wake(start: u64, end: Option<u64>) -> WakeUpEntry {
+        WakeUpEntry {
+            start_unix_ms: start,
+            end_unix_ms: end,
+            loud_ms: 10_000,
+            peak_dbfs: None,
+            alerted: true,
+            alarmed: false,
+            not_the_baby: false,
+        }
+    }
+
+    #[test]
+    fn civil_dates_and_times() {
+        assert_eq!(civil_from_days(0), (1970, 1, 1));
+        assert_eq!(civil_from_days(-1), (1969, 12, 31));
+        let c = civil(SAT + 3 * H + 40 * M);
+        assert_eq!((c.year, c.month, c.day, c.weekday), (2026, 11, 21, 6));
+        assert_eq!(time_of_day(SAT + 3 * H + 40 * M), "03:40");
+        assert_eq!(date_of_day(night_of(SAT + 20 * H)), "Sat 21 Nov");
+        // 02:14 on Sunday belongs to Saturday's night; noon starts the next.
+        assert_eq!(night_of(SAT + 26 * H), night_of(SAT + 13 * H));
+        assert_eq!(night_of(SAT + 36 * H) - night_of(SAT + 35 * H), 1);
+        assert_eq!(night_of(SAT + 11 * H), night_of(SAT + 13 * H) - 1);
+    }
+
+    #[test]
+    fn spans() {
+        assert_eq!(span(59_999), "less than a minute");
+        assert_eq!(span(4 * M + 59_000), "4 min");
+        assert_eq!(span(H + 20 * M), "1 h 20 min");
+        assert_eq!(span(2 * H), "2 h");
+        assert_eq!(escalate_label(30), "30 s");
+        assert_eq!(escalate_label(120), "2 min");
+    }
+
+    #[test]
+    fn localised_dates_and_durations() {
+        use crate::i18n::{Lang, with_language};
+        // English is the fallback for any key a file lacks, so these hold
+        // with complete and incomplete translation files alike.
+        let en = date_of_day(night_of(SAT + 20 * H));
+        for l in Lang::ALL.into_iter().skip(1) {
+            with_language(l, || {
+                let t = time_of_day(SAT + 3 * H + 40 * M);
+                assert!(t.contains("03") && t.contains("40"), "{l:?} {t}");
+                assert!(date_of_day(night_of(SAT + 20 * H)).contains("21"));
+                if crate::i18n::table(l).is_some_and(|t| t.texts.contains_key("month_nov")) {
+                    assert_ne!(date_of_day(night_of(SAT + 20 * H)), en, "{l:?}");
+                }
+            });
+        }
+    }
+
+    #[test]
+    fn room_and_pause_captions() {
+        let mut t = tile();
+        assert_eq!(room_caption(&t, SAT), None);
+        t.room = Room::Awake { since_unix_ms: SAT };
+        assert_eq!(room_caption(&t, SAT + 4 * M).unwrap(), "Awake for 4 min");
+        assert_eq!(
+            room_caption(&t, SAT + 30_000).unwrap(),
+            "Awake for less than a minute"
+        );
+        t.room = Room::Quiet { since_unix_ms: SAT };
+        assert_eq!(
+            room_caption(&t, SAT + H + 20 * M).unwrap(),
+            "Quiet for 1 h 20 min"
+        );
+        t.conn = Conn::Paused;
+        assert_eq!(room_caption(&t, SAT + H), None);
+        t.paused_until_unix_ms = Some(SAT + 3 * H + 40 * M);
+        assert_eq!(
+            paused_caption(&t, SAT + 3 * H).unwrap(),
+            "Alerts paused until 03:40"
+        );
+        assert_eq!(paused_caption(&t, SAT + 4 * H), None);
+        assert_eq!(banner(&t), Banner::None);
+        t.alarm = Alarm::Ringing { since_unix_ms: SAT };
+        assert_eq!(
+            banner(&t),
+            Banner::Ringing("Alarm · Nursery".into(), s::alarm_banner_hint().into())
+        );
+        assert!(any_ringing(&[tile(), t]));
+    }
+
+    #[test]
+    fn night_log_groups_noon_to_noon_newest_first() {
+        let fri_night = SAT - 2 * H; // Fri 22:00
+        let entries = vec![
+            wake(fri_night, Some(fri_night + 6 * M)),
+            wake(SAT + 2 * H + 14 * M, Some(SAT + 2 * H + 20 * M)), // Sat 02:14 (Friday's night)
+            wake(SAT + 22 * H, Some(SAT + 22 * H + 3 * M)),         // Sat 22:00
+            WakeUpEntry {
+                alarmed: true,
+                not_the_baby: true,
+                ..wake(SAT + 26 * H, None)
+            }, // Sun 02:00, going on
+        ];
+        let now = SAT + 26 * H + 5 * M;
+        let n = nights(&entries, now);
+        assert_eq!(n.len(), 2);
+        assert_eq!(n[0].title, "Night of Sat 21 Nov");
+        assert_eq!(n[1].title, "Night of Fri 20 Nov");
+        assert_eq!(n[0].summary, "2 wake-ups · longest quiet 3 h 57 min");
+        assert_eq!(n[1].summary, "2 wake-ups · longest quiet 4 h 8 min");
+        assert_eq!(n[0].entries[1].text, "02:00 · 5 min");
+        assert!(n[0].entries[1].ongoing && n[0].entries[1].alarm && n[0].entries[1].not_the_baby);
+        assert_eq!(n[1].entries[0].text, "22:00 · 6 min");
+        // One wake-up in a past night: no longest quiet.
+        let one = nights(&entries[2..3], SAT + 50 * H);
+        assert_eq!(one[0].summary, "1 wake-up");
+        assert!(nights(&[], now).is_empty());
+    }
+
+    #[test]
+    fn longest_quiet_includes_the_current_quiet() {
+        let e = [wake(SAT, Some(SAT + M)), wake(SAT + H, Some(SAT + H + M))];
+        assert_eq!(longest_quiet(&e, false, SAT + 10 * H), Some(59 * M));
+        assert_eq!(longest_quiet(&e, true, SAT + 3 * H), Some(2 * H - M));
     }
 
     #[test]
@@ -480,21 +857,25 @@ mod tests {
         let (label, link, second) = pairing_links(&p);
         assert_eq!(
             (label, link.as_str()),
-            (s::PAIR_RELAY_LINK, "https://relay.example/app/#x")
+            (s::pair_relay_link(), "https://relay.example/app/#x")
         );
         assert_eq!(
             second,
-            Some((s::PAIR_APP_LINK, "nestwatch://invite?v=1".to_owned()))
+            Some((s::pair_app_link(), "nestwatch://invite?v=1".to_owned()))
         );
         p.web_url = Some("http://192.168.1.2:47180/#x".into());
         let (label, _, second) = pairing_links(&p);
-        assert_eq!(label, s::PAIR_LINK);
-        assert_eq!(second.unwrap().0, s::PAIR_RELAY_LINK);
+        assert_eq!(label, s::pair_link());
+        assert_eq!(second.unwrap().0, s::pair_relay_link());
         p.web_url = None;
         p.relay_web_url = None;
         assert_eq!(
             pairing_links(&p),
-            (s::PAIR_APP_LINK, "nestwatch://invite?v=1".to_owned(), None)
+            (
+                s::pair_app_link(),
+                "nestwatch://invite?v=1".to_owned(),
+                None
+            )
         );
     }
 
@@ -520,7 +901,7 @@ mod tests {
         assert_eq!(duration(3_723_000), "1:02:03");
         assert_eq!(remaining(551_200), "9:12");
         assert_eq!(remaining(0), "0:00");
-        assert_eq!(ago(0, 30_000), s::AGO_NOW);
+        assert_eq!(ago(0, 30_000), s::ago_now());
         assert_eq!(ago(0, 5 * 60_000), s::ago_minutes(5));
         assert_eq!(ago(0, 3 * 86_400_000), s::ago_days(3));
     }
@@ -538,19 +919,19 @@ mod tests {
     #[test]
     fn pills_carry_words() {
         let mut t = tile();
-        assert_eq!(tile_pill(&t), Pill::new("calm", s::STATUS_QUIET));
+        assert_eq!(tile_pill(&t), Pill::new("calm", s::status_quiet()));
         t.open = true;
         assert_eq!(tile_pill(&t).class, "sound");
         assert!(has_sound(&t));
         t.talker = Some("Dad".into());
         assert_eq!(tile_pill(&t).text, "Dad talking");
         t.talk = Talk::Granted;
-        assert_eq!(tile_pill(&t).text, s::STATUS_YOU_TALK);
+        assert_eq!(tile_pill(&t).text, s::status_you_talk());
         t.conn = Conn::Reconnecting {
             attempt: 2,
             tried: 3,
         };
-        assert_eq!(tile_pill(&t), Pill::new("warn", s::STATUS_RECONNECTING));
+        assert_eq!(tile_pill(&t), Pill::new("warn", s::status_reconnecting()));
         assert_eq!(tile_subtitle(&t), "trying 3 addresses…");
         assert!(!has_sound(&t));
         t.conn = Conn::Paused;
@@ -570,7 +951,7 @@ mod tests {
             format!(
                 "{} · {}",
                 s::level_now("\u{2212}20 dB"),
-                s::ALWAYS_ON_CAPTION
+                s::always_on_caption()
             )
         );
     }
@@ -582,7 +963,7 @@ mod tests {
             level_caption(&t),
             "\u{2212}58 dB room · opens above \u{2212}50 dB"
         );
-        assert_eq!(tile_subtitle(&t), s::PATH_LAN);
+        assert_eq!(tile_subtitle(&t), s::path_lan());
         assert_eq!(battery_caption(Some(82), Some(false)), Some(s::battery(82)));
         assert_eq!(battery_caption(None, None), None);
         assert!(battery_low(Some(10), None));
@@ -618,7 +999,7 @@ mod tests {
         assert!(!anyone_hearing(&open), "continuous listeners always hear");
         open[0].open = true;
         assert!(anyone_hearing(&open));
-        assert_eq!(camera_pill(&rows), format!("{} · Mum", s::CAMERA_ON));
+        assert_eq!(camera_pill(&rows), format!("{} · Mum", s::camera_on()));
         assert_eq!(listener_row_caption(&rows[1]), "always on · camera");
         let mut relayed = rows[0].clone();
         relayed.relayed = true;
@@ -638,12 +1019,12 @@ mod tests {
             assert_eq!(tile_subtitle(&t), label);
         }
         assert_eq!(relay_pill(&RelayView::Off).classes(), "pill plain");
-        assert_eq!(relay_pill(&RelayView::Online).text, s::RELAY_ONLINE);
+        assert_eq!(relay_pill(&RelayView::Online).text, s::relay_online());
         let refused = RelayView::Error {
             message: "mailbox-taken".into(),
             permanent: true,
         };
-        assert_eq!(relay_pill(&refused).text, s::RELAY_REFUSED);
+        assert_eq!(relay_pill(&refused).text, s::relay_refused());
     }
 
     #[test]

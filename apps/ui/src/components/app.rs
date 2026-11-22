@@ -7,6 +7,7 @@ use dioxus::prelude::*;
 use super::about::About;
 use super::add_station::AddStation;
 use super::listener::ListenerHome;
+use super::night_log::NightLog;
 use super::notices::Notices;
 use super::station::StationScreen;
 use super::welcome::Welcome;
@@ -22,6 +23,8 @@ pub enum Screen {
     AddStation,
     /// About Nestwatch.
     About,
+    /// The night log of a station (FR-SL-4).
+    NightLog(String),
 }
 
 /// State of a pairing started from the UI or from the browser address.
@@ -86,6 +89,9 @@ pub fn NestwatchApp(
     /// Extra platform components that need the app's context (the desktop tray).
     #[props(default)]
     children: Element,
+    /// The first screen (design previews and render tests); home by default.
+    #[props(default)]
+    start: Option<Screen>,
 ) -> Element {
     let ui = use_hook(|| {
         let ui = Ui::new();
@@ -96,7 +102,7 @@ pub fn NestwatchApp(
     use_context_provider(|| backend.clone());
     let caps = backend.capabilities();
     let nav = use_context_provider(|| Nav {
-        screen: Signal::new(Screen::Home),
+        screen: Signal::new(start.clone().unwrap_or(Screen::Home)),
         panel: Signal::new(None),
         pair: Signal::new(PairFlow::Idle),
         prefs: Signal::new({
@@ -107,6 +113,20 @@ pub fn NestwatchApp(
             p
         }),
     });
+    // Wall-clock time for room status and pauses ("Awake for 4 min").
+    {
+        let backend = backend.clone();
+        use_hook(move || {
+            let mut now = ui.now_unix_ms;
+            now.set(backend.unix_ms());
+            spawn_forever(async move {
+                loop {
+                    backend.sleep(5_000).await;
+                    now.set(backend.unix_ms());
+                }
+            });
+        });
+    }
     // Theme follows the preference.
     {
         let backend = backend.clone();
@@ -147,6 +167,7 @@ pub fn NestwatchApp(
         match screen {
             Screen::About => rsx! { About {} },
             Screen::AddStation => rsx! { AddStation {} },
+            Screen::NightLog(id) => rsx! { NightLog { id } },
             Screen::Home => match prefs.role {
                 Some(Role::Station) if caps.station => rsx! { StationScreen {} },
                 _ => rsx! { ListenerHome {} },

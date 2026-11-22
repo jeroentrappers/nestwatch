@@ -16,7 +16,7 @@ pub fn notice_text(kind: &NoticeKind) -> (String, &'static str, bool) {
     match kind {
         NoticeKind::Alert { station, kind, .. } => {
             let name = if station.is_empty() {
-                s::UNNAMED
+                s::unnamed()
             } else {
                 station
             };
@@ -25,6 +25,7 @@ pub fn notice_text(kind: &NoticeKind) -> (String, &'static str, bool) {
                 AlertKind::Unreachable => (s::alert_unreachable(name), "warn", true),
                 AlertKind::Reachable => (s::alert_reachable(name), "calm", false),
                 AlertKind::BatteryLow(p) => (s::alert_battery(name, *p), "warn", true),
+                AlertKind::Alarm => (s::alarm_title(name), "sound", true),
             }
         }
         NoticeKind::ListenerPaired { name, verification } => (
@@ -42,7 +43,7 @@ pub fn Notices() -> Element {
     let ui = use_context::<Ui>();
     let list = ui.notices.read().clone();
     rsx! {
-        section { class: "notices", aria_label: s::NOTICES, aria_live: "assertive",
+        section { class: "notices", aria_label: s::notices(), aria_live: "assertive",
             for n in list {
                 NoticeItem { key: "{n.id}", notice: n.clone() }
             }
@@ -71,7 +72,7 @@ fn NoticeItem(notice: Notice) -> Element {
             button {
                 class: "btn icon ghost",
                 r#type: "button",
-                aria_label: s::DISMISS,
+                aria_label: s::dismiss(),
                 onclick: move |_| ui.dismiss(id),
                 "×"
             }

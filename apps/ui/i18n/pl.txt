@@ -1,0 +1,936 @@
+# Nestwatch strings. `key = text`; plural strings have one line per
+# category of the language (`key[one]`, `key[other]`, Polish also
+# `key[few]`, `key[many]` instead of `key[other]`). Keep {placeholders}.
+
+# Product name.
+app = Nestwatch
+
+# Promise on the welcome screen.
+promise = Prywatna niania elektroniczna na urządzeniach, które już masz. Wszystko zostaje w twojej sieci.
+
+# Medical disclaimer (product.md §1), first launch and About.
+disclaimer = Nestwatch nie jest wyrobem medycznym i nie zastępuje opieki. Zawsze sprawdzaj dziecko osobiście.
+
+# Accept the disclaimer.
+disclaimer_accept = Rozumiem
+
+# Role choice: station.
+role_station = To urządzenie czuwa
+
+# Explanation of the station role.
+role_station_hint = Postaw je w pokoju dziecka. Słucha, a na prośbę pokazuje obraz z kamery.
+
+# Role choice: listener.
+role_listener = To urządzenie słucha
+
+# Explanation of the listener role.
+role_listener_hint = Słuchaj stąd jednego lub kilku pokoi.
+
+# Role switch group label.
+role_group = Rola
+
+# Role switch: listener.
+role_tab_listening = Słuchanie
+
+# Role switch: station.
+role_tab_station = Stacja dziecka
+
+# Browser cannot be a station.
+role_station_unavailable = Przeglądarka może tylko słuchać. Jako stacji dziecka użyj aplikacji Nestwatch na telefonie lub komputerze.
+
+# The browser's entry to the station role (product.md FR-WEBST-1).
+station_use_this_device = Użyj tego urządzenia jako stacji dziecka
+
+# Explanation of the browser station role.
+role_station_hint_web = Postaw to urządzenie w pokoju dziecka. Urządzenia rodzica łączą się z nim przez serwer pośredniczący; nie zamykaj tej karty.
+
+# Always shown while a browser station runs (FR-WEBST-9).
+station_web_keep_visible = Nie zamykaj tej karty i trzymaj ją na wierzchu. Telefony wstrzymują ukryte karty, a zamknięcie lub odświeżenie karty zatrzymuje stację dziecka.
+
+# Wake lock held (FR-WEBST-8).
+wake_lock_on = Ekran pozostaje włączony, gdy działa stacja dziecka.
+
+# No wake lock (FR-WEBST-8).
+wake_lock_off = Ta przeglądarka nie może utrzymać włączonego ekranu: wyłącz automatyczną blokadę albo sam pilnuj, żeby ekran nie gasł.
+
+# The station's sound waits for a tap (FR-WEBST-6).
+station_tap_to_start = Dotknij, aby włączyć mikrofon i głośnik
+
+# Explanation of the station's tap prompt.
+station_tap_hint = Przeglądarki nagrywają i odtwarzają dźwięk dopiero po dotknięciu.
+
+# No microphone (FR-WEBST-4).
+mic_unavailable = Brak dostępu do mikrofonu: stacja dziecka wysyła ciszę. Zezwól tej stronie na mikrofon, a potem zatrzymaj i uruchom stację ponownie.
+
+# Station footnote in the browser (FR-WEBST-11).
+station_keeps_running_web = Stacja dziecka działa dalej, gdy przełączysz się na Słuchanie. Zamknięcie lub odświeżenie tej karty ją zatrzymuje.
+
+# Relay section of a relay-only station (rendezvous.md FR-RV-7).
+relay_only_note = Stacja dziecka w przeglądarce jest dostępna tylko przez serwer pośredniczący, więc to ustawienie pozostaje włączone.
+
+# The relay server is the page's origin (FR-WEBST-2).
+relay_server_fixed = Ta stacja dziecka korzysta z serwera, z którego pochodzi ta strona.
+
+# Pairing codes need the local network (OPEN-QUESTIONS WEBST-1).
+pair_code_relay_only = Kody parowania działają tylko w sieci lokalnej: zeskanuj kod QR albo otwórz link.
+
+# Where a browser station keeps its keys (security.md §7.1).
+browser_station_storage = Klucze tej stacji dziecka są przechowywane w tej przeglądarce, tylko dla tej strony. Wyczyszczenie danych strony lub zamknięcie okna prywatnego usuwa stację; jej urządzenia rodzica trzeba wtedy sparować ponownie.
+
+# Default name of a browser station.
+browser_station_name = Stacja dziecka ({browser})
+
+# A configurable server the page may not be allowed to reach (WEBST-8).
+relay_open_app_hint = Jeśli serwer pośredniczący nadal jest niedostępny, ta strona może nie mieć pozwolenia na połączenie z nim: otwórz {server}/app/ i uruchom tam stację dziecka.
+
+# Generic close.
+close = Zamknij
+
+# Back.
+back = Wstecz
+
+# Done.
+done = Gotowe
+
+# Cancel.
+cancel = Anuluj
+
+# Save.
+save = Zapisz
+
+# Settings button label.
+settings = Ustawienia
+
+# About.
+about = O Nestwatch
+
+# Copy.
+copy = Kopiuj link
+
+# Copied.
+copied = Skopiowano
+
+# Theme group label.
+theme = Motyw
+
+# Theme: follow the system.
+theme_system = Systemowy
+
+# Theme: night.
+theme_night = Nocny
+
+# Theme: day.
+theme_day = Dzienny
+
+# Dismiss a notice.
+dismiss = Odrzuć
+
+# Alerts region label.
+notices = Powiadomienia
+
+# Unknown name placeholder.
+unnamed = Urządzenie bez nazwy
+
+# About text.
+about_body = Nestwatch łączy twoje własne urządzenia bezpośrednio, w sieci domowej lub przez twój własny VPN. Bez konta, bez chmury i bez śledzenia. Dźwięk i obraz są szyfrowane end-to-end.
+
+# About: version line prefix.
+version = Wersja
+
+# About: device ID label.
+device_id = Identyfikator urządzenia
+
+# About: licence.
+license = Wolne oprogramowanie na licencji GNU AGPL 3.0 lub nowszej.
+
+# Station is starting.
+station_starting = Uruchamianie stacji dziecka…
+
+# Station could not start.
+station_failed = Nie udało się uruchomić stacji dziecka
+
+# Retry.
+retry = Spróbuj ponownie
+
+# Station not running.
+station_stopped = Stacja dziecka nie działa.
+
+# Start the station.
+station_start = Uruchom stację dziecka
+
+# Stop the station.
+station_stop = Zatrzymaj stację dziecka
+
+# Pair a listener.
+pair_listener = Sparuj urządzenie rodzica
+
+# Dim screen.
+dim_screen = Przyciemnij ekran
+
+# Tap to brighten.
+tap_to_brighten = Dotknij w dowolnym miejscu, aby rozjaśnić
+
+# Station screen is dimmed (screen reader).
+dimmed_label = Ekran przyciemniony. Nasłuch trwa dalej. Aktywuj, aby rozjaśnić.
+
+# No listeners yet.
+no_listeners = Nikt jeszcze nie słucha.
+
+# Connected listeners heading (screen reader).
+listeners_heading = Teraz słuchają
+
+# Mode: sound activated.
+mode_sound_activated = aktywacja dźwiękiem
+
+# Mode: always on.
+mode_always_on = zawsze włączone
+
+# Listener uses the browser.
+via_browser = przeglądarka
+
+# Listener row: connected through the relay server.
+via_relay = przez serwer pośredniczący
+
+# Hearing now.
+hearing = słyszy pokój
+
+# Talking now.
+talking_now = mówi
+
+# Watching now.
+watching_now = kamera
+
+# Ring caption: quiet.
+ring_quiet = cisza
+
+# Ring caption: sound.
+ring_sound = dźwięk
+
+# Ring unit.
+db = dB
+
+# Ring label for screen readers.
+ring_label = Poziom dźwięku w pokoju
+
+# Camera on indicator, nobody named.
+camera_on = Kamera włączona
+
+# Camera off indicator.
+camera_off = Kamera wyłączona
+
+# Talk-back off.
+talk_off = Mów do dziecka: wyłączone
+
+# Station background warning (FR-ST-5).
+station_keeps_running = Nie zamykaj tej aplikacji. Zamknięcie okna zostawia stację dziecka w zasobniku; wyjście z aplikacji kończy nasłuch.
+
+# Station settings heading.
+station_settings = Ustawienia stacji dziecka
+
+# Station name field.
+station_name = Nazwa stacji dziecka
+
+# Camera access switch.
+camera_allowed = Zezwól na kamerę
+
+# Talk-back switch.
+talk_allowed = Zezwól na „Mów do dziecka”
+
+# Gain field.
+mic_sensitivity = Czułość mikrofonu
+
+# Gain: automatic.
+gain_auto = Automatycznie
+
+# Talk-back volume.
+talkback_volume = Głośność „Mów do dziecka”
+
+# Trusted listeners heading.
+trusted_listeners = Sparowane urządzenia rodzica
+
+# No trusted listeners.
+no_trusted = Nie sparowano jeszcze żadnego urządzenia rodzica.
+
+# Revoke.
+revoke = Usuń
+
+# HTTPS fingerprint heading.
+https_fingerprint = Odcisk certyfikatu HTTPS
+
+# Fingerprint explanation.
+https_fingerprint_hint = Przeglądarki ostrzegają przed własnym certyfikatem stacji dziecka. Zaakceptuj go tylko wtedy, gdy odcisk się zgadza.
+
+# Browser address heading.
+browser_address = Adres w przeglądarce
+
+# Camera unavailable on this station.
+camera_unavailable_here = Nie znaleziono kamery
+
+# Relay setting.
+relay_title = Dostęp przez serwer pośredniczący
+
+# What the relay is for.
+relay_intro = Pozwala urządzeniom rodzica połączyć się z tą stacją dziecka, gdy bezpośrednie połączenie nie jest możliwe, na przykład przez dane komórkowe, Wi-Fi dla gości lub z innej sieci. W sieci domowej nic się nie zmienia.
+
+# What the server operator can see (rendezvous.md §7).
+relay_can_see = Serwer widzi, że ta stacja dziecka jest online, jej publiczny adres IP, z jakich adresów IP i kiedy ktoś się z nią łączy oraz ile danych przepływa.
+
+# What the server cannot see (rendezvous.md §7).
+relay_cannot_see = Nic więcej nie widzi ani nie słyszy: dźwięk, obraz, wiadomości, nazwy urządzeń, kody parowania i klucze są szyfrowane end-to-end między twoimi urządzeniami, a zaproszenia nigdy przez niego nie przechodzą.
+
+# Traffic analysis note (rendezvous.md §7).
+relay_traffic_note = Przy aktywacji dźwiękiem ilość danych może zdradzić, kiedy w pokoju jest dźwięk.
+
+# Heading of the "can see" paragraph.
+relay_can_see_heading = Co widzi serwer
+
+# Heading of the "cannot see" paragraph.
+relay_cannot_see_heading = Czego nie widzi
+
+# Server address field.
+relay_server = Serwer pośredniczący
+
+# Server address hint (FR-RV-6).
+relay_server_hint = Zostaw serwer Nestwatch albo wpisz adres własnego (https://…).
+
+# Invalid server address.
+relay_server_invalid = Wpisz adres serwera, np. https://relay.example.org
+
+# The server set by default.
+relay_server_named = Serwer: {server}
+
+# Status pill: off.
+relay_off = Serwer pośredniczący wyłączony
+
+# Status pill: connecting.
+relay_connecting = Łączenie z serwerem pośredniczącym…
+
+# Status pill: registered.
+relay_online = Dostępna przez serwer pośredniczący
+
+# Status pill: failed.
+relay_error = Serwer pośredniczący niedostępny
+
+# Status pill: refused for good.
+relay_refused = Serwer pośredniczący odrzucił tę stację dziecka
+
+# Hint for a permanent refusal.
+relay_refused_hint = Zresetuj tożsamość na serwerze pośredniczącym albo wybierz inny serwer.
+
+# Reset relay identity.
+relay_reset = Zresetuj tożsamość na serwerze
+
+# What resetting means.
+relay_reset_hint = Tworzy nowy adres tej stacji dziecka na serwerze pośredniczącym. Urządzenia rodzica, które z niego korzystają, potrzebują nowego zaproszenia.
+
+# Confirm the reset.
+relay_reset_confirm = Zresetuj teraz
+
+# Setup question (asked once).
+relay_setup_title = Łączyć się z tą stacją dziecka z dowolnego miejsca?
+
+# Setup: opt in.
+relay_setup_yes = Użyj serwera pośredniczącego
+
+# Setup: keep it off.
+relay_setup_no = Nie teraz
+
+# Setup footnote.
+relay_setup_later = Możesz to zmienić w każdej chwili w ustawieniach stacji dziecka.
+
+# Pairing sheet: the relay link.
+pair_relay_link = Link przez serwer pośredniczący
+
+# Camera permission denied on this station.
+camera_denied_here = Brak pozwolenia na kamerę
+
+# Pairing sheet intro.
+pair_intro = Zeskanuj aplikacją Nestwatch albo otwórz link na komputerze.
+
+# Code intro.
+pair_code_intro = Brak kamery? Wpisz ten kod
+
+# Station ID caption on the sheet (for code pairing in a browser).
+pair_station_id = Identyfikator stacji dziecka
+
+# QR code label.
+qr_label = Kod QR do parowania
+
+# Pairing is opening.
+pair_opening = Otwieranie parowania…
+
+# Pairing ended.
+pair_closed = Parowanie zamknięte.
+
+# Paired listeners heading on the sheet.
+pair_just_paired = Sparowano. Sprawdź, czy urządzenie rodzica pokazuje tę samą liczbę:
+
+# Link label.
+pair_link = Link do przeglądarki
+
+# The `nestwatch://` invitation link, when the station has no web address.
+pair_app_link = Link do aplikacji
+
+# Add a station.
+add_station = Dodaj stację dziecka
+
+# Add station button.
+add_station_button = + Dodaj stację
+
+# Nearby heading.
+nearby = W pobliżu
+
+# Searching.
+nearby_searching = Szukam stacji dziecka w tej sieci…
+
+# Nearby not available (browser).
+nearby_unavailable = Przeglądarka nie może przeszukać sieci. Użyj linku lub kodu ze stacji dziecka.
+
+# Pairing open pill.
+pairing_open = parowanie otwarte
+
+# Already paired.
+already_paired = już sparowano
+
+# Not pairing.
+not_pairing = parowanie zamknięte
+
+# Invitation field.
+invite_field = Link z zaproszeniem
+
+# Invitation hint.
+invite_hint = Wklej link nestwatch:// lub adres internetowy widoczny na stacji dziecka.
+
+# Invitation submit.
+invite_submit = Sparuj przez link
+
+# Code field.
+code_field = Kod parowania
+
+# Code field when a station is chosen.
+code_field_for = Kod parowania ze stacji „{name}”
+
+# Code submit.
+code_submit = Sparuj kodem
+
+# Station ID field (code pairing without discovery).
+station_id_field = Identyfikator stacji dziecka (pod kodem)
+
+# Manual address field.
+address_field = Adres stacji dziecka (opcjonalnie, dla VPN)
+
+# Manual address hint.
+address_hint = Na przykład nursery.tailnet.ts.net:47100 lub 100.101.102.103:47100.
+
+# Pairing in progress.
+pairing = Parowanie…
+
+# Verification prompt.
+verify_prompt = Sprawdź, czy stacja dziecka pokazuje tę samą liczbę
+
+# Verification: same.
+verify_same = Taka sama, dalej
+
+# Verification: different.
+verify_different = Inna
+
+# After "different".
+verify_removed = Stację dziecka usunięto. Sparuj jeszcze raz, będąc blisko niej.
+
+# Or divider.
+or = lub
+
+# Pairing errors.
+err_invalid_invite = Ten link nie jest zaproszeniem Nestwatch.
+
+# Invalid code.
+err_invalid_code = Ten kod jest nieprawidłowy. Ma 10 liter i cyfr.
+
+# Invalid ID.
+err_invalid_id = Ten identyfikator stacji dziecka jest nieprawidłowy.
+
+# Invalid address.
+err_invalid_address = Ten adres jest nieprawidłowy. Użyj formatu host:port.
+
+# Unreachable.
+err_unreachable = Nie udało się połączyć ze stacją dziecka. Czy jest włączona i w tej samej sieci?
+
+# Refused.
+err_refused = Stacja dziecka nie paruje teraz. Otwórz parowanie na stacji.
+
+# Rejected.
+err_rejected = Parowanie nie powiodło się. Kod może być błędny albo zaproszenie wygasło.
+
+# Too many stations.
+err_too_many = Śledzisz już 8 stacji dziecka.
+
+# Not connected.
+err_not_connected = Stacja dziecka nie jest połączona.
+
+# Generic failure.
+err_generic = Coś poszło nie tak.
+
+# No stations yet.
+no_stations = Nie masz jeszcze stacji. Dodaj stację dziecka z pokoju dziecka, aby zacząć słuchać.
+
+# Keeps listening (desktop).
+keeps_listening = Nestwatch słucha dalej, gdy okno jest zamknięte.
+
+# Keeps listening only while open (browser).
+browser_keep_open = Nie zamykaj tej karty i nie usypiaj urządzenia: przeglądarki przestają słuchać w tle.
+
+# Tap to start audio (browser rule).
+tap_to_listen = Dotknij, aby zacząć słuchać
+
+# Explanation of the audio prompt.
+tap_to_listen_hint = Przeglądarki odtwarzają dźwięk dopiero po dotknięciu.
+
+# Enable notifications.
+enable_notifications = Włącz powiadomienia
+
+# Status: quiet.
+status_quiet = Cisza
+
+# Status: sound.
+status_sound = Dźwięk
+
+# Status: live in continuous mode.
+status_live = Słuchanie
+
+# Status: connecting.
+status_connecting = Łączenie
+
+# Status: reconnecting.
+status_reconnecting = Ponowne łączenie
+
+# Status: not followed.
+status_paused = Wstrzymano
+
+# Status: needs pairing.
+status_needs_pairing = Wymaga parowania
+
+# Status: someone talks.
+status_talking_named = {name} mówi
+
+# Status: someone (unnamed) talks.
+status_talking_someone = Ktoś mówi
+
+# Status: we talk.
+status_you_talk = Mówisz
+
+# Path: LAN.
+path_lan = sieć domowa
+
+# Path: VPN.
+path_vpn = przez VPN
+
+# Path: hole-punched across the internet (rendezvous.md FR-RV-4).
+path_direct = bezpośrednio (internet)
+
+# Path: through the relay server (rendezvous.md FR-RV-4).
+path_relayed = przez serwer pośredniczący
+
+# Trying addresses.
+trying_no_address = próbuję…
+
+# Trying several addresses.
+trying_addresses_n[one] = sprawdzam {n} adres…
+trying_addresses_n[few] = sprawdzam {n} adresy…
+trying_addresses_n[many] = sprawdzam {n} adresów…
+
+# Attempt caption.
+attempt = próba {n}
+
+# Unreachable caption.
+unreachable_for = Brak połączenia od {duration}. Dostaniesz powiadomienie, gdy wróci.
+
+# Needs pairing caption.
+needs_pairing_hint = Ta stacja dziecka usunęła to urządzenie. Sparuj ponownie, aby słuchać.
+
+# Paused caption.
+paused_hint = Nie słuchasz tej stacji dziecka.
+
+# Resume.
+resume = Wznów
+
+# Level caption "now".
+level_now = teraz {db}
+
+# Level caption "room".
+level_room = pokój {db}
+
+# Threshold caption.
+opens_above = włącza się powyżej {db}
+
+# Continuous caption.
+always_on_caption = zawsze włączone
+
+# No level yet.
+no_level = brak poziomu
+
+# Battery.
+battery = Bateria {percent}%
+
+# Charging.
+charging = ładowanie
+
+# Battery and charging.
+battery_charging = Bateria {percent}%, ładowanie
+
+# Mute.
+mute = Wycisz
+
+# Solo.
+solo = Solo
+
+# Camera.
+camera = Kamera
+
+# Hold to talk.
+hold_to_talk = Przytrzymaj, aby mówić
+
+# Talking.
+talking = Mówisz… puść, aby skończyć
+
+# Waiting for talk grant.
+talk_wait = Łączenie z głośnikiem…
+
+# Busy.
+talk_busy_named = {name} mówi
+
+# Busy, talker unknown.
+talk_busy_someone = Ktoś inny mówi
+
+# Talk disabled.
+talk_disabled = „Mów do dziecka” jest wyłączone na stacji
+
+# Talk needs a secure context in the browser.
+talk_needs_https = „Mów do dziecka” wymaga adresu HTTPS stacji
+
+# Settings of a station (aria).
+station_settings_of = Ustawienia: {name}
+
+# Tile region label.
+tile_label = {name}: {status}
+
+# Meter label.
+meter_label = Poziom dźwięku w pokoju
+
+# Alert halo text for screen readers.
+sound_alert_sr = Wykryto dźwięk
+
+# Settings caption.
+listening_settings = ustawienia słuchania
+
+# Listening mode group.
+listen_mode = Tryb słuchania
+
+# Always on.
+mode_always = Zawsze włączone
+
+# When there's sound.
+mode_sound = Gdy słychać dźwięk
+
+# Calibration explanation.
+calibrate_hint = Linia pokazuje poziom dźwięku w pokoju z ostatniej minuty. Przeciągnij próg tuż nad cichą częścią.
+
+# Calibration slider label.
+threshold = Próg dźwięku
+
+# Calibration in continuous mode.
+calibrate_continuous = Linia pokazuje poziom dźwięku w pokoju z ostatniej minuty. W tym trybie próg ma znaczenie tylko dla alertów.
+
+# Hold time label.
+hold_time = Słuchaj dalej po dźwięku
+
+# Seconds.
+seconds[one] = {n} sekunda
+seconds[few] = {n} sekundy
+seconds[many] = {n} sekund
+
+# Volume.
+volume = Głośność
+
+# Percent.
+percent = {n}%
+
+# Alert sound toggle.
+alert_sound_toggle = Alert o dźwięku
+
+# Alert unreachable toggle.
+alert_unreachable_toggle = Alert przy braku połączenia
+
+# Alert battery toggle.
+alert_battery_toggle = Alert przy słabej baterii
+
+# Add an address.
+add_address = Dodaj adres
+
+# Address added.
+address_added = Dodano adres.
+
+# Pause.
+pause = Przestań słuchać
+
+# Forget.
+forget = Zapomnij tę stację
+
+# Confirm forget.
+forget_confirm = Zapomnieć ją? Trzeba będzie sparować ponownie.
+
+# Confirm forget button.
+forget_yes = Zapomnij
+
+# Network route caption.
+connected_via = Połączono: {route}
+
+# Camera view heading.
+camera_of = Kamera · {name}
+
+# Camera live badge.
+camera_live = Kamera na żywo
+
+# Waiting for frames.
+camera_starting = Uruchamianie kamery…
+
+# Station camera off by setting.
+camera_disabled = Kamera jest wyłączona na stacji dziecka.
+
+# No camera.
+camera_unavailable = Stacja dziecka nie ma dostępnej kamery.
+
+# Permission denied.
+camera_denied = Stacja dziecka nie ma pozwolenia na kamerę.
+
+# Camera stopped.
+camera_stopped = Kamera się zatrzymała.
+
+# Night image.
+night_image = Tryb nocny
+
+# Switch camera.
+switch_camera = Przełącz kamerę
+
+# Camera image alt.
+camera_alt = Obraz na żywo z kamery: {name}
+
+# Frame info.
+frame_info = {w}×{h} · {fps} kl./s
+
+# Sound alert.
+alert_sound = Dźwięk: {name}
+
+# Unreachable alert.
+alert_unreachable = {name}: brak połączenia
+
+# Reachable alert.
+alert_reachable = {name}: połączenie wróciło
+
+# Battery alert.
+alert_battery = {name}: słaba bateria ({percent}%)
+
+# Station: a listener paired.
+listener_paired = Sparowano: {name}
+
+# Alert notification body.
+alert_body = Otwórz Nestwatch, aby posłuchać.
+
+# Just now.
+ago_now = przed chwilą
+
+# Minutes ago.
+ago_minutes = {n} min temu
+
+# Hours ago.
+ago_hours = {n} godz. temu
+
+# Days ago.
+ago_days[one] = wczoraj
+ago_days[few] = {n} dni temu
+ago_days[many] = {n} dni temu
+
+# Paired / last seen caption.
+paired_seen = sparowano {paired} · ostatnio widziane {seen}
+
+# "2 listening".
+listening_nobody = Nikt nie słucha
+
+# "2 listening".
+listening_n[one] = {n} urządzenie słucha
+listening_n[few] = {n} urządzenia słuchają
+listening_n[many] = {n} urządzeń słucha
+
+# Pairing window caption.
+pairing_open_window = Otwarte jeszcze {remaining} · {devices}
+
+# How many more devices may pair in this window.
+pairing_devices_left[one] = jeszcze {n} urządzenie
+pairing_devices_left[few] = do {n} urządzeń
+pairing_devices_left[many] = do {n} urządzeń
+
+# Station talk indicator.
+talking_through = {name} mówi
+
+# Button on the alert banner and notifications: acknowledges the alert or alarm ("I am going to the child"). Very short.
+im_on_it = Już idę
+
+# Button and badge: the sound was not the child (a dog, a TV…); it pauses sound alerts for 10 minutes. Also a badge in the night log.
+not_the_baby = To nie dziecko
+
+# Button that ends the 10-minute pause after "Not the baby".
+resume_alerts = Wznów alerty
+
+# Shown on the tile while alerts are paused; `time` is local time (03:40).
+alerts_paused_until = Alerty wstrzymane do {time}
+
+# System notification title when the escalating alarm rings.
+alarm_title = {name}: dźwięk nie ustaje
+
+# System notification body of the alarm.
+alarm_body = Nikt jeszcze nie zareagował na alert.
+
+# Prominent banner on the station tile while the alarm rings.
+alarm_banner = Alarm · {name}
+
+# Second line of the ringing alarm banner.
+alarm_banner_hint = Dźwięk nie ustaje, a nikt jeszcze nie zareagował.
+
+# Room status on the tile: a wake-up has been going on for `duration`.
+awake_for = Nie śpi od {duration}
+
+# Room status on the tile: no wake-up for `duration`.
+quiet_for = Cisza od {duration}
+
+# A duration under one minute ("Awake for less than a minute").
+less_than_a_minute = mniej niż minuty
+
+# A duration in seconds, short ("30 s").
+duration_seconds = {n} s
+
+# A duration in minutes, short ("4 min").
+duration_minutes = {n} min
+
+# A duration in whole hours, short ("2 h").
+duration_hours = {n} godz.
+
+# A duration in hours and minutes, short ("1 h 20 min").
+duration_hours_minutes = {h} godz. {m} min
+
+# Night log screen title and the button that opens it.
+night_log = Dziennik nocy
+
+# Night log heading with the station name.
+night_log_of = Dziennik nocy · {name}
+
+# Heading of one night (noon to noon) in the night log; `date` is the evening's date ("Sat 21 Nov").
+night_of = Noc z {date}
+
+# Number of wake-ups in one night.
+wake_ups[one] = {n} pobudka
+wake_ups[few] = {n} pobudki
+wake_ups[many] = {n} pobudek
+
+# Longest time without a wake-up in one night, after the count ("3 wake-ups · longest quiet 4 h 10 min").
+longest_quiet = najdłuższa cisza {duration}
+
+# One wake-up in the night log: start time and how long it lasted.
+wake_up_entry = {time} · {duration}
+
+# Marks the wake-up that is still going on in the night log.
+going_on = trwa
+
+# Badge: this wake-up made the alarm ring.
+badge_alarm = Alarm
+
+# Night log without entries.
+night_log_empty = Jeszcze żadnej pobudki. Pobudka jest zapisywana, gdy w pokoju jest głośno przez co najmniej 10 sekund.
+
+# Night log footer.
+night_log_footer = Przechowywane tylko na tym urządzeniu, przez 30 dni. Nestwatch nasłuchuje dźwięku; cisza w pokoju nie oznacza, że dziecko śpi.
+
+# Button that clears the night log of a station.
+clear_log = Wyczyść dziennik
+
+# Confirmation question before clearing.
+clear_log_confirm = Wyczyścić dziennik nocy dla {name}?
+
+# Confirm button for clearing.
+clear = Wyczyść
+
+# Alert setting: escalate unanswered sound alerts to an alarm.
+escalating_alarm = Narastający alarm
+
+# Explanation under the escalating alarm setting.
+escalating_alarm_hint = Jeśli dźwięk nie ustaje, a nikt nie zareaguje na alert, włącza się alarm, coraz głośniejszy, także w trybie cichym.
+
+# Choice: how long after an unanswered sound alert the alarm rings.
+alarm_after = Alarm po
+
+# Time of day, 24 hours; `hh` and `mm` are two digits ("03:40").
+time_hm = {hh}:{mm}
+
+# Short date with weekday ("Sat 21 Nov"); `day` is the day of the month.
+date_short = {weekday}, {day} {month}
+
+# Short weekday name.
+weekday_sun = niedz.
+
+# Short weekday name.
+weekday_mon = pon.
+
+# Short weekday name.
+weekday_tue = wt.
+
+# Short weekday name.
+weekday_wed = śr.
+
+# Short weekday name.
+weekday_thu = czw.
+
+# Short weekday name.
+weekday_fri = pt.
+
+# Short weekday name.
+weekday_sat = sob.
+
+# Short month name.
+month_jan = sty
+
+# Short month name.
+month_feb = lut
+
+# Short month name.
+month_mar = mar
+
+# Short month name.
+month_apr = kwi
+
+# Short month name.
+month_may = maj
+
+# Short month name.
+month_jun = cze
+
+# Short month name.
+month_jul = lip
+
+# Short month name.
+month_aug = sie
+
+# Short month name.
+month_sep = wrz
+
+# Short month name.
+month_oct = paź
+
+# Short month name.
+month_nov = lis
+
+# Short month name.
+month_dec = gru
+
+# Tray menu: show the window.
+tray_show = Pokaż Nestwatch
+
+# Tray menu: quit the app.
+tray_quit = Zakończ Nestwatch

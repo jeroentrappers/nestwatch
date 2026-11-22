@@ -79,17 +79,31 @@ fn websocket_url() -> String {
     )
 }
 
-fn show_notification(station_id: &str, title: &str) {
+/// Shows a system notification; `on_click` runs when its body is tapped
+/// (FR-AL-6: tapping a sound alert or alarm acknowledges it).
+fn show_notification(station_id: &str, title: &str, body: &str, on_click: Option<Box<dyn Fn()>>) {
     if !notifications_supported()
         || web_sys::Notification::permission() != web_sys::NotificationPermission::Granted
     {
         return;
     }
     let opts = web_sys::NotificationOptions::new();
-    opts.set_body(s::ALERT_BODY);
+    opts.set_body(body);
     opts.set_tag(station_id);
     opts.set_icon("logo.svg");
-    let _ = web_sys::Notification::new_with_options(title, &opts);
+    let Ok(n) = web_sys::Notification::new_with_options(title, &opts) else {
+        return;
+    };
+    if let Some(f) = on_click {
+        let cb = Closure::<dyn FnMut(web_sys::Event)>::new(move |_e: web_sys::Event| {
+            if let Some(w) = web_sys::window() {
+                let _ = w.focus();
+            }
+            f();
+        });
+        n.set_onclick(Some(cb.as_ref().unchecked_ref()));
+        cb.forget();
+    }
 }
 
 fn alert_title(name: &str, alert: Alert) -> String {
@@ -98,7 +112,67 @@ fn alert_title(name: &str, alert: Alert) -> String {
         Alert::Unreachable => s::alert_unreachable(name),
         Alert::Reachable => s::alert_reachable(name),
         Alert::BatteryLow { percent } => s::alert_battery(name, percent),
+        Alert::Alarm => s::alarm_title(name),
     }
+}
+
+/// Follows the browser's languages (NFR-I18N-2) and time zone.
+fn init_locale() {
+    let Some(window) = web_sys::window() else {
+        return;
+    };
+    let nav = window.navigator();
+    let mut tags: Vec<String> = nav
+        .languages()
+        .iter()
+        .filter_map(|v| v.as_string())
+        .collect();
+    if let Some(l) = nav.language() {
+        tags.push(l);
+    }
+    let lang = nestwatch_ui::i18n::Lang::from_tags(&tags);
+    nestwatch_ui::i18n::set_language(lang);
+    nestwatch_ui::i18n::set_utc_offset(|unix_ms| {
+        let d = js_sys::Date::new(&JsValue::from_f64(unix_ms as f64));
+        -(d.get_timezone_offset() as i32)
+    });
+    if let Some(root) = window.document().and_then(|d| d.document_element()) {
+        let _ = root.set_attribute("lang", lang.tag());
+    }
+}
+
+/// Plays the alarm while any station's alarm rings (FR-AL-5), with
+/// vibration where the browser offers it.
+fn spawn_alarm_watch(engine: ListenerEngine, audio: Rc<Audio>) {
+    spawn_local(async move {
+        let mut rx = engine.state();
+        let mut last_buzz = 0.0;
+        loop {
+            let ringing =
+                rx.borrow_and_update().stations.iter().any(|v| {
+                    matches!(v.alarm, nestwatch_core::listener::AlarmView::Ringing { .. })
+                });
+            audio.set_alarm(ringing);
+            let now = js_sys::Date::now();
+            if ringing
+                && now - last_buzz >= 1_300.0
+                && let Some(w) = web_sys::window()
+            {
+                last_buzz = now;
+                let pattern = js_sys::Array::of3(
+                    &JsValue::from_f64(400.0),
+                    &JsValue::from_f64(200.0),
+                    &JsValue::from_f64(400.0),
+                );
+                let _ = w.navigator().vibrate_with_pattern(&pattern);
+            }
+            let tick = gloo_timers::future::sleep(std::time::Duration::from_millis(1_300));
+            if let Some(Err(_)) = nestwatch_ui::backend::race(rx.changed(), tick).await {
+                audio.set_alarm(false);
+                break;
+            }
+        }
+    });
 }
 
 /// Routes engine events to the microphone, the alert sound and system
@@ -118,10 +192,23 @@ fn spawn_event_loop(engine: ListenerEngine, audio: Rc<Audio>) {
                         .find(|v| v.id == station_id)
                         .map(|v| v.name.clone())
                         .unwrap_or_default();
-                    if !matches!(alert, Alert::Reachable) {
+                    // The alarm has its own sound (`spawn_alarm_watch`).
+                    if !matches!(alert, Alert::Reachable | Alert::Alarm) {
                         audio.beep();
                     }
-                    show_notification(&station_id, &alert_title(&name, alert));
+                    let body = if alert == Alert::Alarm {
+                        s::alarm_body()
+                    } else {
+                        s::alert_body()
+                    };
+                    let on_click: Option<Box<dyn Fn()>> =
+                        matches!(alert, Alert::SoundStarted | Alert::Alarm).then(|| {
+                            let (e, id) = (engine.clone(), station_id.clone());
+                            Box::new(move || {
+                                let _ = e.acknowledge(&id);
+                            }) as Box<dyn Fn()>
+                        });
+                    show_notification(&station_id, &alert_title(&name, alert), body, on_click);
                 }
                 Ok(_) => {}
                 Err(tokio::sync::broadcast::error::RecvError::Lagged(_)) => {}
@@ -158,6 +245,7 @@ pub fn run() {
         web_sys::console::error_1(&JsValue::from_str(&format!("Nestwatch panicked: {info}")));
     }));
     let invitation = take_invitation();
+    init_locale();
 
     #[cfg(feature = "demo")]
     {
@@ -235,6 +323,7 @@ pub fn run() {
         let audio = Audio::new(engine.clone());
         unlock_on_first_gesture(audio.clone());
         spawn_event_loop(engine.clone(), audio.clone());
+        spawn_alarm_watch(engine.clone(), audio.clone());
         let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
         let host = WebHost {
             storage: local.ok(),

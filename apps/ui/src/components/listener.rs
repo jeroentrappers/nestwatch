@@ -9,7 +9,7 @@ use super::common::{Brand, Meter, Segmented, StatusPill, Toggle};
 use super::settings_panel::SettingsPanel;
 use crate::backend::{BackendHandle, Ui};
 use crate::logic;
-use crate::model::{Conn, Mode, Platform, Role, StationRun, Talk, Tile};
+use crate::model::{Conn, Mode, Platform, Role, Room, StationRun, Talk, Tile};
 use crate::strings as s;
 
 /// Role switch (design README §5.1): always on desktop, in the browser
@@ -36,14 +36,17 @@ pub fn RoleSwitch() -> Element {
     }
     let options = vec![
         (
-            s::ROLE_TAB_LISTENING.to_owned(),
+            s::role_tab_listening().to_owned(),
             role == Some(Role::Listener),
         ),
-        (s::ROLE_TAB_STATION.to_owned(), role == Some(Role::Station)),
+        (
+            s::role_tab_station().to_owned(),
+            role == Some(Role::Station),
+        ),
     ];
     rsx! {
         Segmented {
-            label: s::ROLE_GROUP.to_owned(),
+            label: s::role_group().to_owned(),
             options,
             onselect: move |i: usize| {
                 let r = if i == 0 { Role::Listener } else { Role::Station };
@@ -83,19 +86,19 @@ pub fn ListenerHome() -> Element {
     rsx! {
         main { class: "page stack",
             header { class: "app-top",
-                Brand { title: s::APP.to_owned() }
+                Brand { title: s::app().to_owned() }
                 div { class: "row wrap",
                     RoleSwitch {}
                     button {
                         class: "btn ghost",
                         r#type: "button",
                         onclick: move |_| nav.screen.set(Screen::AddStation),
-                        "{s::ADD_STATION_BUTTON}"
+                        "{s::add_station_button()}"
                     }
                     button {
                         class: "btn icon ghost",
                         r#type: "button",
-                        aria_label: s::ABOUT,
+                        aria_label: s::about(),
                         onclick: move |_| nav.screen.set(Screen::About),
                         "ⓘ"
                     }
@@ -106,8 +109,8 @@ pub fn ListenerHome() -> Element {
                     class: "card audio-prompt",
                     r#type: "button",
                     onclick: move |_| unlock.unlock_audio(),
-                    strong { "{s::TAP_TO_LISTEN}" }
-                    span { class: "caption", "{s::TAP_TO_LISTEN_HINT}" }
+                    strong { "{s::tap_to_listen()}" }
+                    span { class: "caption", "{s::tap_to_listen_hint()}" }
                 }
             }
             if askable {
@@ -115,18 +118,18 @@ pub fn ListenerHome() -> Element {
                     class: "btn ghost",
                     r#type: "button",
                     onclick: move |_| notif.request_notifications(),
-                    "{s::ENABLE_NOTIFICATIONS}"
+                    "{s::enable_notifications()}"
                 }
             }
             div { class: "{layout}",
                 if model.tiles.is_empty() {
                     div { class: "card stack empty",
-                        p { "{s::NO_STATIONS}" }
+                        p { "{s::no_stations()}" }
                         button {
                             class: "btn primary",
                             r#type: "button",
                             onclick: move |_| nav.screen.set(Screen::AddStation),
-                            "{s::ADD_STATION}"
+                            "{s::add_station()}"
                         }
                     }
                 } else {
@@ -146,9 +149,9 @@ pub fn ListenerHome() -> Element {
             }
             p { class: "caption footnote",
                 if caps.platform == Platform::Web {
-                    "{s::BROWSER_KEEP_OPEN}"
+                    "{s::browser_keep_open()}"
                 } else {
-                    "{s::KEEPS_LISTENING}"
+                    "{s::keeps_listening()}"
                 }
             }
             if offer_station {
@@ -158,7 +161,7 @@ pub fn ListenerHome() -> Element {
                     onclick: move |_| {
                         nav.update_prefs(&use_station, |p| p.role = Some(Role::Station));
                     },
-                    "{s::STATION_USE_THIS_DEVICE}"
+                    "{s::station_use_this_device()}"
                 }
             }
         }
@@ -173,7 +176,9 @@ pub fn TileCard(tile: Tile, solo: bool) -> Element {
     let pill = logic::tile_pill(&tile);
     let subtitle = logic::tile_subtitle(&tile);
     let live = tile.conn == Conn::Live;
-    let class = if tile.alerting {
+    let class = if tile.alarm.is_ringing() {
+        "card tile alert ringing"
+    } else if tile.alerting {
         "card tile alert"
     } else {
         "card tile"
@@ -200,6 +205,16 @@ pub fn TileCard(tile: Tile, solo: bool) -> Element {
     let id4 = id.clone();
     let id5 = id.clone();
     let settings_label = s::station_settings_of(&tile.name);
+    let ui = use_context::<Ui>();
+    let now = *ui.now_unix_ms.read();
+    let room = logic::room_caption(&tile, now);
+    let paused = logic::paused_caption(&tile, now);
+    let banner = logic::banner(&tile);
+    // "Not the baby" also while awake without a banner (FR-AL-7).
+    let awake_offer = matches!(tile.room, Room::Awake { .. })
+        && live
+        && banner == logic::Banner::None
+        && paused.is_none();
 
     rsx! {
         article { class: "{class}", aria_label: "{label}",
@@ -213,8 +228,9 @@ pub fn TileCard(tile: Tile, solo: bool) -> Element {
                 StatusPill { pill }
             }
             if tile.alerting {
-                span { class: "sr-only", "{s::SOUND_ALERT_SR}" }
+                span { class: "sr-only", "{s::sound_alert_sr()}" }
             }
+            AlertBanner { id: tile.id.clone(), banner: banner.clone() }
             Meter { level: if live { tile.level_dbfs } else { None }, threshold }
             if live {
                 div { class: "row-between caption",
@@ -237,20 +253,36 @@ pub fn TileCard(tile: Tile, solo: bool) -> Element {
                     p { class: "caption", "{s::attempt(*attempt)}" }
                 },
                 Conn::NeedsPairing => rsx! {
-                    p { class: "caption", "{s::NEEDS_PAIRING_HINT}" }
+                    p { class: "caption", "{s::needs_pairing_hint()}" }
                 },
                 Conn::Paused => rsx! {
                     div { class: "row-between",
-                        p { class: "caption", "{s::PAUSED_HINT}" }
+                        p { class: "caption", "{s::paused_hint()}" }
                         button {
                             class: "btn",
                             r#type: "button",
                             onclick: move |_| { let _ = b4.set_follow(&id4, true); },
-                            "{s::RESUME}"
+                            "{s::resume()}"
                         }
                     }
                 },
                 Conn::Live => rsx! {},
+            }
+            if room.is_some() || awake_offer {
+                div { class: "row-between room-status",
+                    if let Some(r) = room {
+                        span { class: "caption", "{r}" }
+                    }
+                    if awake_offer {
+                        AnswerButton { id: tile.id.clone(), ack: false, class: "btn ghost" }
+                    }
+                }
+            }
+            if let Some(p) = paused {
+                div { class: "row-between paused-notice", role: "status",
+                    span { class: "caption", "{p}" }
+                    ResumeAlertsButton { id: tile.id.clone() }
+                }
             }
             if live && cam_open {
                 CameraView { tile: tile.clone() }
@@ -258,18 +290,18 @@ pub fn TileCard(tile: Tile, solo: bool) -> Element {
             div { class: "actions",
                 if live {
                     Toggle {
-                        label: s::MUTE.to_owned(),
+                        label: s::mute().to_owned(),
                         pressed: muted,
                         onclick: move |_| { let _ = b1.set_muted(&id1, !muted); },
                     }
                     Toggle {
-                        label: s::CAMERA.to_owned(),
+                        label: s::camera().to_owned(),
                         pressed: cam_open,
                         disabled: !tile.can_video,
                         onclick: move |_| { let _ = b2.set_camera(&id2, !cam_open); },
                     }
                     Toggle {
-                        label: s::SOLO.to_owned(),
+                        label: s::solo().to_owned(),
                         pressed: solo,
                         onclick: move |_| {
                             let _ = b3.set_solo(if solo { None } else { Some(id3.as_str()) });
@@ -295,17 +327,86 @@ pub fn TileCard(tile: Tile, solo: bool) -> Element {
     }
 }
 
+/// "I'm on it" (`ack`) or "Not the baby" for station `id` (FR-AL-6, FR-AL-7).
+#[component]
+fn AnswerButton(id: String, ack: bool, class: String) -> Element {
+    let backend = use_context::<BackendHandle>();
+    let text = if ack {
+        s::im_on_it()
+    } else {
+        s::not_the_baby()
+    };
+    rsx! {
+        button {
+            class: "{class}",
+            r#type: "button",
+            onclick: move |_| {
+                let _ = if ack { backend.acknowledge(&id) } else { backend.not_the_baby(&id) };
+            },
+            "{text}"
+        }
+    }
+}
+
+#[component]
+fn ResumeAlertsButton(id: String) -> Element {
+    let backend = use_context::<BackendHandle>();
+    rsx! {
+        button {
+            class: "btn",
+            r#type: "button",
+            onclick: move |_| { let _ = backend.resume_alerts(&id); },
+            "{s::resume_alerts()}"
+        }
+    }
+}
+
+/// The banner of an unanswered sound alert or a ringing alarm (FR-AL-6):
+/// icon and words, never colour alone. Seeing it does not acknowledge.
+#[component]
+fn AlertBanner(id: String, banner: logic::Banner) -> Element {
+    let (class, title, hint) = match banner {
+        logic::Banner::None => return rsx! {},
+        logic::Banner::Pending(t) => ("alert-banner pending", t, None),
+        logic::Banner::Ringing(t, h) => ("alert-banner ringing", t, Some(h)),
+    };
+    let ringing = hint.is_some();
+    rsx! {
+        div { class: "{class}", role: "alert",
+            div { class: "row",
+                span { class: "banner-icon", "aria-hidden": "true",
+                    if ringing { "⏰" } else { "♪" }
+                }
+                div { class: "title",
+                    strong { "{title}" }
+                    if let Some(h) = hint {
+                        span { class: "caption", "{h}" }
+                    }
+                }
+            }
+            div { class: "row",
+                AnswerButton {
+                    id: id.clone(),
+                    ack: true,
+                    class: if ringing { "btn alarm grow" } else { "btn primary grow" },
+                }
+                AnswerButton { id, ack: false, class: "btn ghost grow" }
+            }
+        }
+    }
+}
+
 /// Hold to talk (FR-TB-1): pointer down/up, or Space/Enter held.
 #[component]
 fn TalkButton(id: String, talk: Talk) -> Element {
     let backend = use_context::<BackendHandle>();
     let mut held = use_signal(|| false);
     let (text, disabled) = match &talk {
-        Talk::Granted => (s::TALKING.to_owned(), false),
-        Talk::Requested => (s::TALK_WAIT.to_owned(), false),
+        Talk::Granted => (s::talking().to_owned(), false),
+        Talk::Requested => (s::talk_wait().to_owned(), false),
         Talk::Busy(by) => (s::talk_busy(by.as_deref()), true),
-        Talk::Disabled => (s::TALK_DISABLED.to_owned(), true),
-        Talk::Idle => (s::HOLD_TO_TALK.to_owned(), false),
+        Talk::Disabled => (s::talk_disabled().to_owned(), true),
+        Talk::Idle => (s::hold_to_talk().to_owned(), false),
     };
     let active = *held.read() || talk == Talk::Granted;
     let class = if active {

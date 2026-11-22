@@ -17,17 +17,17 @@ use crate::strings as s;
 pub fn RelayExplainer(server: String) -> Element {
     rsx! {
         div { class: "stack-s relay-explainer",
-            p { "{s::RELAY_INTRO}" }
+            p { "{s::relay_intro()}" }
             p { class: "caption mono", "{s::relay_server_named(&server)}" }
             div { class: "stack-s",
-                strong { "{s::RELAY_CAN_SEE_HEADING}" }
-                p { class: "muted", "{s::RELAY_CAN_SEE}" }
+                strong { "{s::relay_can_see_heading()}" }
+                p { class: "muted", "{s::relay_can_see()}" }
             }
             div { class: "stack-s",
-                strong { "{s::RELAY_CANNOT_SEE_HEADING}" }
-                p { class: "muted", "{s::RELAY_CANNOT_SEE}" }
+                strong { "{s::relay_cannot_see_heading()}" }
+                p { class: "muted", "{s::relay_cannot_see()}" }
             }
-            p { class: "caption", "{s::RELAY_TRAFFIC_NOTE}" }
+            p { class: "caption", "{s::relay_traffic_note()}" }
         }
     }
 }
@@ -40,9 +40,9 @@ pub fn RelaySetup(server: String) -> Element {
     let nav = use_context::<Nav>();
     let (yes, no) = (backend.clone(), backend.clone());
     rsx! {
-        div { class: "overlay", role: "dialog", aria_modal: "true", aria_label: s::RELAY_SETUP_TITLE,
+        div { class: "overlay", role: "dialog", aria_modal: "true", aria_label: s::relay_setup_title(),
             div { class: "sheet stack relay-setup",
-                h2 { "{s::RELAY_SETUP_TITLE}" }
+                h2 { "{s::relay_setup_title()}" }
                 RelayExplainer { server }
                 div { class: "stack-s",
                     button {
@@ -52,7 +52,7 @@ pub fn RelaySetup(server: String) -> Element {
                             let _ = yes.set_relay_enabled(true);
                             nav.update_prefs(&yes, |p| p.relay_asked = true);
                         },
-                        "{s::RELAY_SETUP_YES}"
+                        "{s::relay_setup_yes()}"
                     }
                     button {
                         class: "btn ghost block",
@@ -61,9 +61,9 @@ pub fn RelaySetup(server: String) -> Element {
                             let _ = no.set_relay_enabled(false);
                             nav.update_prefs(&no, |p| p.relay_asked = true);
                         },
-                        "{s::RELAY_SETUP_NO}"
+                        "{s::relay_setup_no()}"
                     }
-                    p { class: "caption footnote", "{s::RELAY_SETUP_LATER}" }
+                    p { class: "caption footnote", "{s::relay_setup_later()}" }
                 }
             }
         }
@@ -88,18 +88,18 @@ pub fn RelaySettings(model: StationModel) -> Element {
     let detail = match &model.relay {
         RelayView::Error {
             permanent: true, ..
-        } => Some(s::RELAY_REFUSED_HINT.to_owned()),
+        } => Some(s::relay_refused_hint().to_owned()),
         RelayView::Error { message, .. } => Some(message.clone()),
         _ => None,
     };
     rsx! {
-        section { class: "stack-s relay-settings", aria_label: s::RELAY_TITLE,
+        section { class: "stack-s relay-settings", aria_label: s::relay_title(),
             if caps.relay_only {
-                h3 { "{s::RELAY_TITLE}" }
-                p { class: "caption", "{s::RELAY_ONLY_NOTE}" }
+                h3 { "{s::relay_title()}" }
+                p { class: "caption", "{s::relay_only_note()}" }
             } else {
                 SwitchRow {
-                    label: s::RELAY_TITLE.to_owned(),
+                    label: s::relay_title().to_owned(),
                     checked: set.relay_enabled,
                     onchange: move |v: bool| {
                         let _ = b_toggle.set_relay_enabled(v);
@@ -115,7 +115,7 @@ pub fn RelaySettings(model: StationModel) -> Element {
             }
             RelayExplainer { server: set.relay_server.clone() }
             if caps.relay_server_fixed {
-                p { class: "caption", "{s::RELAY_SERVER_FIXED}" }
+                p { class: "caption", "{s::relay_server_fixed()}" }
             } else {
             form {
                 class: "field",
@@ -126,7 +126,7 @@ pub fn RelaySettings(model: StationModel) -> Element {
                         Err(e) => error.set(Some(e.message())),
                     }
                 },
-                label { r#for: "relay-server", "{s::RELAY_SERVER}" }
+                label { r#for: "relay-server", "{s::relay_server()}" }
                 div { class: "row",
                     input {
                         id: "relay-server",
@@ -139,9 +139,9 @@ pub fn RelaySettings(model: StationModel) -> Element {
                         aria_describedby: "relay-server-hint",
                         oninput: move |e: FormEvent| server.set(e.value()),
                     }
-                    button { class: "btn", r#type: "submit", "{s::SAVE}" }
+                    button { class: "btn", r#type: "submit", "{s::save()}" }
                 }
-                span { id: "relay-server-hint", class: "caption", "{s::RELAY_SERVER_HINT}" }
+                span { id: "relay-server-hint", class: "caption", "{s::relay_server_hint()}" }
                 if let Some(e) = error.read().as_ref() {
                     span { class: "caption", role: "alert", "{e}" }
                 }
@@ -152,7 +152,7 @@ pub fn RelaySettings(model: StationModel) -> Element {
             }
             div { class: "stack-s",
                 if *confirm.read() {
-                    p { class: "caption", "{s::RELAY_RESET_HINT}" }
+                    p { class: "caption", "{s::relay_reset_hint()}" }
                     div { class: "row",
                         button {
                             class: "btn danger",
@@ -161,13 +161,13 @@ pub fn RelaySettings(model: StationModel) -> Element {
                                 let _ = b_reset.reset_relay_identity();
                                 confirm.set(false);
                             },
-                            "{s::RELAY_RESET_CONFIRM}"
+                            "{s::relay_reset_confirm()}"
                         }
                         button {
                             class: "btn ghost",
                             r#type: "button",
                             onclick: move |_| confirm.set(false),
-                            "{s::CANCEL}"
+                            "{s::cancel()}"
                         }
                     }
                 } else {
@@ -175,7 +175,7 @@ pub fn RelaySettings(model: StationModel) -> Element {
                         class: "btn ghost",
                         r#type: "button",
                         onclick: move |_| confirm.set(true),
-                        "{s::RELAY_RESET}"
+                        "{s::relay_reset()}"
                     }
                 }
             }

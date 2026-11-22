@@ -41,11 +41,11 @@ pub fn AddStation() -> Element {
         return rsx! {
             main { class: "page stack narrow",
                 div { class: "row",
-                    h1 { "{s::ADD_STATION}" }
+                    h1 { "{s::add_station()}" }
                 }
-                div { class: "card stack centered verify-card", role: "alertdialog", aria_label: s::VERIFY_PROMPT,
+                div { class: "card stack centered verify-card", role: "alertdialog", aria_label: s::verify_prompt(),
                     h2 { "{outcome.name}" }
-                    span { class: "caption", "{s::VERIFY_PROMPT}" }
+                    span { class: "caption", "{s::verify_prompt()}" }
                     span { class: "verify", "{outcome.verification}" }
                     div { class: "row full",
                         button {
@@ -55,7 +55,7 @@ pub fn AddStation() -> Element {
                                 let _ = forget.forget(&id);
                                 nav.pair.set(PairFlow::Removed);
                             },
-                            "{s::VERIFY_DIFFERENT}"
+                            "{s::verify_different()}"
                         }
                         button {
                             class: "btn primary grow",
@@ -64,7 +64,7 @@ pub fn AddStation() -> Element {
                                 nav.pair.set(PairFlow::Idle);
                                 nav.screen.set(Screen::Home);
                             },
-                            "{s::VERIFY_SAME}"
+                            "{s::verify_same()}"
                         }
                     }
                 }
@@ -76,7 +76,7 @@ pub fn AddStation() -> Element {
     let b_code = backend.clone();
     let code_label = match &*chosen.read() {
         Some(n) => s::code_field_for(&n.name),
-        None => s::CODE_FIELD.to_owned(),
+        None => s::code_field().to_owned(),
     };
     let need_id = chosen.read().is_none();
     rsx! {
@@ -85,24 +85,24 @@ pub fn AddStation() -> Element {
                 button {
                     class: "btn icon ghost",
                     r#type: "button",
-                    aria_label: s::BACK,
+                    aria_label: s::back(),
                     onclick: back,
                     "‹"
                 }
-                h1 { "{s::ADD_STATION}" }
+                h1 { "{s::add_station()}" }
             }
             match &flow {
-                PairFlow::Busy => rsx! { p { class: "card", role: "status", "{s::PAIRING}" } },
+                PairFlow::Busy => rsx! { p { class: "card", role: "status", "{s::pairing()}" } },
                 PairFlow::Failed(m) => rsx! { p { class: "card error", role: "alert", "{m}" } },
-                PairFlow::Removed => rsx! { p { class: "card", role: "status", "{s::VERIFY_REMOVED}" } },
+                PairFlow::Removed => rsx! { p { class: "card", role: "status", "{s::verify_removed()}" } },
                 _ => rsx! {},
             }
-            section { class: "card stack", aria_label: s::NEARBY,
-                h3 { "{s::NEARBY}" }
+            section { class: "card stack", aria_label: s::nearby(),
+                h3 { "{s::nearby()}" }
                 if !caps.discovery {
-                    p { class: "caption", "{s::NEARBY_UNAVAILABLE}" }
+                    p { class: "caption", "{s::nearby_unavailable()}" }
                 } else if nearby.is_empty() {
-                    p { class: "caption", role: "status", "{s::NEARBY_SEARCHING}" }
+                    p { class: "caption", role: "status", "{s::nearby_searching()}" }
                 } else {
                     div { class: "list",
                         for n in nearby.iter() {
@@ -122,11 +122,11 @@ pub fn AddStation() -> Element {
                                         },
                                         span { class: "grow", "{n.name}" }
                                         if n.known {
-                                            span { class: "caption", "{s::ALREADY_PAIRED}" }
+                                            span { class: "caption", "{s::already_paired()}" }
                                         } else if n.pairing {
-                                            span { class: "pill calm plain", "{s::PAIRING_OPEN}" }
+                                            span { class: "pill calm plain", "{s::pairing_open()}" }
                                         } else {
-                                            span { class: "caption", "{s::NOT_PAIRING}" }
+                                            span { class: "caption", "{s::not_pairing()}" }
                                         }
                                     }
                                 }
@@ -145,7 +145,7 @@ pub fn AddStation() -> Element {
                     }
                 },
                 div { class: "field",
-                    label { r#for: "invite", "{s::INVITE_FIELD}" }
+                    label { r#for: "invite", "{s::invite_field()}" }
                     input {
                         id: "invite",
                         class: "input",
@@ -155,11 +155,11 @@ pub fn AddStation() -> Element {
                         value: "{invite}",
                         oninput: move |e: FormEvent| invite.set(e.value()),
                     }
-                    span { class: "caption", "{s::INVITE_HINT}" }
+                    span { class: "caption", "{s::invite_hint()}" }
                 }
-                button { class: "btn primary", r#type: "submit", disabled: busy, "{s::INVITE_SUBMIT}" }
+                button { class: "btn primary", r#type: "submit", disabled: busy, "{s::invite_submit()}" }
             }
-            p { class: "caption centered", "{s::OR}" }
+            p { class: "caption centered", "{s::or()}" }
             form {
                 class: "stack-s",
                 onsubmit: move |e: FormEvent| {
@@ -197,7 +197,7 @@ pub fn AddStation() -> Element {
                 }
                 if need_id {
                     div { class: "field",
-                        label { r#for: "station-id", "{s::STATION_ID_FIELD}" }
+                        label { r#for: "station-id", "{s::station_id_field()}" }
                         input {
                             id: "station-id",
                             class: "input mono",
@@ -210,7 +210,7 @@ pub fn AddStation() -> Element {
                     }
                 }
                 div { class: "field",
-                    label { r#for: "address", "{s::ADDRESS_FIELD}" }
+                    label { r#for: "address", "{s::address_field()}" }
                     input {
                         id: "address",
                         class: "input",
@@ -220,13 +220,13 @@ pub fn AddStation() -> Element {
                         value: "{address}",
                         oninput: move |e: FormEvent| address.set(e.value()),
                     }
-                    span { class: "caption", "{s::ADDRESS_HINT}" }
+                    span { class: "caption", "{s::address_hint()}" }
                 }
                 button {
                     class: "btn primary",
                     r#type: "submit",
                     disabled: busy || !logic::code_complete(&code.read()),
-                    "{s::CODE_SUBMIT}"
+                    "{s::code_submit()}"
                 }
             }
         }
