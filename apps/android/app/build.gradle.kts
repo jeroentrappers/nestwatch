@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "be.appmire.nestwatch"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 36
         // The release jobs pass the tag and the commit count (docs/releasing.md §6).
         versionCode = (findProperty("nestwatch.versionCode") as String?)?.toInt() ?: 1
@@ -39,7 +39,7 @@ android {
     }
 
     compileOptions {
-        // JNA uses java.util.function and streams, which API 23 lacks.
+        // Desugaring stays on for Java APIs newer than minSdk that libraries use.
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -84,7 +84,7 @@ val cargoNdkBuild = tasks.register<Exec>("cargoNdkBuild") {
     inputs.file(workspaceDir.resolve("Cargo.lock"))
     inputs.property("abis", abis)
     outputs.dir(rustJniDir)
-    val args = mutableListOf(cargo, "ndk", "--platform", "23")
+    val args = mutableListOf(cargo, "ndk", "--platform", "24")
     abis.forEach { args += listOf("-t", it) }
     args += listOf("-o", rustJniDir.get().asFile.path, "build", "--release", "-p", "nestwatch-ffi", "--lib")
     commandLine(args)

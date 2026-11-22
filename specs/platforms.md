@@ -8,7 +8,7 @@
 | macOS | station, listener | macOS 12, Apple silicon and Intel | Dioxus desktop | Rust directly |
 | Windows | station, listener | Windows 10 21H2, x86_64 and arm64 | Dioxus desktop | Rust directly |
 | Browser | listener; station through a relay server only (§2.5) | Chrome/Edge 113, Firefox 128, Safari 17 | Dioxus web (wasm) | Rust compiled to wasm32 |
-| Android | station, listener | Android 6.0 (API 23) | Jetpack Compose | UniFFI (Kotlin) |
+| Android | station, listener | Android 7.0 (API 24) | Jetpack Compose | UniFFI (Kotlin) |
 | iOS / iPadOS | station, listener | iOS 15 | SwiftUI | UniFFI (Swift) |
 
 ## 2. Obligations per platform
@@ -25,7 +25,7 @@
 - Station and listener run in a foreground service
   (`FOREGROUND_SERVICE_MICROPHONE`, `..._CAMERA` while video streams,
   `..._MEDIA_PLAYBACK` for listeners on API 34+; `foregroundServiceType` on
-  API 29+; plain foreground service on API 23–28).
+  API 29+; plain foreground service on API 24–28).
 - Request `POST_NOTIFICATIONS` on API 33+, `RECORD_AUDIO` and `CAMERA` at
   first use. Hold a partial wake lock and a Wi-Fi lock while active.
 - Offer to exempt the app from battery optimisation, explaining why.

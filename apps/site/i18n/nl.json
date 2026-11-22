@@ -239,7 +239,7 @@
           "name": "Android",
           "status": "",
           "roles": "Zender en luisteraar, app voor telefoon en tablet.",
-          "requirements": ["Android 6.0 of nieuwer", "arm64, armv7 of x86_64"],
+          "requirements": ["Android 7.0 of nieuwer", "arm64, armv7 of x86_64"],
           "notes": [
             "Open het gedownloade bestand en sta je browser of bestandsbeheerder toe apps te installeren als daarom gevraagd wordt. Releases die zonder de ondertekeningssleutel van het project gebouwd zijn, zeggen dat in hun naam (<code>…-testkey.apk</code>); verwijder zo'n versie voor je een correct ondertekende installeert.",
             "Een Android-zender biedt de browserluisteraar zelf niet aan. Wil je in een browser luisteren, zet dan de relay aan op de zender en gebruik de web-app op deze site."

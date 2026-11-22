@@ -18,7 +18,7 @@ import javax.crypto.spec.GCMParameterSpec
 /**
  * The engines' storage port on Android (security.md §5): every value is
  * sealed with AES-256-GCM under a non-exportable Android Keystore key
- * (API 23+) and written atomically to `noBackupFilesDir/nestwatch/<name>.sealed`,
+ * (API 24+) and written atomically to `noBackupFilesDir/nestwatch/<name>.sealed`,
  * which Android never includes in backups (the manifest also disables
  * backups and device transfer).
  *

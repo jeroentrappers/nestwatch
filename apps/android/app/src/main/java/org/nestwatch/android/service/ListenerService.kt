@@ -37,7 +37,7 @@ import org.nestwatch.ffi.ListenerSnapshot
 /**
  * Keeps a listener receiving and alerting with the screen off (FR-LS-4,
  * FR-AL-4, platforms.md §2.2): a foreground service of type
- * mediaPlayback (plain on API 23–28) that holds a partial wake lock and a
+ * mediaPlayback (plain on API 24–28) that holds a partial wake lock and a
  * Wi-Fi lock, plays the mix, captures talk-back while granted, browses
  * NSD and turns alerts into notifications. While any station's alarm
  * rings (FR-AL-5) it plays one alarm on the alarm stream and shows an

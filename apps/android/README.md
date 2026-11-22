@@ -1,6 +1,6 @@
 # Nestwatch for Android
 
-Kotlin + Jetpack Compose app (minSdk 23, target and compile SDK 36) on the
+Kotlin + Jetpack Compose app (minSdk 24, target and compile SDK 36) on the
 Rust core through `crates/nestwatch-ffi` (UniFFI, JNA). Station and listener,
 the screens of `design/README.md` §5 with the Nestwatch tokens mapped to
 Material 3 (§6).
@@ -9,7 +9,7 @@ Material 3 (§6).
 |---------|-------|
 | Engines | `core/Nestwatch.kt` owns the `Station` and `Listener` objects and republishes snapshots, events and video frames as flows |
 | Storage (device key, trust, settings) | `core/KeystoreStorage.kt`: AES-256-GCM under an Android Keystore key, files in `noBackupFilesDir`, backups off (ANDROID-2) |
-| Station | `service/StationService.kt`: foreground service (microphone, camera if granted; plain on API 23–29), wake and Wi-Fi locks, `AudioRecord` → `push_capture_i16`, talk-back `AudioTrack`, CameraX on `CameraWanted` only, battery, NSD advertising |
+| Station | `service/StationService.kt`: foreground service (microphone, camera if granted; plain on API 24–29), wake and Wi-Fi locks, `AudioRecord` → `push_capture_i16`, talk-back `AudioTrack`, CameraX on `CameraWanted` only, battery, NSD advertising |
 | Listener | `service/ListenerService.kt`: foreground service (mediaPlayback on API 29+), `pull_playback` → `AudioTrack`, talk-back microphone, NSD browsing under a multicast lock, alert notifications; the escalating alarm (`audio/Alarm.kt`, a generated tone on `USAGE_ALARM` with a 30 s ramp and vibration) on the `alert-alarm` channel, "I'm on it" / "Not the baby" through `platform/AlertActions.kt` |
 | Languages | English reference plus nl, fr, de, es, it, pt-BR, pl, sv, da, nb (`res/values-*`), per-app language via `res/xml/locales_config.xml`; `TranslationsTest` checks names, placeholders and plural quantities |
 | mDNS | Android NSD, not the core's responder (ANDROID-1) |

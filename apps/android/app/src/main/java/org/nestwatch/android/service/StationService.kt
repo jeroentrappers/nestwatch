@@ -36,7 +36,7 @@ import org.nestwatch.ffi.StationEventInfo
 /**
  * Keeps a station running with the screen off (FR-ST-5, platforms.md
  * §2.2): a foreground service of type microphone (plus camera when the
- * permission is granted; plain on API 23–28) that holds a partial wake
+ * permission is granted; plain on API 24–28) that holds a partial wake
  * lock and a Wi-Fi lock, captures the microphone, plays talk-back, runs
  * the camera on demand, reports the battery and advertises over NSD.
  */

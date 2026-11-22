@@ -59,7 +59,7 @@ knows the station's static key, and the 128-bit token is never guessable.
 
 | Platform | Device key and trust store |
 |----------|----------------------------|
-| Android | Encrypted with an Android Keystore AES-GCM key (API 23+) in app-private storage |
+| Android | Encrypted with an Android Keystore AES-GCM key (API 24+) in app-private storage |
 | iOS | Keychain item, `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` |
 | macOS | Keychain |
 | Windows | DPAPI (user scope) protected file in `%APPDATA%` |

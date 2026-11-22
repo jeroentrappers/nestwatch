@@ -239,7 +239,7 @@
           "name": "Android",
           "status": "",
           "roles": "Station and listener, phone and tablet app.",
-          "requirements": ["Android 6.0 or newer", "arm64, armv7 or x86_64"],
+          "requirements": ["Android 7.0 or newer", "arm64, armv7 or x86_64"],
           "notes": [
             "Open the downloaded file and allow your browser or file manager to install apps when asked. Releases built without the project's signing key carry a name that says so (<code>…-testkey.apk</code>); uninstall such a build before installing a properly signed one.",
             "An Android station does not serve the browser listener itself. To listen in a browser, switch on the relay on the station and use the web app on this site."

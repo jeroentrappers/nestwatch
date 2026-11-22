@@ -397,9 +397,9 @@ jobs:
             echo "| macOS 12+ (Apple silicon and Intel) | \`nestwatch-macos-universal.dmg\` |"
             echo "| Windows 10 21H2+ (x86_64) | \`nestwatch-windows-x86_64.msi\` |"
             if [ -f dist/nestwatch-android.apk ]; then
-              echo "| Android 6.0+ | \`nestwatch-android.apk\` |"
+              echo "| Android 7.0+ | \`nestwatch-android.apk\` |"
             else
-              echo "| Android 6.0+ | \`nestwatch-android-testkey.apk\` (signed with a throw-away test key: uninstall it before installing a properly signed build) |"
+              echo "| Android 7.0+ | \`nestwatch-android-testkey.apk\` (signed with a throw-away test key: uninstall it before installing a properly signed build) |"
             fi
             echo "| Browser listener (static files) | \`nestwatch-web.tar.gz\` |"
             echo "| Website (static files) | \`nestwatch-site.tar.gz\` |"
