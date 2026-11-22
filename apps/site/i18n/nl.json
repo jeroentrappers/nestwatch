@@ -464,7 +464,7 @@
           "pill": "",
           "body": [
             "Nestwatch valt onder de <a href=\"{repo}/blob/main/LICENSE\">GNU Affero General Public License v3.0 of later</a>. Je mag het gebruiken, bestuderen, aanpassen en delen; verspreid je een aangepaste versie of bied je die als dienst aan anderen aan, dan deel je je wijzigingen onder dezelfde licentie.",
-            "De AGPL botst met de regels van de Apple App Store. Voor een iOS-release wil de auteursrechthebbende een uitdrukkelijke bijkomende toestemming geven voor verspreiding via app-winkels, of iOS-versies op een andere manier verspreiden."
+            "De AGPL botst met de regels van de Apple App Store. Daarom geeft de auteursrechthebbende een bijkomende toestemming voor verspreiding via app-winkels (LICENSE-APP-STORES.md in de broncode)."
           ]
         },
         {

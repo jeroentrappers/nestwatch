@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Google Play uploads for the Android app, from apps/android/:
+# `bundle exec fastlane <lane>` (docs/releasing.md §6). The release workflow
+# (.github/workflows/stores.yml) runs them on the Linux release runner.
+#
+# The Play service account key comes from SUPPLY_JSON_KEY (a path) or
+# SUPPLY_JSON_KEY_DATA (the JSON itself). The bundle is built and signed
+# before these lanes run; they only upload.
+default_platform(:android)
+
+platform :android do
+  desc "Upload a signed bundle: aab:<path> track:<internal|alpha|beta|production> status:<draft|completed>"
+  lane :upload do |options|
+    mapping = options[:mapping]
+    upload_to_play_store(
+      aab: options.fetch(:aab),
+      mapping: (mapping if mapping && File.exist?(mapping)),
+      track: options.fetch(:track, "internal"),
+      release_status: options.fetch(:status, "draft"),
+      # The listing (texts, icon, feature graphic, screenshots) goes with every
+      # bundle: Play accepts a listing-only upload only once a release exists.
+      metadata_path: "fastlane/metadata/android",
+      sync_image_upload: true
+    )
+  end
+
+  desc "Move the release on one track to another: from:<track> to:<track> [rollout:<0..1>]"
+  lane :promote do |options|
+    rollout = options[:rollout]
+    upload_to_play_store(
+      track: options.fetch(:from, "internal"),
+      track_promote_to: options.fetch(:to),
+      track_promote_release_status: rollout && rollout.to_f < 1 ? "inProgress" : "completed",
+      rollout: (rollout.to_s if rollout && rollout.to_f < 1),
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Upload the store listing only (texts, icon, feature graphic, screenshots); needs an existing release"
+  lane :listing do
+    upload_to_play_store(
+      metadata_path: "fastlane/metadata/android",
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_changelogs: true,
+      sync_image_upload: true
+    )
+  end
+end

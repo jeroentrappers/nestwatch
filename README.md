@@ -43,7 +43,6 @@ Behaviour is defined in [specs/](specs/README.md).
 
 GNU Affero General Public License v3.0 or later, see [LICENSE](LICENSE).
 
-The AGPL's terms conflict with Apple App Store distribution rules. Before an
-iOS release, the copyright holder intends to grant an explicit additional
-permission (AGPL section 7) for app-store distribution, or to distribute iOS
-builds through other channels.
+The AGPL's terms conflict with Apple App Store distribution rules, so the
+copyright holder grants an additional permission (AGPL section 7) for
+app-store distribution: see [LICENSE-APP-STORES.md](LICENSE-APP-STORES.md).

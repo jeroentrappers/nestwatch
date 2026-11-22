@@ -1,0 +1,26 @@
+Nestwatch turns the phones, tablets and computers you already own into a baby monitor. Sound and video travel directly from one of your devices to another, end-to-end encrypted. There is no account to make and no cloud in between.
+
+HOW IT WORKS
+- Set up a station: put a device near your child and choose "This device watches". It listens to the room and shows the sound level. The screen can be dimmed while it keeps monitoring.
+- Pair a listener: on the station, tap "Pair a listener" and scan the QR code with your phone, open the invitation link, or type the 10-character code. Both screens show the same number, so you can check nobody is in between.
+- Listen, talk, look: the listener plays the room when there is sound, alerts you, lets you hold to talk, and opens the camera only when you ask.
+
+FEATURES
+- Sound activation with your own threshold, with a short pre-roll so the start of a cry is never cut off. Or keep the sound always on.
+- Talk-back: hold to talk through the station's speaker.
+- Camera on demand: the camera is off whenever nobody is looking, and the station shows when it sends.
+- Several stations and listeners: follow up to 8 stations at once, each with its own volume, mute and solo. A station serves up to 8 listeners.
+- Alerts that work while muted: when a quiet room starts to sound, when a station is unreachable, and when a station's battery is low.
+- Calm at night: warm, low-glare colours, a night and a day theme and a dimmed station screen.
+- Works across platforms: stations and listeners on Android, iPhone, iPad, Linux, macOS, Windows and in the browser.
+
+PRIVATE BY DESIGN
+- No account and no cloud. On your home network, or over your own VPN, devices talk directly.
+- Away from home, an optional relay passes on the encrypted stream without being able to read it. Use the project's relay or run your own.
+- Every connection is encrypted and authenticated with the Noise Protocol Framework. Only devices you paired can hear, see or talk through a station.
+- No analytics, no ads, no tracking, no recordings. Audio and video are never stored.
+
+OPEN SOURCE
+Nestwatch is free software under the GNU AGPL 3.0 or later. The source code is at https://github.com/jeroentrappers/nestwatch
+
+Nestwatch is not a medical device and does not replace supervision.

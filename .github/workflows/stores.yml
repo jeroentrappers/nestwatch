@@ -1,0 +1,223 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Ships a version tag (vX.Y.Z) to Google Play and the App Store. See
+# docs/releasing.md §6.
+#
+# Two self-hosted runners do the work, both labelled nestwatch-release:
+#   ryzen (Linux):  Rust core for Android, signed .aab, fastlane supply
+#   mini4 (macOS):  Rust XCFramework, unit tests, signed .ipa, fastlane
+#                   deliver (TestFlight, then App Review)
+# Pull requests never run here: this workflow only starts on tags and by
+# hand, and fork pull requests need approval before any workflow runs.
+#
+# Google Play: the bundle goes to PLAY_TRACK (repository variable, default
+# production) with status PLAY_RELEASE_STATUS (default draft: Play accepts
+# nothing else until the app has been published once; set it to completed
+# afterwards and tags release without a click).
+# App Store: the build is uploaded and submitted for review; it is released
+# by hand once approved unless IOS_AUTOMATIC_RELEASE is true.
+#
+# Versions: the tag without "v" (v0.2.0 → 0.2.0); version code and build
+# number: the commit count of the tagged commit, as for manual releases.
+name: Stores
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "!v*-*" # prereleases: release.yml (GitHub) only
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to ship, e.g. v0.2.0"
+        required: true
+      android:
+        description: "Google Play"
+        type: boolean
+        default: true
+      ios:
+        description: "App Store"
+        type: boolean
+        default: true
+      play_track:
+        description: "Google Play track"
+        type: choice
+        options: [production, beta, alpha, internal]
+        default: production
+      play_status:
+        description: "Google Play release status"
+        type: choice
+        options: [draft, completed]
+        default: draft
+      ios_submit:
+        description: "Submit the iOS build for App Review (else TestFlight only)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stores-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  FASTLANE_SKIP_UPDATE_CHECK: "1"
+  FASTLANE_HIDE_CHANGELOG: "1"
+  FASTLANE_HIDE_TIMESTAMP: "1"
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  plan:
+    name: Plan
+    if: github.repository == 'jeroentrappers/nestwatch'
+    runs-on: [self-hosted, Linux, nestwatch-release]
+    timeout-minutes: 10
+    outputs:
+      sha: ${{ steps.plan.outputs.sha }}
+      version: ${{ steps.plan.outputs.version }}
+      build: ${{ steps.plan.outputs.build }}
+      android: ${{ steps.plan.outputs.android }}
+      ios: ${{ steps.plan.outputs.ios }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.TAG }}
+          fetch-depth: 0
+          persist-credentials: false
+      - id: plan
+        env:
+          IN_ANDROID: ${{ github.event.inputs.android || 'true' }}
+          IN_IOS: ${{ github.event.inputs.ios || 'true' }}
+        run: |
+          [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]] || { echo "::error::$TAG is not vMAJOR.MINOR.PATCH"; exit 1; }
+          sha=$(git rev-parse "refs/tags/$TAG^{commit}")
+          git merge-base --is-ancestor "$sha" origin/main || { echo "::error::$TAG is not on main"; exit 1; }
+          build=$(git rev-list --count "$sha")
+          {
+            echo "sha=$sha"
+            echo "version=${TAG#v}"
+            echo "build=$build"
+            echo "android=$IN_ANDROID"
+            echo "ios=$IN_IOS"
+          } | tee -a "$GITHUB_OUTPUT"
+          {
+            echo "### Stores $TAG (\`${sha:0:7}\`): ${TAG#v} ($build)"
+            echo "Google Play: $IN_ANDROID · App Store: $IN_IOS"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  play:
+    name: Google Play
+    needs: plan
+    if: needs.plan.outputs.android == 'true'
+    runs-on: [self-hosted, Linux, nestwatch-release]
+    environment: production
+    timeout-minutes: 90
+    env:
+      # UniFFI reads the bindings metadata from the library's symbols
+      # (release.yml, android job).
+      CARGO_PROFILE_RELEASE_STRIP: none
+      TRACK: ${{ github.event.inputs.play_track || vars.PLAY_TRACK || 'production' }}
+      STATUS: ${{ github.event.inputs.play_status || vars.PLAY_RELEASE_STATUS || 'draft' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+          clean: true
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Rust targets and cargo-ndk
+        run: |
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/.cargo/bin:$PATH"
+          rustup toolchain install
+          rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+          cargo ndk --version 2>/dev/null | grep -q 4.1.2 || cargo install --locked cargo-ndk --version 4.1.2
+      - name: bundleRelease
+        working-directory: apps/android
+        run: |
+          ./gradlew --no-daemon bundleRelease \
+            -Pnestwatch.versionCode=${{ needs.plan.outputs.build }} \
+            -Pnestwatch.versionName=${{ needs.plan.outputs.version }}
+      - name: Sign with the upload key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          [[ -n "$KEYSTORE_BASE64" ]] || { echo "::error::ANDROID_KEYSTORE_BASE64 is not set"; exit 1; }
+          aab=apps/android/app/build/outputs/bundle/release/app-release.aab
+          umask 077
+          printf %s "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          export KEY_PASSWORD=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}
+          mkdir -p dist
+          jarsigner -keystore "$RUNNER_TEMP/release.jks" -storepass:env KEYSTORE_PASSWORD -keypass:env KEY_PASSWORD \
+            -sigalg SHA256withRSA -digestalg SHA-256 -signedjar dist/nestwatch-android.aab "$aab" "$KEY_ALIAS"
+          rm -f "$RUNNER_TEMP/release.jks"
+          jarsigner -verify dist/nestwatch-android.aab
+      - uses: actions/upload-artifact@v7
+        with:
+          name: store-android
+          path: |
+            dist/nestwatch-android.aab
+            apps/android/app/build/outputs/mapping/release/mapping.txt
+      - name: Upload to Google Play
+        working-directory: apps/android
+        env:
+          SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          [[ -n "$SUPPLY_JSON_KEY_DATA" ]] || { echo "::error::PLAY_SERVICE_ACCOUNT_JSON is not set"; exit 1; }
+          bundle config set --local path vendor/bundle
+          bundle install --quiet
+          bundle exec fastlane android upload \
+            aab:"$GITHUB_WORKSPACE/dist/nestwatch-android.aab" \
+            mapping:"$GITHUB_WORKSPACE/apps/android/app/build/outputs/mapping/release/mapping.txt" \
+            track:"$TRACK" status:"$STATUS"
+          echo "Google Play: ${{ needs.plan.outputs.version }} (${{ needs.plan.outputs.build }}) on $TRACK, $STATUS" >> "$GITHUB_STEP_SUMMARY"
+
+  app-store:
+    name: App Store
+    needs: plan
+    if: needs.plan.outputs.ios == 'true'
+    runs-on: [self-hosted, macOS, nestwatch-release]
+    environment: production
+    timeout-minutes: 120
+    env:
+      MARKETING_VERSION: ${{ needs.plan.outputs.version }}
+      BUILD_NUMBER: ${{ needs.plan.outputs.build }}
+      SUBMIT: ${{ github.event.inputs.ios_submit || 'true' }}
+      AUTOMATIC_RELEASE: ${{ vars.IOS_AUTOMATIC_RELEASE || 'false' }}
+      FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "30"
+      FASTLANE_XCODEBUILD_SETTINGS_RETRIES: "6"
+    steps:
+      # Xcode and fastlane write large temp files: keep them in the work
+      # directory (mini4's NVMe disk), not on the small internal disk.
+      - name: Temp files in the work directory
+        run: echo "TMPDIR=$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+          fetch-depth: 0
+          clean: true
+          persist-credentials: false
+      # The build Mac's own App Store Connect key, match password and signing
+      # keychain (~/.appstoreconnect, apps/ios/fastlane/Fastfile); CI unset so
+      # fastlane uses that keychain instead of making a temporary one.
+      - name: Build, test, upload to TestFlight
+        working-directory: apps/ios
+        run: |
+          env -u CI ../../scripts/release/in-login-shell.sh bash -c '
+            bundle config set --local path vendor/bundle && bundle install --quiet &&
+            bundle exec fastlane release upload:true'
+      - name: Submit for App Review
+        if: env.SUBMIT == 'true'
+        run: env -u CI scripts/release/in-login-shell.sh scripts/release/app-store-submit.sh "$MARKETING_VERSION" "$BUILD_NUMBER"

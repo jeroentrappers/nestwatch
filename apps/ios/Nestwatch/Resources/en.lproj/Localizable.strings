@@ -23,7 +23,7 @@
 "about_body" = "Nestwatch connects your own devices directly, on your home network or your own VPN. There is no account, no cloud and no tracking. Audio and video are end-to-end encrypted.";
 "version" = "Version";
 "device_id" = "Device ID";
-"license" = "Free software under the GNU AGPL 3.0 or later.";
+"license" = "Free software under the GNU AGPL 3.0 or later. Source code: https://github.com/jeroentrappers/nestwatch";
 "change_role" = "Change role";
 "change_role_hint" = "Stops what this device is doing now and shows the role choice again.";
 "perm_mic_title" = "Microphone";

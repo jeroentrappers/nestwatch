@@ -41,7 +41,7 @@ The emulator reaches the host at `10.0.2.2`:
 ```sh
 cargo run --release -p nestwatch-cli -- --data /tmp/st station --pair --tone \
   --no-mdns --no-web --port 47210 --endpoint 10.0.2.2:47210
-adb shell "am start -a android.intent.action.VIEW -d '<invite>' org.nestwatch.android"
+adb shell "am start -a android.intent.action.VIEW -d '<invite>' be.appmire.nestwatch"
 ```
 
 For a station in the emulator, forward its port and pair by code:

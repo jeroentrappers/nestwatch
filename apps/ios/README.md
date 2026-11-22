@@ -54,6 +54,27 @@ The project is generated with [XcodeGen](https://github.com/yonaskolb/XcodeGen)
 `project.yml` (for example to add a file outside the existing folders),
 regenerate it with `xcodegen generate` in this directory.
 
+## Releasing (TestFlight)
+
+Release builds are signed with **fastlane match** for the Appmire GCV team
+(`QB4NQU492U`) on the Apple build Mac; the project itself keeps automatic
+signing, so development builds need no setup. Needs Ruby 3.4.7 (Bundler) and
+the App Store Connect API key and `MATCH_PASSWORD` in `~/.appstoreconnect/`
+(`env`, `signing.env`).
+
+```sh
+cd apps/ios
+bundle install
+bundle exec fastlane certificates            # fetch the App Store profile (read-only)
+bundle exec fastlane release                 # Rust core, unit tests, archive → build/Nestwatch.ipa
+bundle exec fastlane release upload:true     # … and upload to TestFlight
+```
+
+The version is the latest `v*` tag without its suffix, the build number the
+commit count. `renew_certificates` and `refresh_profiles` change the Apple
+account (App ID profile, certificates). App Store Connect setup and review:
+[docs/releasing.md](../../docs/releasing.md) §6.
+
 ## Running on your own iPhone or iPad
 
 No paid developer account is needed for your own devices:

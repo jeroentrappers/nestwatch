@@ -4,7 +4,7 @@
 # XcodeGen 2.46.0 (see README.md).
 name: Nestwatch
 options:
-  bundleIdPrefix: org.nestwatch
+  bundleIdPrefix: be.appmire
   deploymentTarget:
     iOS: "15.0"
   developmentLanguage: en
@@ -40,7 +40,7 @@ targets:
           fi
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: org.nestwatch.Nestwatch
+        PRODUCT_BUNDLE_IDENTIFIER: be.appmire.nestwatch
         PRODUCT_NAME: Nestwatch
         INFOPLIST_FILE: Nestwatch/Resources/Info.plist
         CODE_SIGN_ENTITLEMENTS: Nestwatch/Resources/Nestwatch.entitlements
@@ -58,7 +58,7 @@ targets:
       - target: Nestwatch
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: org.nestwatch.NestwatchTests
+        PRODUCT_BUNDLE_IDENTIFIER: be.appmire.nestwatch.tests
         GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Nestwatch.app/Nestwatch"
         BUNDLE_LOADER: "$(TEST_HOST)"
@@ -71,7 +71,7 @@ targets:
       - target: Nestwatch
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: org.nestwatch.NestwatchUITests
+        PRODUCT_BUNDLE_IDENTIFIER: be.appmire.nestwatch.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: Nestwatch
 schemes:

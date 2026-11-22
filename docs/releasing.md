@@ -10,8 +10,9 @@ a maintainer.
 1. Make sure `main` is green in CI ([ci.yml](../.github/workflows/ci.yml)).
 2. Set the version everywhere it is written down:
    - `Cargo.toml` → `[workspace.package] version` (desktop, CLI, core).
-   - `apps/android/app/build.gradle.kts` → `versionName`, and raise
-     `versionCode` by one (Android refuses updates with a lower or equal code).
+   - Android takes its `versionName` from the tag and its `versionCode` from
+     the commit count (`-Pnestwatch.versionName`, `-Pnestwatch.versionCode`,
+     §6); nothing to edit.
    - Run `cargo update --workspace` so `Cargo.lock` follows.
 3. Commit (`Release 0.2.0`), then tag and push:
 
@@ -162,3 +163,113 @@ meant for users.
   [self-hosting.md](self-hosting.md) §2. Check `/healthz`, and that
   `/app/` sends `Permissions-Policy: camera=(self), …`.
 - Check the download buttons on `/download/` resolve.
+
+## 6. App stores
+
+A version tag `vX.Y.Z` on `main` also runs the **Stores** workflow
+([.github/workflows/stores.yml](../.github/workflows/stores.yml)) on two
+self-hosted runners labelled `nestwatch-release`:
+
+- **ryzen** (Linux, user `nestwatch-runner`): builds the Rust core for
+  Android, `bundleRelease`, signs the bundle with the upload key and sends it
+  to Google Play with fastlane (`apps/android/fastlane`, lane `upload`).
+- **mini4** (macOS, `~/actions-runner-nestwatch`, work directory on the NVMe
+  disk): `apps/ios/fastlane` lane `release upload:true` (Rust XCFramework,
+  unit tests, signed archive, TestFlight), then `submit` (App Review with the
+  committed metadata, `scripts/release/app-store-submit.sh`). It uses the
+  build Mac's own App Store Connect key, match password and signing keychain
+  (`~/.appstoreconnect/`), as a manual release does.
+
+Pull requests never run on these runners: the workflow starts only on tags
+and by hand, and fork pull requests need approval before any workflow runs.
+Both jobs use the GitHub environment `production` (deployments from `v*`
+tags only), which holds `PLAY_SERVICE_ACCOUNT_JSON`; the Android keystore
+secrets are repository secrets (§4).
+
+Repository variables steer the stores:
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `PLAY_TRACK` | `production` | Play track of a tag's bundle |
+| `PLAY_RELEASE_STATUS` | `draft` | `draft` until the app has been published once (Play accepts nothing else), then `completed` so tags go live without a click |
+| `IOS_AUTOMATIC_RELEASE` | `false` | release the iOS version as soon as Apple approves it |
+
+Run the workflow by hand to ship an existing tag again, to one store only,
+to another track, or to TestFlight without submitting.
+
+Version and build numbers come from the tag and the commit count of the
+tagged commit (`v0.2.0` at commit 131 → `0.2.0 (131)`): the Android
+`versionCode` is passed to Gradle as `-Pnestwatch.versionCode`, the iOS
+build number as `BUILD_NUMBER`. Both stores refuse a number they have seen,
+so a tag can be shipped only once per store.
+
+Store texts and images live in the repository and are uploaded by fastlane:
+`apps/android/fastlane/metadata/android/` (lane `listing`) and
+`apps/ios/fastlane/metadata/`, `screenshots/` (lane `metadata`, and with every
+submission). Screenshots come from the apps themselves: on iOS,
+`NestwatchUITests/StoreScreenshotTests` with CLI stations as the other side;
+on Android, the emulator paired with CLI stations through
+`nestwatch://invite` links.
+
+Both apps may be distributed through the stores under the additional
+permission in [LICENSE-APP-STORES.md](../LICENSE-APP-STORES.md); the store
+listings must link to the source code.
+
+### Google Play: one-time setup
+
+The store package is `be.appmire.nestwatch`. Release 0.1.0's APK on GitHub
+used `org.nestwatch.android`, so Android treats the two as different apps:
+installing a newer APK does not update 0.1.0, and the old app (with its
+pairings) has to be removed by hand.
+
+1. In Play Console create the app `Nestwatch`, package
+   `be.appmire.nestwatch`. Enrol in **Play App Signing** and keep the
+   project key (`ANDROID_KEYSTORE_*`, §4) as the **upload key**; Play signs
+   what users install with its own app-signing key.
+2. Uploads use the Appmire developer account's service account
+   (`fastlane-appmire@…`, key on the build Mac in `~/.config/play/`), stored
+   as `PLAY_SERVICE_ACCOUNT_JSON` in the `production` environment. Every tag
+   also keeps the signed bundle as the `store-android` artifact, for a
+   manual upload if Play ever refuses the API.
+4. Complete the listing and **App content**: privacy policy (the site's
+   privacy page), data safety (no data collected or shared; audio and video
+   go end-to-end encrypted to the user's own paired devices), target
+   audience (adults; the app is used by parents, not by children), content
+   rating, and the declarations for these permissions:
+   - `FOREGROUND_SERVICE_MICROPHONE` / `_CAMERA`: the station streams the
+     room to paired listeners while the screen is off; show a video of
+     starting a station and listening.
+   - `FOREGROUND_SERVICE_MEDIA_PLAYBACK`: the listener plays the stream in
+     the background.
+   - `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`: Play allows this only where
+     Doze breaks the core function; a baby monitor that must keep streaming
+     for hours qualifies, but expect review questions.
+
+### App Store: one-time setup
+
+Team: Appmire GCV (`QB4NQU492U`). Signing uses fastlane match with the
+team's certificate repository; the App Store Connect API key and
+`MATCH_PASSWORD` are read from `~/.appstoreconnect/` on the build Mac.
+
+1. The App ID `be.appmire.nestwatch` needs the **Time Sensitive
+   Notifications** capability, which the App Store Connect API cannot set:
+   enable it under developer.apple.com → Identifiers. Then create its App
+   Store profile: `bundle exec fastlane renew_certificates` (changes the
+   Apple account; after a later capability change, `refresh_profiles`).
+2. In App Store Connect create the app with that bundle ID (needs a
+   signed-in Apple ID; the API key cannot create app records).
+3. `bundle exec fastlane release upload:true` builds the Rust core, runs the
+   unit tests, archives, and uploads to TestFlight; `submit build_number:N`
+   sends it to App Review with the texts, screenshots, age rating
+   (`fastlane/age_rating.json`) and review notes (`fastlane/review_notes.txt`).
+   The reviewer's phone number comes from `~/.appstoreconnect/review.env`.
+4. Before submitting for review: privacy labels (Data Not Collected),
+   privacy policy URL, age rating, screenshots for 6.9" iPhone and 13" iPad,
+   and review notes that explain that the station needs a second device
+   (the reviewer can pair against the web app at
+   `https://nestwatch.appmire.be/app/` as a station) and why the app uses
+   background audio (a station keeps listening with the screen locked).
+5. Export compliance: `Info.plist` declares `ITSAppUsesNonExemptEncryption`
+   `false`. Nestwatch uses standard algorithms (Noise, ChaCha20-Poly1305)
+   to protect the user's own streams; confirm that classification before
+   the first submission.

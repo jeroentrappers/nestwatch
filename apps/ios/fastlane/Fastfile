@@ -1,0 +1,174 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Signing and TestFlight uploads for the iOS app, run on the Apple build Mac
+# from apps/ios/: `bundle exec fastlane <lane>` (README.md, Releasing).
+#
+# Needs an App Store Connect API key (ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH)
+# and MATCH_PASSWORD, read from ~/.appstoreconnect/env and signing.env when
+# not set. Identities go into the signing keychain NESTWATCH_KEYCHAIN
+# (default: the Mac's shared ~/Library/Keychains/kinframe-signing.keychain-db),
+# password NESTWATCH_KEYCHAIN_PASSWORD (default KINFRAME_KEYCHAIN_PASSWORD).
+#
+# The project keeps automatic signing for development; release signs
+# manually with the match profile through build settings.
+default_platform(:ios)
+
+APP_ID = "be.appmire.nestwatch".freeze
+TEAM = "QB4NQU492U".freeze
+
+platform :ios do
+  before_all do
+    load_local_env
+  end
+
+  desc "Fetch the App Store certificate and profile (read-only)"
+  lane :certificates do
+    sync(type: "appstore")
+  end
+
+  desc "Create the App ID's App Store profile, and the certificate if missing (changes the Apple account; ask first)"
+  lane :renew_certificates do
+    sync(type: "appstore", readonly: false)
+  end
+
+  desc "Regenerate the profile after a capability change on the App ID (changes the Apple account; ask first)"
+  lane :refresh_profiles do
+    sync(type: "appstore", readonly: false, force: true)
+  end
+
+  desc "Build the Rust core, run the unit tests, archive a Release build into build/; upload: true also sends it to TestFlight"
+  lane :release do |options|
+    sh("../build-rust.sh")
+    run_tests(
+      project: "Nestwatch.xcodeproj",
+      scheme: "Nestwatch",
+      destination: "platform=iOS Simulator,name=#{ENV["TEST_SIMULATOR"] || test_simulator}",
+      only_testing: ["NestwatchTests"],
+      xcargs: "CODE_SIGNING_ALLOWED=NO",
+      output_directory: "build/tests",
+      output_types: "junit"
+    )
+    sync(type: "appstore")
+    version = ENV["MARKETING_VERSION"] || last_tag_version
+    build = ENV["BUILD_NUMBER"] || sh("git rev-list --count HEAD").strip
+    UI.message("Nestwatch #{version} (#{build})")
+    signing = {
+      "DEVELOPMENT_TEAM" => TEAM,
+      "CODE_SIGN_STYLE" => "Manual",
+      "CODE_SIGN_IDENTITY" => "Apple Distribution",
+      "PROVISIONING_PROFILE_SPECIFIER" => "match AppStore #{APP_ID}",
+      "MARKETING_VERSION" => version,
+      "CURRENT_PROJECT_VERSION" => build,
+    }
+    build_app(
+      project: "Nestwatch.xcodeproj",
+      scheme: "Nestwatch",
+      configuration: "Release",
+      destination: "generic/platform=iOS",
+      output_directory: "build",
+      export_options: "ExportOptions.plist",
+      xcargs: signing.map { |k, v| "#{k}=#{v.shellescape}" }.join(" ")
+    )
+    upload_to_testflight(api_key: asc_key, skip_waiting_for_build_processing: true) if options[:upload]
+  end
+
+  desc "Upload the App Store texts, screenshots, age rating and review notes in fastlane/ (no build, no submission)"
+  lane :metadata do
+    deliver(**store_options, skip_binary_upload: true, submit_for_review: false)
+  end
+
+  desc "Submit an uploaded build for App Review with the metadata: build_number:<n> [app_version:<x.y.z>]"
+  lane :submit do |options|
+    deliver(
+      **store_options,
+      app_version: options[:app_version] || ENV["MARKETING_VERSION"] || last_tag_version,
+      build_number: options.fetch(:build_number).to_s,
+      skip_binary_upload: true,
+      submit_for_review: true,
+      # Released by hand once approved, unless automatic_release:true.
+      automatic_release: options[:automatic_release].to_s == "true",
+      submission_information: { add_id_info_uses_idfa: false, export_compliance_uses_encryption: false, content_rights_contains_third_party_content: false }
+    )
+  end
+
+  private_lane :sync do |options|
+    password = ENV["NESTWATCH_KEYCHAIN_PASSWORD"] || ENV.fetch("KINFRAME_KEYCHAIN_PASSWORD")
+    # codesign needs the keychain unlocked in this session (over SSH and on the runner too).
+    unlock_keychain(path: keychain_path, password: password, add_to_search_list: false, set_default: false)
+    match(
+      type: options[:type],
+      readonly: options.fetch(:readonly, true),
+      force: options.fetch(:force, false),
+      api_key: asc_key,
+      keychain_name: keychain_path,
+      keychain_password: password
+    )
+  end
+end
+
+# What deliver shares between the metadata and submit lanes.
+def store_options
+  {
+    api_key: asc_key,
+    app_identifier: APP_ID,
+    platform: "ios",
+    metadata_path: "fastlane/metadata",
+    screenshots_path: "fastlane/screenshots",
+    overwrite_screenshots: true,
+    app_rating_config_path: "fastlane/age_rating.json",
+    app_review_information: review_information,
+    run_precheck_before_submit: false,
+    force: true
+  }
+end
+
+# The reviewer's contact: REVIEW_* from the environment or ~/.appstoreconnect/review.env.
+def review_information
+  {
+    first_name: "Jeroen",
+    last_name: "Trappers",
+    phone_number: ENV.fetch("REVIEW_PHONE"),
+    email_address: ENV["REVIEW_EMAIL"] || "jeroen.trappers@gmail.com",
+    demo_required: false,
+    notes: File.read(File.expand_path("review_notes.txt", __dir__))
+  }
+end
+
+def asc_key
+  @asc_key ||= app_store_connect_api_key(
+    key_id: ENV.fetch("ASC_KEY_ID"),
+    issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+    key_filepath: ENV.fetch("ASC_KEY_PATH")
+  )
+end
+
+def keychain_path
+  ENV["NESTWATCH_KEYCHAIN"] || File.expand_path("~/Library/Keychains/kinframe-signing.keychain-db")
+end
+
+# ~/.appstoreconnect/env and signing.env: KEY=value lines; variables already set win.
+def load_local_env
+  %w[env signing.env review.env].each do |name|
+    path = File.expand_path("~/.appstoreconnect/#{name}")
+    next unless File.exist?(path)
+    File.readlines(path).each do |line|
+      key, value = line.strip.split("=", 2)
+      next if key.nil? || key.start_with?("#") || value.nil?
+      ENV[key] ||= value.gsub("$HOME", Dir.home)
+    end
+  end
+end
+
+# The latest vX.Y.Z tag without its pre-release suffix (App Store versions are numbers only).
+def last_tag_version
+  tag = sh("git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null || echo v0.1.0").strip
+  tag.delete_prefix("v").split("-").first
+end
+
+# An available iPhone simulator, a booted one first.
+def test_simulator
+  devices = JSON.parse(sh("xcrun simctl list devices available -j", log: false))["devices"].values.flatten
+  phones = devices.select { |d| d["name"].include?("iPhone") }
+  phone = phones.find { |d| d["state"] == "Booted" } || phones.last
+  UI.user_error!("No iPhone simulator for the tests; set TEST_SIMULATOR") unless phone
+  phone["name"]
+end

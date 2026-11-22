@@ -20,11 +20,12 @@ android {
     ndkVersion = "30.0.16248370"
 
     defaultConfig {
-        applicationId = "org.nestwatch.android"
+        applicationId = "be.appmire.nestwatch"
         minSdk = 23
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1.0"
+        // The release jobs pass the tag and the commit count (docs/releasing.md §6).
+        versionCode = (findProperty("nestwatch.versionCode") as String?)?.toInt() ?: 1
+        versionName = (findProperty("nestwatch.versionName") as String?) ?: "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk { abiFilters += abis }
     }

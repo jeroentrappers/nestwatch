@@ -256,6 +256,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ env.TAG }}
+          fetch-depth: 0 # the version code is the commit count (docs/releasing.md §6)
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
@@ -279,7 +280,10 @@ jobs:
         run: cargo install --locked cargo-ndk --version "$CARGO_NDK_VERSION"
       - name: assembleRelease (unsigned)
         working-directory: apps/android
-        run: ./gradlew --no-daemon assembleRelease
+        run: |
+          ./gradlew --no-daemon assembleRelease \
+            -Pnestwatch.versionCode="$(git rev-list --count HEAD)" \
+            -Pnestwatch.versionName="${{ needs.meta.outputs.version }}"
       - name: Sign
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}

@@ -11,5 +11,13 @@ build/
 /apps/ios/Generated/
 /apps/ios/.tools/
 /apps/ios/build/
+/apps/ios/vendor/
+/apps/ios/.bundle/
+/apps/ios/fastlane/report.xml
+/apps/ios/fastlane/README.md
+/apps/android/vendor/
+/apps/android/.bundle/
+/apps/android/fastlane/report.xml
+/apps/android/fastlane/README.md
 xcuserdata/
 *.xcuserstate

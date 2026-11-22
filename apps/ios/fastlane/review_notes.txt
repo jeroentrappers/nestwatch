@@ -1,0 +1,13 @@
+Nestwatch is a baby monitor that works between the user's own devices: one device is the station (in the child's room), another is the listener. There is no account, so no demo login is needed.
+
+To test with a single iPhone:
+1. On a computer, open https://nestwatch.appmire.be/app/ in Chrome, Safari or Firefox and choose "This device watches". Allow the microphone, and when asked, make the station reachable through the relay.
+2. Tap "Pair a listener" in the browser. It shows a QR code.
+3. On the iPhone, choose "This device listens", tap "Add a station" and scan the QR code (or tap "Use a link" and paste the invitation link shown under the code).
+4. Confirm that both screens show the same number. The station tile then shows the room's sound level; speak near the computer to hear it on the iPhone. Hold "Hold to talk" to talk back, and tap "Camera" to open the station's camera.
+
+With two iOS devices, choose "This device watches" on one and follow the same steps from step 2.
+
+Background audio: a listener keeps playing the room's sound with the screen locked, which is the core function of a baby monitor. The station uses the microphone and, only on request from a paired listener, the camera. Time-sensitive notifications alert the parent when a quiet room starts to sound or a station is unreachable.
+
+Encryption: connections use the Noise Protocol Framework (ChaCha20-Poly1305) for end-to-end encryption between the user's devices. Nestwatch is open source (https://github.com/jeroentrappers/nestwatch).

@@ -1,0 +1,1 @@
+First release on Google Play. Pair a listener by scanning the station's QR code, opening its invitation link or typing its code.

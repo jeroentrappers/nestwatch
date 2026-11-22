@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Certificates and provisioning profiles live encrypted in a private repo
+# (one branch per team); MATCH_PASSWORD decrypts them. The Appmire team's
+# distribution certificate is shared with its other apps.
+git_url("git@github.com:jeroentrappers/apple-certificates.git")
+storage_mode("git")
+git_branch("appmire")
+team_id("QB4NQU492U")
+app_identifier(["be.appmire.nestwatch"])
+platform("ios")
+readonly(true)
