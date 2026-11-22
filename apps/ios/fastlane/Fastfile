@@ -43,7 +43,8 @@ platform :ios do
       scheme: "Nestwatch",
       destination: "platform=iOS Simulator,name=#{ENV["TEST_SIMULATOR"] || test_simulator}",
       only_testing: ["NestwatchTests"],
-      xcargs: "CODE_SIGNING_ALLOWED=NO",
+      # Signed to run locally (the default for the simulator): the Keychain
+      # tests fail in unsigned builds (-34018).
       output_directory: "build/tests",
       output_types: "junit",
       derived_data_path: "build/DerivedData"

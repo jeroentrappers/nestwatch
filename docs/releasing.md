@@ -174,8 +174,13 @@ self-hosted runners labelled `nestwatch-release`:
   Android, `bundleRelease`, signs the bundle with the upload key and sends it
   to Google Play with fastlane (`apps/android/fastlane`, lane `upload`).
 - **mini4** (macOS, `~/actions-runner-nestwatch`, work directory on the
-  system disk: the runner service may not read the external NVMe volume, so
-  the job uses only local tools, without a login shell): `apps/ios/fastlane` lane `release upload:true` (Rust XCFramework,
+  system disk, no login shell). The simulators (`~/Library/Developer/
+  CoreSimulator`) live on the external NVMe volume, which macOS lets the
+  runner service read only after someone at the Mac allows it (System
+  Settings → Privacy & Security → Files and Folders → Removable Volumes, or
+  Full Disk Access, for the runner in `~/actions-runner-nestwatch/bin`).
+  Until then the unit-test step hangs; release over SSH instead with the
+  same lanes: `apps/ios/fastlane` lane `release upload:true` (Rust XCFramework,
   unit tests, signed archive, TestFlight), then `submit` (App Review with the
   committed metadata, `scripts/release/app-store-submit.sh`). It uses the
   build Mac's own App Store Connect key, match password and signing keychain
