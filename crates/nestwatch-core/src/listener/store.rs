@@ -150,6 +150,15 @@ pub struct AlertToggles {
     /// Low battery (FR-AL-3).
     #[n(2)]
     pub battery: bool,
+    /// Escalate unacknowledged sound alerts to the alarm (FR-AL-5).
+    #[n(3)]
+    #[cbor(default)]
+    pub escalate: bool,
+    /// Seconds after the sound alert (FR-AL-5: 60 by default). Stored 0
+    /// means a record from before FR-AL-5 (SL-1).
+    #[n(4)]
+    #[cbor(default)]
+    pub escalate_after_s: u16,
 }
 
 impl Default for AlertToggles {
@@ -158,6 +167,8 @@ impl Default for AlertToggles {
             sound: true,
             unreachable: true,
             battery: true,
+            escalate: true,
+            escalate_after_s: 60,
         }
     }
 }
@@ -180,6 +191,17 @@ pub struct StationSettings {
     /// Followed: connected whenever possible.
     #[n(4)]
     pub follow: bool,
+}
+
+impl StationSettings {
+    /// Fills in settings added later (SL-1: escalation).
+    pub(crate) fn migrated(mut self) -> Self {
+        if self.alerts.escalate_after_s == 0 {
+            self.alerts.escalate = true;
+            self.alerts.escalate_after_s = 60;
+        }
+        self
+    }
 }
 
 impl Default for StationSettings {
@@ -341,7 +363,7 @@ pub(crate) fn load_stations(storage: &dyn Storage) -> Result<Vec<KnownStation>, 
             key,
             name: s.name,
             endpoints,
-            settings: s.settings,
+            settings: s.settings.migrated(),
             needs_pairing: s.needs_pairing,
             paired_unix_ms: s.paired,
             relay: s.relay.and_then(|r| {

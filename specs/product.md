@@ -116,6 +116,32 @@ its relay mailbox and nothing else.
   while not charging.
 - **FR-AL-4** Alerts MUST work while the listener is muted and, where the
   platform allows, while it is in the background.
+- **FR-AL-5** **Escalating alarm.** A sound alert (FR-AL-1) that nobody
+  acknowledges MUST escalate to an alarm when the room is still loud
+  `escalate_after` after the alert (default 60 s, choices 30 s, 1, 2 and
+  5 min; per station, on by default, can be turned off). "Still loud" means
+  the station's sound (FR-AL-1, CORE-5) was on within the last 15 s. The
+  alarm repeats an alarm sound that starts at 30 % of full volume and rises
+  to 100 % over 30 s, vibrates where available, and plays while the device
+  is muted, in silent or vibrate mode where the platform permits (platforms.md
+  §2.2 Android alarm stream, §2.3 iOS playback session). It rings until it is
+  acknowledged or the room has been quiet for the quiet gap of FR-SL-2
+  (2 min).
+- **FR-AL-6** **Acknowledge.** A sound alert or alarm is acknowledged by the
+  "I'm on it" action of the in-app banner or the notification, by tapping
+  the notification, or by "Not the baby" (FR-AL-7). An app that is merely
+  open and visible does not acknowledge: a listener often lies open on the
+  nightstand. Acknowledging stops the
+  alarm on that listener and prevents another escalation until the current
+  wake-up (FR-SL-1) has ended. It never stops the rate-limited sound alerts
+  of FR-AL-1. Acknowledging on one listener does not affect other listeners.
+- **FR-AL-7** **Not the baby.** Every sound alert, the alarm and the station
+  tile while the room is "Awake" MUST offer "Not the baby". It acknowledges
+  (FR-AL-6), marks the current wake-up in the night log as not the baby
+  (FR-SL-4), returns the room status to what it was before that wake-up,
+  and pauses sound alerts, alarms and wake-up detection for that station for
+  10 minutes. The tile shows "Alerts paused until 03:40" with a "Resume
+  alerts" action. Connection and battery alerts are never paused.
 
 ### 3.6 Talk-back
 
@@ -214,6 +240,38 @@ its relay mailbox and nothing else.
   to its listener view and back; only "Stop the station" or closing the page
   stops it.
 
+### 3.11 Room status and night log
+
+Status and log are derived on each listener from the station's sound
+reports alone (the sound signal of FR-AL-1 / CORE-5); nothing is recorded,
+and nothing is sent anywhere. Sound does not prove that a child is awake or
+asleep: a quiet room is reported as "Quiet", never as "Asleep".
+
+- **FR-SL-1** **Wake-up.** A wake-up starts at the first loud moment after
+  the room was quiet, and counts once the room has been loud for at least
+  10 s in total (sound activation open, or the level at or above the
+  threshold in continuous mode). A sound that never reaches 10 s within the
+  quiet gap is not a wake-up.
+- **FR-SL-2** **End of a wake-up.** A wake-up ends when the room has been
+  quiet for 2 minutes (the quiet gap); its end time is the last loud
+  moment. A live session that ends also ends a wake-up, at its last loud
+  moment.
+- **FR-SL-3** **Room status.** Each station tile MUST show, while the
+  session is live, "Awake for 4 min" during a wake-up and "Quiet for
+  1 h 20 min" otherwise. "Quiet" counts from the end of the last wake-up, or
+  from when the listener started hearing the station; an outage longer than
+  60 s restarts that count. While the station is not live the status is
+  unknown and not shown.
+- **FR-SL-4** **Night log.** A listener MUST keep, per station, a log of
+  wake-ups: start, end, total loud time, loudest level, whether it raised a
+  sound alert, an alarm, and whether it was marked "Not the baby". The
+  station's screen in the listener MUST show the log grouped by night (a
+  night runs from noon to noon in local time), with the number of wake-ups,
+  the longest quiet stretch of the night and each wake-up's time and
+  duration. The log is kept on the listener only, for 30 days and at most
+  500 wake-ups per station; it can be cleared, and forgetting a station
+  deletes its log.
+
 ## 4. Non-functional requirements
 
 - **NFR-LAT-1** Audio latency: see FR-AU-1.
@@ -229,11 +287,16 @@ its relay mailbox and nothing else.
   with large text; status MUST never rely on colour alone.
 - **NFR-I18N-1** User-facing text MUST be externalised for translation;
   English is the reference language.
+- **NFR-I18N-2** Every app and both store listings MUST be available in
+  English, Dutch, French, German, Spanish, Italian, Portuguese (Brazil),
+  Polish, Swedish, Danish and Norwegian Bokmål. Apps follow the system
+  language (the browser's on the web) and fall back to English.
 
 ## 5. Out of scope (version 1)
 
 Accounts or cloud services beyond the optional, self-hostable relay of
-rendezvous.md, recording or history of audio/video, breathing or
+rendezvous.md, recording or history of audio/video (the night log of
+§3.11 holds times and levels only), breathing or
 movement analysis, smart-home integrations, lullaby playback, multi-household
 sharing beyond pairwise pairing.
 
@@ -266,3 +329,5 @@ Resolved implementation questions; normative.
 - **UI-9** (platforms.md §2.5, media.md §4). Talk-back capture rate in the browser. **Resolution:** The microphone runs in its own `AudioContext` at the device rate (some browsers refuse a `MediaStream` source in a 16 kHz context); blocks go to `push_talk_capture` with that rate.
 - **UI-10** (protocol.md §3.3, platforms.md §2.4). Where does a desktop station find the browser bundle it serves? **Resolution:** First of `$NESTWATCH_WEB_DIR`, `<exe dir>/web`, `<exe dir>/../share/nestwatch/web`, the workspace's `target/nestwatch-web`; otherwise a placeholder page that says the app is missing.
 - **UI-11** (product.md FR-CAM-1). How are camera frames shown? **Resolution:** The newest complete JPEG as an `img` with a `data:` URI (allowed by `img-src data:`); same on desktop and web.
+- **SL-1** (product.md FR-AL-5..7, §3.11). Where alarm, room status and night log live. **Resolution:** In the listener engine of `nestwatch-core`, on the monotonic clock with wall-clock dates for log entries. The station view carries `room` (unknown, quiet since, awake since; Unix ms), `alarm` (off, pending, ringing since; plus `paused_until`) and `log_revision`; intents `acknowledge(station)`, `not_the_baby(station)`, `resume_alerts(station)`, `night_log(station)`, `clear_night_log(station)`. Apps play the alarm while `alarm` is ringing and stop it when it is not; the ramp is the app's. "Loud" accumulates the time between consecutive loud reports, at most 1 s per gap. The log is stored under `listener-log` (CORE-1 format): per station ID a list of entries; it is written when a wake-up ends, is marked, or is cleared. Settings: `AlertToggles` fields `escalate` (`#[n(3)]`, default true) and `escalate_after_s` (`#[n(4)]`, default 60).
+

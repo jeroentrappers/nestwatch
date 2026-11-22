@@ -6,8 +6,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use nestwatch_core::listener::{
-    Alert, AlertToggles, ConnStatus, DiscoveredView, KnownStation, ListenSettings, ListenerConfig,
-    ListenerEngine, ListenerEvent, ListenerState, NetPath, Route, StationView, TalkView,
+    AlarmView, Alert, AlertToggles, ConnStatus, DiscoveredView, KnownStation, ListenSettings, ListenerConfig,
+    ListenerEngine, ListenerEvent, ListenerState, NetPath, RoomView, Route, StationView, TalkView,
     VideoFrameEvent, VideoRequest, VideoView,
 };
 use nestwatch_core::{SystemClock, VideoStateKind};
@@ -130,6 +130,10 @@ pub struct AlertSettings {
     pub unreachable: bool,
     /// Low battery (FR-AL-3).
     pub battery: bool,
+    /// Escalate unacknowledged sound alerts to the alarm (FR-AL-5).
+    pub escalate: bool,
+    /// Seconds from the sound alert to the alarm, 30..600 (FR-AL-5).
+    pub escalate_after_s: u16,
 }
 
 /// Per-station settings on this listener.
@@ -157,6 +161,8 @@ impl From<nestwatch_core::listener::StationSettings> for StationPrefs {
                 sound: s.alerts.sound,
                 unreachable: s.alerts.unreachable,
                 battery: s.alerts.battery,
+                escalate: s.alerts.escalate,
+                escalate_after_s: s.alerts.escalate_after_s,
             },
             follow: s.follow,
         }
@@ -286,6 +292,67 @@ pub struct StationTile {
     pub prefs: StationPrefs,
     /// Audio frames received in this follow.
     pub audio_frames: u64,
+    /// Room status (FR-SL-3).
+    pub room: RoomStatus,
+    /// Alarm state (FR-AL-5); play the alarm while it is `Ringing`.
+    pub alarm: AlarmState,
+    /// Sound alerts paused by "Not the baby" until (Unix ms, FR-AL-7).
+    pub paused_until_unix_ms: Option<u64>,
+    /// Changes whenever the night log changes (FR-SL-4).
+    pub log_revision: u64,
+}
+
+/// Room status from sound alone (FR-SL-3).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
+pub enum RoomStatus {
+    /// Not live.
+    Unknown,
+    /// Quiet since (Unix ms).
+    Quiet {
+        /// Unix ms.
+        since_unix_ms: u64,
+    },
+    /// Awake since (Unix ms).
+    Awake {
+        /// Unix ms.
+        since_unix_ms: u64,
+    },
+}
+
+/// Alarm state (FR-AL-5, FR-AL-6).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, uniffi::Enum)]
+pub enum AlarmState {
+    /// Nothing to escalate.
+    Off,
+    /// Unacknowledged sound alert since (Unix ms).
+    Pending {
+        /// Unix ms.
+        since_unix_ms: u64,
+    },
+    /// Ringing since (Unix ms).
+    Ringing {
+        /// Unix ms.
+        since_unix_ms: u64,
+    },
+}
+
+/// One wake-up of the night log (FR-SL-4).
+#[derive(Debug, Clone, Copy, PartialEq, uniffi::Record)]
+pub struct WakeUpEntry {
+    /// First loud moment (Unix ms).
+    pub start_unix_ms: u64,
+    /// Last loud moment (Unix ms); `None` while it goes on.
+    pub end_unix_ms: Option<u64>,
+    /// Total loud time in ms.
+    pub loud_ms: u64,
+    /// Loudest level (dBFS).
+    pub peak_dbfs: Option<f32>,
+    /// It raised a sound alert.
+    pub alerted: bool,
+    /// It escalated to the alarm.
+    pub alarmed: bool,
+    /// Marked "Not the baby".
+    pub not_the_baby: bool,
 }
 
 /// A station on the local network (protocol.md §3.4).
@@ -360,6 +427,8 @@ pub enum AlertKind {
         /// Percent.
         percent: u8,
     },
+    /// An unacknowledged sound alert escalated: the alarm rings (FR-AL-5).
+    Alarm,
 }
 
 /// Something that happened on the listener.
@@ -627,8 +696,50 @@ impl Listener {
                 sound: alerts.sound,
                 unreachable: alerts.unreachable,
                 battery: alerts.battery,
+                escalate: alerts.escalate,
+                escalate_after_s: alerts.escalate_after_s,
             },
         )?)
+    }
+
+    /// "I'm on it": stops the alarm of a station (FR-AL-6).
+    pub fn acknowledge(&self, station_id: String) -> Result<(), NestwatchError> {
+        Ok(self.engine.acknowledge(&station_id)?)
+    }
+
+    /// "Not the baby" (FR-AL-7): acknowledges, marks the wake-up and pauses
+    /// sound alerts of the station for 10 minutes.
+    pub fn not_the_baby(&self, station_id: String) -> Result<(), NestwatchError> {
+        Ok(self.engine.not_the_baby(&station_id)?)
+    }
+
+    /// Ends a "Not the baby" pause (FR-AL-7).
+    pub fn resume_alerts(&self, station_id: String) -> Result<(), NestwatchError> {
+        Ok(self.engine.resume_alerts(&station_id)?)
+    }
+
+    /// The night log of a station, oldest first; a wake-up going on comes
+    /// last with no end (FR-SL-4).
+    pub fn night_log(&self, station_id: String) -> Result<Vec<WakeUpEntry>, NestwatchError> {
+        Ok(self
+            .engine
+            .night_log(&station_id)?
+            .into_iter()
+            .map(|w| WakeUpEntry {
+                start_unix_ms: w.start_unix_ms,
+                end_unix_ms: w.end_unix_ms,
+                loud_ms: w.loud_ms,
+                peak_dbfs: w.peak_dbfs,
+                alerted: w.alerted,
+                alarmed: w.alarmed,
+                not_the_baby: w.not_the_baby,
+            })
+            .collect())
+    }
+
+    /// Clears the night log of a station (FR-SL-4).
+    pub fn clear_night_log(&self, station_id: String) -> Result<(), NestwatchError> {
+        Ok(self.engine.clear_night_log(&station_id)?)
     }
 
     /// Hears only one station, or all with `None` (FR-LS-2).
@@ -888,6 +999,18 @@ fn tile(v: &StationView) -> StationTile {
         can_video: v.caps.iter().any(|c| c == caps::VIDEO),
         prefs: v.settings.into(),
         audio_frames: v.audio_frames,
+        room: match v.room {
+            RoomView::Unknown => RoomStatus::Unknown,
+            RoomView::Quiet { since_unix_ms } => RoomStatus::Quiet { since_unix_ms },
+            RoomView::Awake { since_unix_ms } => RoomStatus::Awake { since_unix_ms },
+        },
+        alarm: match v.alarm {
+            AlarmView::Off => AlarmState::Off,
+            AlarmView::Pending { since_unix_ms } => AlarmState::Pending { since_unix_ms },
+            AlarmView::Ringing { since_unix_ms } => AlarmState::Ringing { since_unix_ms },
+        },
+        paused_until_unix_ms: v.paused_until_unix_ms,
+        log_revision: v.log_revision,
     }
 }
 
@@ -951,6 +1074,7 @@ fn event(e: ListenerEvent) -> ListenerEventInfo {
                 Alert::Unreachable => AlertKind::Unreachable,
                 Alert::Reachable => AlertKind::Reachable,
                 Alert::BatteryLow { percent } => AlertKind::BatteryLow { percent },
+                Alert::Alarm => AlertKind::Alarm,
             },
         },
         ListenerEvent::Talk { station_id, state } => ListenerEventInfo::Talk {

@@ -30,6 +30,12 @@
   first use. Hold a partial wake lock and a Wi-Fi lock while active.
 - Offer to exempt the app from battery optimisation, explaining why.
 - Use NSD for mDNS; acquire a `MulticastLock` while browsing.
+- Alarm (product.md FR-AL-5): played by the listener service on the alarm
+  stream (`AudioAttributes.USAGE_ALARM`), which rings in silent and vibrate
+  mode, with a high-priority notification on its own channel (`alert-alarm`,
+  category alarm, full-screen intent where permitted) carrying "I'm on it"
+  and "Not the baby" actions. The ramp scales the player volume; the user's
+  alarm volume is the ceiling.
 
 ### 2.3 iOS
 
@@ -41,6 +47,11 @@
 - Camera capture stops when the app leaves the foreground (iOS rule); the
   station reports `video-state unavailable` and resumes on return.
 - Alerts use local notifications with time-sensitive interruption level.
+- Alarm (product.md FR-AL-5): the listener's `playback` session ignores the
+  ring/silent switch, so the alarm plays through it while the app runs or
+  plays audio in the background, ramping the player volume (the system
+  volume is the ceiling). Notifications carry a category with "I'm on it"
+  and "Not the baby" actions. Critical alerts are not used.
 
 ### 2.4 Desktop
 
@@ -49,6 +60,8 @@
 - Prevent system sleep while a station is active (inhibit on Linux via
   logind, `IOPMAssertion` on macOS, `SetThreadExecutionState` on Windows).
 - The station serves the browser listener (protocol.md §3.3).
+- Alarm (product.md FR-AL-5): through the listener's audio output, with the
+  window brought to front and a system notification.
 
 ### 2.5 Browser
 
@@ -63,6 +76,9 @@
   available, otherwise codec 2.
 - Offers notifications via the Notification API when permitted; alerts are
   otherwise visual plus a sound.
+- Alarm (product.md FR-AL-5): through the page's `AudioContext` once audio
+  is unlocked (UI-7), with an in-page banner; a hidden tab may be throttled
+  by the browser, which the alarm settings say.
 - Station: microphone and camera through `getUserMedia` (camera only while
   a listener watches), camera frames through a canvas; talk-back plays after
   the first user gesture; battery through the Battery Status API where it

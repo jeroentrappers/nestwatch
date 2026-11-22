@@ -11,6 +11,8 @@ pub enum Alert {
     Unreachable,
     /// It is reachable again after an [`Alert::Unreachable`] (FR-AL-2).
     Reachable,
+    /// An unacknowledged sound alert escalated: the alarm rings (FR-AL-5).
+    Alarm,
     /// Battery below 15 % while not charging (FR-AL-3).
     BatteryLow {
         /// Reported percent.

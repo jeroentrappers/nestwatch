@@ -19,6 +19,7 @@ use nestwatch_session::{
 use tokio::sync::{mpsc, oneshot};
 
 use super::relay;
+use super::room::{RoomLimits, RoomOutput};
 use super::{
     Alert, Cmd, ConnStatus, Inner, KnownStation, ListenerError, ListenerEvent, NetPath, PairResult,
     Route, Shared, StationSettings, TalkView, VideoFrameEvent, VideoView, effective_video,
@@ -492,6 +493,10 @@ impl Ctx<'_> {
         }
         self.out.live = true;
         let reachable = !was_live && rt.alerts.on_up();
+        if !was_live {
+            let out = rt.room.on_up(shared.at(), &RoomLimits::default());
+            shared.room_output(&mut g, id, out);
+        }
         apply_status(shared, &mut g, id, status);
         shared.apply_mixer(&mut g, id);
         if !was_live {
@@ -524,19 +529,28 @@ impl Ctx<'_> {
                 rt.level = Some(dbfs);
                 rt.open = open;
                 let s = rt.known.settings.listen;
-                let sound = s.mode == ListenMode::Continuous
-                    && rt.alerts.on_level(dbfs, s.threshold_dbfs, now, &limits);
+                let continuous = s.mode == ListenMode::Continuous;
+                let loud = if continuous { dbfs >= s.threshold_dbfs } else { open };
+                let out = rt.room.on_sample(loud, Some(dbfs), shared.at(), &RoomLimits::default());
+                let sound = continuous && rt.alerts.on_level(dbfs, s.threshold_dbfs, now, &limits);
+                shared.room_output(&mut g, &id, out);
                 if sound {
-                    shared.alert(&g, &id, Alert::SoundStarted);
+                    shared.sound_alert(&mut g, &id);
                 }
                 shared.touch(&mut g);
             }
             Control::Activity { open } => {
                 rt.open = open;
-                let sound = rt.known.settings.listen.mode == ListenMode::Activated
-                    && rt.alerts.on_activity(open, now, &limits);
+                let activated = rt.known.settings.listen.mode == ListenMode::Activated;
+                let out = if activated {
+                    rt.room.on_sample(open, None, shared.at(), &RoomLimits::default())
+                } else {
+                    RoomOutput::default()
+                };
+                let sound = activated && rt.alerts.on_activity(open, now, &limits);
+                shared.room_output(&mut g, &id, out);
                 if sound {
-                    shared.alert(&g, &id, Alert::SoundStarted);
+                    shared.sound_alert(&mut g, &id);
                 }
                 shared.publish(&mut g);
             }
@@ -642,6 +656,11 @@ pub(super) fn detach(shared: &Shared, g: &mut Inner, id: &str, now: u64, reason:
         VideoView::Off
     };
     rt.alerts.on_down(now);
+    let out = rt.room.on_down(shared.at());
+    shared.room_output(g, id, out);
+    let Some(rt) = g.stations.get_mut(id) else {
+        return;
+    };
     if rt.following {
         rt.status = ConnStatus::Reconnecting {
             attempt: 1,

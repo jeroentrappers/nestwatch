@@ -15,7 +15,9 @@
 
 mod alerts;
 mod follow;
+mod log;
 mod relay;
+mod room;
 mod store;
 
 use std::collections::{BTreeMap, VecDeque};
@@ -43,12 +45,16 @@ use crate::storage::{Storage, StorageError};
 use crate::types::{TalkStatus, VideoStateKind, clamp_name};
 
 pub use alerts::Alert;
+pub use log::KEY_LOG;
+pub use room::{AlarmView, RoomView, WakeUp};
 pub use store::{
     AlertToggles, KEY_LISTENER, KEY_STATIONS, KnownEndpoint, KnownStation, ListenSettings, Route,
     StationSettings,
 };
 
 use alerts::{AlertLimits, AlertState};
+use log::NightLog;
+use room::{At, Room, RoomLimits, RoomOutput};
 use store::ListenerRecord;
 
 /// Listener configuration. Tunables default to the spec values.
@@ -281,6 +287,14 @@ pub struct StationView {
     pub audio_frames: u64,
     /// Of those, frames flagged pre-roll.
     pub preroll_frames: u64,
+    /// Room status (FR-SL-3).
+    pub room: RoomView,
+    /// Alarm state (FR-AL-5, FR-AL-6); apps play the alarm while ringing.
+    pub alarm: AlarmView,
+    /// Sound alerts paused by "Not the baby" until (Unix ms, FR-AL-7).
+    pub paused_until_unix_ms: Option<u64>,
+    /// Changes whenever this station's night log changes (FR-SL-4).
+    pub log_revision: u64,
 }
 
 /// A station found by mDNS (protocol.md §3.4).
@@ -474,6 +488,8 @@ pub(crate) struct Rt {
     pub audio_frames: u64,
     pub preroll_frames: u64,
     pub alerts: AlertState,
+    pub room: Room,
+    pub log_revision: u64,
 }
 
 impl Rt {
@@ -508,6 +524,8 @@ impl Rt {
             audio_frames: 0,
             preroll_frames: 0,
             alerts: AlertState::default(),
+            room: Room::default(),
+            log_revision: 0,
         }
     }
 
@@ -553,6 +571,10 @@ impl Rt {
             settings: self.known.settings,
             audio_frames: self.audio_frames,
             preroll_frames: self.preroll_frames,
+            room: self.room.view(),
+            alarm: self.room.alarm(),
+            paused_until_unix_ms: self.room.paused_until(),
+            log_revision: self.log_revision,
         }
     }
 }
@@ -574,6 +596,8 @@ pub(crate) struct Inner {
     pub solo: Option<String>,
     pending: VecDeque<i16>,
     pub talk: Option<TalkCapture>,
+    /// Night logs (FR-SL-4).
+    pub log: NightLog,
     #[cfg(feature = "native")]
     pub discovered: BTreeMap<String, nestwatch_net::mdns::DiscoveredStation>,
     dirty: bool,
@@ -624,6 +648,50 @@ impl Shared {
         g.dirty = true;
     }
 
+    /// Now on both clocks.
+    pub fn at(&self) -> At {
+        At {
+            mono: self.now(),
+            unix: self.clock.unix_ms(),
+        }
+    }
+
+    /// Acts on a room change of `id`: stores a finished wake-up, raises the
+    /// alarm alert, marks the state for publishing.
+    pub fn room_output(&self, g: &mut Inner, id: &str, out: RoomOutput) {
+        if let Some(w) = out.finished {
+            let unix = self.clock.unix_ms();
+            g.log.push(id, w, unix);
+            let _ = g.log.save(&*self.storage);
+            if let Some(rt) = g.stations.get_mut(id) {
+                rt.log_revision += 1;
+            }
+        }
+        if out.ringing {
+            self.alert(g, id, Alert::Alarm);
+        }
+        if out.changed || out.finished.is_some() {
+            g.dirty = true;
+        }
+    }
+
+    /// The sound alert of FR-AL-1, unless paused (FR-AL-7); it may become
+    /// the alarm (FR-AL-5).
+    pub fn sound_alert(&self, g: &mut Inner, id: &str) {
+        let at = self.at();
+        let Some(rt) = g.stations.get_mut(id) else { return };
+        if rt.room.paused(at.mono) {
+            return;
+        }
+        let t = rt.known.settings.alerts;
+        if !t.sound {
+            return;
+        }
+        let out = rt.room.on_sound_alert(t.escalate, at);
+        self.alert(g, id, Alert::SoundStarted);
+        self.room_output(g, id, out);
+    }
+
     pub fn limits(&self) -> AlertLimits {
         AlertLimits {
             sound_interval_ms: self.cfg.sound_alert_interval.as_millis() as u64,
@@ -636,7 +704,7 @@ impl Shared {
         let Some(rt) = g.stations.get(id) else { return };
         let t = rt.known.settings.alerts;
         let on = match alert {
-            Alert::SoundStarted => t.sound,
+            Alert::SoundStarted | Alert::Alarm => t.sound,
             Alert::Unreachable | Alert::Reachable => t.unreachable,
             Alert::BatteryLow { .. } => t.battery,
         };
@@ -660,6 +728,10 @@ impl Shared {
             audio: crate::types::audio_codecs(),
             video: vec![VIDEO_CODEC_JPEG],
         }
+    }
+
+    pub fn save_log(&self, g: &Inner) -> Result<(), StorageError> {
+        g.log.save(&*self.storage)
     }
 
     pub fn save(&self, g: &Inner) {
@@ -795,7 +867,10 @@ impl Shared {
         if !g.running {
             return;
         }
+        let at = self.at();
+        let room_limits = RoomLimits::default();
         let mut due = Vec::new();
+        let mut rooms = Vec::new();
         for (id, rt) in g.stations.iter_mut() {
             if rt.following
                 && rt.status != ConnStatus::Live
@@ -803,9 +878,18 @@ impl Shared {
             {
                 due.push(id.clone());
             }
+            let t = rt.known.settings.alerts;
+            let escalate = (t.sound && t.escalate).then(|| u64::from(t.escalate_after_s) * 1_000);
+            let out = rt.room.tick(escalate, at, &room_limits);
+            if out != RoomOutput::default() {
+                rooms.push((id.clone(), out));
+            }
         }
         for id in due {
             self.alert(&g, &id, Alert::Unreachable);
+        }
+        for (id, out) in rooms {
+            self.room_output(&mut g, &id, out);
         }
         if g.dirty {
             self.publish(&mut g);
@@ -889,6 +973,7 @@ impl ListenerEngine {
             .map(|r| r.name)
             .unwrap_or_else(|| clamp_name(&cfg.name));
         let known = store::load_stations(&*storage)?;
+        let log = NightLog::load(&*storage)?;
         let (state_tx, _) = watch::channel(ListenerState {
             name: name.clone(),
             device_id: device_id.clone(),
@@ -912,6 +997,7 @@ impl ListenerEngine {
                 solo: None,
                 pending: VecDeque::new(),
                 talk: None,
+                log,
                 #[cfg(feature = "native")]
                 discovered: BTreeMap::new(),
                 dirty: false,
@@ -1128,6 +1214,9 @@ impl ListenerEngine {
         }
         shared.stop_talk_capture(&mut g, &id);
         shared.save(&g);
+        if g.log.clear(&id) {
+            let _ = g.log.save(&*shared.storage);
+        }
         shared.emit_after_publish(&mut g, ListenerEvent::Forgotten { station_id: id });
         shared.publish(&mut g);
         Ok(())
@@ -1238,9 +1327,90 @@ impl ListenerEngine {
         self.update_settings(station_id, |s| s.muted = muted)
     }
 
-    /// Sets which alerts a station raises.
+    /// Sets which alerts a station raises; `escalate_after_s` is clamped
+    /// to 30 s..10 min (FR-AL-5).
     pub fn set_alerts(&self, station_id: &str, alerts: AlertToggles) -> Result<(), ListenerError> {
+        let alerts = AlertToggles {
+            escalate_after_s: alerts.escalate_after_s.clamp(30, 600),
+            ..alerts
+        };
         self.update_settings(station_id, |s| s.alerts = alerts)
+    }
+
+    fn with_room(
+        &self,
+        station_id: &str,
+        f: impl FnOnce(&mut Room, At) -> (RoomOutput, Option<u64>),
+    ) -> Result<(), ListenerError> {
+        let id = parse_station_id(station_id)?;
+        let shared = &self.shared;
+        let at = shared.at();
+        let mut g = shared.lock();
+        let rt = g
+            .stations
+            .get_mut(&id)
+            .ok_or(ListenerError::UnknownStation)?;
+        let (out, mark) = f(&mut rt.room, at);
+        if let Some(start) = mark
+            && g.log.mark_not_the_baby(&id, start)
+        {
+            let _ = g.log.save(&*shared.storage);
+            if let Some(rt) = g.stations.get_mut(&id) {
+                rt.log_revision += 1;
+            }
+            g.dirty = true;
+        }
+        shared.room_output(&mut g, &id, out);
+        if g.dirty {
+            shared.publish(&mut g);
+        }
+        Ok(())
+    }
+
+    /// "I'm on it": stops the alarm and prevents another escalation until
+    /// the wake-up has ended (FR-AL-6).
+    pub fn acknowledge(&self, station_id: &str) -> Result<(), ListenerError> {
+        self.with_room(station_id, |r, _| (r.acknowledge(), None))
+    }
+
+    /// "Not the baby" (FR-AL-7): acknowledges, marks the wake-up in the
+    /// night log and pauses sound alerts for 10 minutes.
+    pub fn not_the_baby(&self, station_id: &str) -> Result<(), ListenerError> {
+        self.with_room(station_id, |r, at| r.not_the_baby(at, &RoomLimits::default()))
+    }
+
+    /// Ends a "Not the baby" pause (FR-AL-7).
+    pub fn resume_alerts(&self, station_id: &str) -> Result<(), ListenerError> {
+        self.with_room(station_id, |r, _| (r.resume(), None))
+    }
+
+    /// The night log of a station, oldest first, with the wake-up going on
+    /// last (`end_unix_ms` `None`) (FR-SL-4).
+    pub fn night_log(&self, station_id: &str) -> Result<Vec<WakeUp>, ListenerError> {
+        let id = parse_station_id(station_id)?;
+        let g = self.shared.lock();
+        let rt = g.stations.get(&id).ok_or(ListenerError::UnknownStation)?;
+        let mut out = g.log.entries(&id).to_vec();
+        out.extend(rt.room.ongoing());
+        Ok(out)
+    }
+
+    /// Clears the night log of a station (FR-SL-4).
+    pub fn clear_night_log(&self, station_id: &str) -> Result<(), ListenerError> {
+        let id = parse_station_id(station_id)?;
+        let shared = &self.shared;
+        let mut g = shared.lock();
+        if !g.stations.contains_key(&id) {
+            return Err(ListenerError::UnknownStation);
+        }
+        if g.log.clear(&id) {
+            shared.save_log(&g)?;
+            if let Some(rt) = g.stations.get_mut(&id) {
+                rt.log_revision += 1;
+            }
+            shared.publish(&mut g);
+        }
+        Ok(())
     }
 
     /// Hears only `station_id`, or every station with `None` (FR-LS-2).
