@@ -24,7 +24,7 @@
     <string name="about_body">Nestwatch connects your own devices directly, on your home network or your own VPN. There is no account, no cloud and no tracking. Audio and video are end-to-end encrypted.</string>
     <string name="version">Version</string>
     <string name="device_id">Device ID</string>
-    <string name="license">Free software under the GNU AGPL 3.0 or later.</string>
+    <string name="license">Free software under the GNU AGPL 3.0 or later. Source code: https://github.com/jeroentrappers/nestwatch</string>
     <string name="change_role">Change role</string>
     <string name="change_role_hint">Stops what this device is doing now and shows the role choice again.</string>
 
@@ -117,6 +117,8 @@
     <string name="scan_qr">Scan the QR code</string>
     <string name="scan_hint">Point the camera at the QR code on the station.</string>
     <string name="scan_not_nestwatch">That QR code is not a Nestwatch invitation.</string>
+    <string name="no_camera_scan">This device has no camera. Paste the invitation link or enter the code instead.</string>
+    <string name="perm_denied_camera">Camera access is off for Nestwatch. You can allow it in Settings.</string>
     <string name="nearby">Nearby</string>
     <string name="nearby_searching">Looking for stations on this network…</string>
     <string name="pairing_open">pairing open</string>

@@ -66,12 +66,16 @@ fun AddStationScreen(initialInvite: String?, onDone: () -> Unit) {
     var chosen by remember { mutableStateOf<NearbyStation?>(null) }
     var address by remember { mutableStateOf("") }
     var mode by remember { mutableStateOf(if (initialInvite != null) 1 else 0) }
+    var cameraNote by remember { mutableStateOf<Int?>(null) }
 
     val askCamera = rememberPermissionAsk(
         listOf(Manifest.permission.CAMERA),
         R.string.perm_camera_title,
         R.string.perm_camera_scan,
-    ) { ok -> scanning = ok }
+    ) { ok ->
+        scanning = ok
+        cameraNote = if (ok) null else R.string.perm_denied_camera
+    }
 
     fun routes(): List<String> = buildList {
         address.trim().takeIf { it.isNotEmpty() }?.let { add(it) }
@@ -122,14 +126,20 @@ fun AddStationScreen(initialInvite: String?, onDone: () -> Unit) {
                 pairInvite(text)
             },
             onCancel = { scanning = false },
+            onUnavailable = {
+                scanning = false
+                cameraNote = R.string.no_camera_scan
+            },
         )
         return
     }
 
     Page(stringResource(R.string.add_station), onDone) {
         NestwatchCard {
-            PrimaryButton(stringResource(R.string.scan_qr), { askCamera.ask() }, Modifier.fillMaxWidth())
-            Caption(stringResource(R.string.scan_hint))
+            PrimaryButton(stringResource(R.string.scan_qr), { cameraNote = null; askCamera.ask() }, Modifier.fillMaxWidth())
+            val note = cameraNote
+            if (note != null) Caption(stringResource(note), color = nestwatch.amber)
+            else Caption(stringResource(R.string.scan_hint))
         }
         // Nearby stations found over NSD.
         NestwatchCard {

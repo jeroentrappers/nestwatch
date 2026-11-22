@@ -17,6 +17,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,21 +85,34 @@ class QrDecoder {
     }
 }
 
-/** Full-screen scanner; calls [onResult] once with a valid invitation. */
+/**
+ * Full-screen scanner; calls [onResult] once with a valid invitation.
+ * [onUnavailable] is called when no camera can be opened.
+ */
 @Composable
-fun QrScanner(onResult: (String) -> Unit, onCancel: () -> Unit) {
+fun QrScanner(onResult: (String) -> Unit, onCancel: () -> Unit, onUnavailable: () -> Unit = onCancel) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     var notNestwatch by remember { mutableStateOf(false) }
     val done = remember { AtomicBoolean(false) }
     val executor = remember { Executors.newSingleThreadExecutor() }
     val previewView = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER } }
+    val latestResult by rememberUpdatedState(onResult)
+    val latestUnavailable by rememberUpdatedState(onUnavailable)
 
     DisposableEffect(owner) {
         val future = ProcessCameraProvider.getInstance(context)
         var provider: ProcessCameraProvider? = null
+        // The lifecycle owner is the activity, so a camera bound after this
+        // screen closed would stay on until the app is closed.
+        var disposed = false
         future.addListener({
-            val p = runCatching { future.get() }.getOrNull() ?: return@addListener
+            if (disposed) return@addListener
+            val p = runCatching { future.get() }.getOrNull()
+            if (p == null) {
+                latestUnavailable()
+                return@addListener
+            }
             provider = p
             val preview = Preview.Builder().build().also { it.surfaceProvider = previewView.surfaceProvider }
             val decoder = QrDecoder()
@@ -111,21 +125,28 @@ fun QrScanner(onResult: (String) -> Unit, onCancel: () -> Unit) {
                     val text = decoder.decode(it) ?: return@use
                     if (runCatching { parseInvitation(text) }.isSuccess) {
                         if (done.compareAndSet(false, true)) {
-                            ContextCompat.getMainExecutor(context).execute { onResult(text) }
+                            ContextCompat.getMainExecutor(context).execute { if (!disposed) latestResult(text) }
                         }
                     } else {
                         notNestwatch = true
                     }
                 }
             }
-            val selector = if (p.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)) CameraSelector.DEFAULT_BACK_CAMERA
-            else CameraSelector.DEFAULT_FRONT_CAMERA
-            runCatching {
+            val selector = when {
+                runCatching { p.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) }.getOrDefault(false) ->
+                    CameraSelector.DEFAULT_BACK_CAMERA
+                runCatching { p.hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) }.getOrDefault(false) ->
+                    CameraSelector.DEFAULT_FRONT_CAMERA
+                else -> null
+            }
+            val bound = selector != null && runCatching {
                 p.unbindAll()
                 p.bindToLifecycle(owner, selector, preview, analysis)
-            }
+            }.isSuccess
+            if (!bound) latestUnavailable()
         }, ContextCompat.getMainExecutor(context))
         onDispose {
+            disposed = true
             provider?.unbindAll()
             executor.shutdown()
         }
