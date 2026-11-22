@@ -1,0 +1,31 @@
+Nestwatch zamienia telefony, tablety i komputery, które już masz, w elektroniczną nianię. Dźwięk i obraz płyną bezpośrednio z jednego Twojego urządzenia na drugie, z szyfrowaniem end-to-end. Nie musisz zakładać konta i nie ma żadnej chmury po drodze.
+
+JAK TO DZIAŁA
+- Ustaw stację dziecka: połóż urządzenie blisko dziecka i wybierz, że to urządzenie czuwa. Słucha pokoju i pokazuje poziom dźwięku. Ekran można przyciemnić, a czuwanie trwa dalej.
+- Sparuj urządzenie rodzica: na stacji dziecka wybierz parowanie i zeskanuj kod QR telefonem, otwórz link z zaproszeniem albo wpisz 10-znakowy kod. Oba ekrany pokazują tę samą liczbę, więc sprawdzisz, że nikt się nie wtrącił.
+- Słuchaj, mów, patrz: urządzenie rodzica odtwarza pokój, gdy coś słychać, powiadamia Cię, pozwala mówić, gdy przytrzymujesz przycisk, i włącza kamerę tylko na Twoją prośbę.
+
+FUNKCJE
+- Aktywacja dźwiękiem z własnym progiem i krótkim buforem, dzięki czemu początek płaczu nigdy nie umyka. Albo dźwięk włączony cały czas.
+- Narastający alarm: jeśli dźwięk nie ustaje, a nikt nie reaguje na powiadomienie, dzwoni alarm, coraz głośniej, także w trybie cichym. Wybierz, po jakim czasie, albo go wyłącz.
+- „To nie dziecko”: rodzeństwo, pies albo przejeżdżający samochód? Jedno dotknięcie wstrzymuje powiadomienia na 10 minut.
+- Status pokoju: jednym spojrzeniem widzisz, co się dzieje, na przykład „Nie śpi od 4 min” albo „Cisza od 1 godz.”.
+- Dziennik nocy: kiedy dziecko się obudziło i na jak długo, noc po nocy. Przechowywany tylko na Twoim urządzeniu, przez 30 dni.
+- Mów do dziecka: przytrzymaj przycisk i mów przez głośnik stacji dziecka.
+- Kamera na żądanie: kamera jest wyłączona, gdy nikt nie patrzy, a stacja dziecka pokazuje, kiedy nadaje.
+- Wiele stacji i urządzeń: obserwuj do 8 stacji dziecka naraz, każdą z osobną głośnością, wyciszeniem i trybem solo. Jedna stacja dziecka obsługuje do 8 urządzeń rodzica.
+- Powiadomienia działają nawet przy wyciszonym dźwięku: gdy w cichym pokoju robi się głośno, gdy stacja dziecka jest nieosiągalna i gdy jej bateria jest na wyczerpaniu.
+- Spokojnie w nocy: ciepłe, nieoślepiające kolory, motyw nocny i dzienny oraz przyciemniony ekran stacji dziecka.
+- Na wielu platformach: stacje i urządzenia rodzica na Androidzie, iPhonie, iPadzie, Linuksie, macOS, Windowsie i w przeglądarce.
+- W 11 językach: polskim, angielskim, niderlandzkim, francuskim, niemieckim, hiszpańskim, włoskim, portugalskim (Brazylia), szwedzkim, duńskim i norweskim.
+
+PRYWATNOŚĆ OD PODSTAW
+- Bez konta i bez chmury. W sieci domowej lub przez Twój własny VPN urządzenia łączą się bezpośrednio.
+- Poza domem opcjonalny serwer pośredniczący przekazuje zaszyfrowany strumień, nie mogąc go odczytać. Skorzystaj z serwera projektu albo uruchom własny.
+- Każde połączenie jest szyfrowane i uwierzytelniane za pomocą Noise Protocol Framework. Tylko sparowane przez Ciebie urządzenia mogą słyszeć, widzieć lub mówić przez stację dziecka.
+- Bez analityki, bez reklam, bez śledzenia, bez nagrań. Dźwięk i obraz nigdy nie są zapisywane.
+
+OPEN SOURCE
+Nestwatch to wolne oprogramowanie na licencji GNU AGPL 3.0 lub nowszej. Kod źródłowy znajdziesz na https://github.com/jeroentrappers/nestwatch
+
+Nestwatch nie jest wyrobem medycznym i nie zastępuje opieki. Nasłuchuje dźwięku: cisza w pokoju nie oznacza, że dziecko śpi.

@@ -1,0 +1,6 @@
+Neu in 0.3.0
+- Alarm, der lauter wird: Hält das Geräusch an und reagiert niemand auf die Benachrichtigung, klingelt ein Alarm, immer lauter, auch im Lautlos-Modus.
+- „Nicht das Baby“: Ein Tippen pausiert die Benachrichtigungen für 10 Minuten.
+- Zimmerstatus: „Seit 4 Min. wach“ oder „Seit 1 Std. ruhig“ bei jeder Babystation.
+- Nachtprotokoll: wann dein Kind aufgewacht ist, 30 Tage nur auf deinem Gerät gespeichert.
+- Nestwatch gibt es jetzt in 11 Sprachen.

@@ -1,0 +1,31 @@
+Nestwatch maakt van de telefoons, tablets en computers die je al hebt een babyfoon. Geluid en beeld gaan rechtstreeks van het ene toestel naar het andere, end-to-end versleuteld. Je hoeft geen account te maken en er zit geen cloud tussen.
+
+ZO WERKT HET
+- Zet een babystation klaar: leg een toestel bij je kind en kies dat dit toestel waakt. Het luistert naar de kamer en toont het geluidsniveau. Het scherm mag gedimd worden, het blijft gewoon waken.
+- Koppel een ouderapparaat: tik op het babystation op koppelen en scan de QR-code met je telefoon, open de uitnodigingslink of typ de code van 10 tekens. Beide schermen tonen hetzelfde getal, zo weet je zeker dat niemand meekijkt.
+- Luisteren, praten, kijken: het ouderapparaat laat de kamer horen als er geluid is, waarschuwt je, laat je terugpraten zolang je de knop vasthoudt en zet de camera pas aan als jij erom vraagt.
+
+FUNCTIES
+- Geluidsactivatie met je eigen drempel en een korte voorloop, zodat het begin van een huiltje nooit wegvalt. Of laat het geluid altijd aan.
+- Alarm dat steeds luider wordt: gaat het geluid door en reageert niemand op de melding, dan gaat er een alarm af, steeds luider, ook in de stille modus. Kies na hoelang, of zet het uit.
+- "Niet de baby": een broertje, de hond of een voorbijrijdende auto? Met één tik pauzeer je de meldingen 10 minuten.
+- Status van de kamer: zie in één oogopslag hoe het gaat, bijvoorbeeld "Al 4 min wakker" of "Al 1 u stil".
+- Nachtlogboek: wanneer je kind wakker werd en hoelang, nacht per nacht. Alleen bewaard op je eigen toestel, 30 dagen lang.
+- Terugpraten: houd de knop ingedrukt en praat via de luidspreker van het babystation.
+- Camera op aanvraag: de camera staat uit zolang niemand kijkt, en het babystation toont wanneer het beeld verstuurt.
+- Meerdere babystations en ouderapparaten: volg tot 8 babystations tegelijk, elk met een eigen volume, dempen en solo. Een babystation bedient tot 8 ouderapparaten.
+- Meldingen die ook werken als het geluid gedempt is: als een stille kamer geluid maakt, als een babystation onbereikbaar is en als de batterij van een babystation bijna leeg is.
+- Rustig 's nachts: warme kleuren die niet verblinden, een nacht- en een dagthema en een gedimd scherm op het babystation.
+- Op al je toestellen: babystations en ouderapparaten op Android, iPhone, iPad, Linux, macOS, Windows en in de browser.
+- In 11 talen: Nederlands, Engels, Frans, Duits, Spaans, Italiaans, Portugees (Brazilië), Pools, Zweeds, Deens en Noors.
+
+PRIVACY VANAF HET BEGIN
+- Geen account en geen cloud. Op je thuisnetwerk of via je eigen VPN praten de toestellen rechtstreeks met elkaar.
+- Buitenshuis geeft een optionele relayserver de versleutelde stroom door, zonder die te kunnen lezen. Gebruik de relayserver van het project of draai je eigen.
+- Elke verbinding is versleuteld en geverifieerd met het Noise Protocol Framework. Alleen toestellen die je gekoppeld hebt, kunnen horen, zien of praten via een babystation.
+- Geen analytics, geen advertenties, geen tracking, geen opnames. Geluid en beeld worden nooit bewaard.
+
+OPEN SOURCE
+Nestwatch is vrije software onder de GNU AGPL 3.0 of later. De broncode staat op https://github.com/jeroentrappers/nestwatch
+
+Nestwatch is geen medisch hulpmiddel en vervangt geen toezicht. Het luistert naar geluid: een stille kamer betekent niet dat je kind slaapt.

@@ -1,0 +1,31 @@
+Nestwatch macht aus den Handys, Tablets und Computern, die du schon hast, ein Babyphone. Ton und Bild gehen direkt von einem deiner Geräte zum anderen, Ende-zu-Ende-verschlüsselt. Du brauchst kein Konto, und es gibt keine Cloud dazwischen.
+
+SO FUNKTIONIERT'S
+- Babystation einrichten: Leg ein Gerät in die Nähe deines Kindes und wähle, dass dieses Gerät wacht. Es hört ins Zimmer und zeigt den Geräuschpegel. Der Bildschirm darf gedimmt sein, die Überwachung läuft weiter.
+- Elterngerät koppeln: Tippe auf der Babystation auf Koppeln und scanne den QR-Code mit deinem Handy, öffne den Einladungslink oder gib den 10-stelligen Code ein. Beide Bildschirme zeigen dieselbe Zahl, so siehst du, dass niemand dazwischen sitzt.
+- Hören, sprechen, sehen: Das Elterngerät spielt das Zimmer ab, sobald es Geräusche gibt, benachrichtigt dich, lässt dich sprechen, solange du die Taste hältst, und schaltet die Kamera nur ein, wenn du es möchtest.
+
+FUNKTIONEN
+- Geräuschaktivierung mit deiner eigenen Schwelle und einem kurzen Vorlauf, damit der Anfang eines Weinens nie verloren geht. Oder lass den Ton immer an.
+- Alarm, der lauter wird: Hält das Geräusch an und reagiert niemand auf die Benachrichtigung, klingelt ein Alarm, immer lauter, auch im Lautlos-Modus. Wähle, nach welcher Zeit, oder schalte ihn aus.
+- „Nicht das Baby“: Geschwister, der Hund oder ein vorbeifahrendes Auto? Ein Tippen pausiert die Benachrichtigungen für 10 Minuten.
+- Zimmerstatus: Auf einen Blick sehen, wie es im Zimmer aussieht, zum Beispiel „Seit 4 Min. wach“ oder „Seit 1 Std. ruhig“.
+- Nachtprotokoll: wann dein Kind aufgewacht ist und wie lange, Nacht für Nacht. Nur auf deinem Gerät gespeichert, 30 Tage lang.
+- Zurücksprechen: Halte die Taste gedrückt und sprich über den Lautsprecher der Babystation.
+- Kamera auf Abruf: Die Kamera ist aus, solange niemand zusieht, und die Babystation zeigt an, wenn sie sendet.
+- Mehrere Babystationen und Elterngeräte: Verfolge bis zu 8 Babystationen gleichzeitig, jede mit eigener Lautstärke, Stummschaltung und Solo. Eine Babystation versorgt bis zu 8 Elterngeräte.
+- Benachrichtigungen auch bei stummgeschaltetem Ton: wenn ein ruhiges Zimmer laut wird, wenn eine Babystation nicht erreichbar ist und wenn ihr Akku fast leer ist.
+- Ruhig in der Nacht: warme, blendfreie Farben, ein Nacht- und ein Tagdesign und ein gedimmter Bildschirm auf der Babystation.
+- Auf allen Plattformen: Babystationen und Elterngeräte auf Android, iPhone, iPad, Linux, macOS, Windows und im Browser.
+- In 11 Sprachen: Deutsch, Englisch, Niederländisch, Französisch, Spanisch, Italienisch, Portugiesisch (Brasilien), Polnisch, Schwedisch, Dänisch und Norwegisch.
+
+PRIVAT VON GRUND AUF
+- Kein Konto und keine Cloud. Im Heimnetz oder über dein eigenes VPN sprechen die Geräte direkt miteinander.
+- Unterwegs leitet ein optionaler Relay-Server den verschlüsselten Datenstrom weiter, ohne ihn lesen zu können. Nutze den Relay-Server des Projekts oder betreibe deinen eigenen.
+- Jede Verbindung ist mit dem Noise Protocol Framework verschlüsselt und authentifiziert. Nur Geräte, die du gekoppelt hast, können über eine Babystation hören, sehen oder sprechen.
+- Keine Analyse, keine Werbung, kein Tracking, keine Aufnahmen. Ton und Bild werden nie gespeichert.
+
+OPEN SOURCE
+Nestwatch ist freie Software unter der GNU AGPL 3.0 oder neuer. Der Quellcode liegt auf https://github.com/jeroentrappers/nestwatch
+
+Nestwatch ist kein Medizinprodukt und ersetzt keine Aufsicht. Es hört auf Geräusche: Ein ruhiges Zimmer heißt nicht, dass dein Kind schläft.

@@ -1,0 +1,1 @@
+babymonitor,babyalarm,baby,barnerom,kamera,lyd,video,søvn,alarm,privat,kryptert,åpen kildekode

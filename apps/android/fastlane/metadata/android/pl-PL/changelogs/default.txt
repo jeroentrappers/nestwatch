@@ -1,0 +1,6 @@
+Nowości w wersji 0.3.0
+- Narastający alarm: jeśli dźwięk nie ustaje, a nikt nie reaguje na powiadomienie, dzwoni alarm, coraz głośniej, także w trybie cichym.
+- „To nie dziecko”: jedno dotknięcie wstrzymuje powiadomienia na 10 minut.
+- Status pokoju: „Nie śpi od 4 min” albo „Cisza od 1 godz.” przy każdej stacji dziecka.
+- Dziennik nocy: pobudki dziecka, przechowywane 30 dni tylko na Twoim urządzeniu.
+- Nestwatch jest teraz dostępny w 11 językach.

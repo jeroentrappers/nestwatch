@@ -1,0 +1,6 @@
+Nieuw in 0.3.0
+- Alarm dat steeds luider wordt: gaat het geluid door en reageert niemand op de melding, dan gaat er een alarm af, ook in de stille modus.
+- "Niet de baby": met één tik pauzeer je de meldingen 10 minuten.
+- Status van de kamer: "Al 4 min wakker" of "Al 1 u stil" bij elk babystation.
+- Nachtlogboek: wanneer je kind wakker werd, 30 dagen bewaard op alleen je eigen toestel.
+- Nestwatch is nu beschikbaar in 11 talen.

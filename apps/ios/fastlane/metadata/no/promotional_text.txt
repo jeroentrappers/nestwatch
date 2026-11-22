@@ -1,0 +1,1 @@
+Nytt: en alarm som blir høyere og høyere, status for rommet og en nattlogg. En babycall på dine egne enheter: kryptert, uten konto, uten sky, med åpen kildekode.

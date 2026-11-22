@@ -1,0 +1,1 @@
+babymonitor,baby,bebis,barnkammare,kamera,ljud,video,sömn,larm,privat,krypterad,öppen källkod

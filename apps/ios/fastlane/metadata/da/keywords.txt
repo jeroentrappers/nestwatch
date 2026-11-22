@@ -1,0 +1,1 @@
+babyovervågning,babymonitor,baby,babyfon,kamera,lyd,video,søvn,privat,krypteret,open source

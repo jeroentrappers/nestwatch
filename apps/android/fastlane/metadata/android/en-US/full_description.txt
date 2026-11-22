@@ -7,12 +7,17 @@ HOW IT WORKS
 
 FEATURES
 - Sound activation with your own threshold, with a short pre-roll so the start of a cry is never cut off. Or keep the sound always on.
+- Escalating alarm: if the sound goes on and nobody answers the alert, an alarm rings, louder and louder, also in silent mode. Choose after how long, or turn it off.
+- "Not the baby": a sibling, the dog or a passing car? One tap pauses the alerts for 10 minutes.
+- Room status: see at a glance how the room is doing, such as "Awake for 4 min" or "Quiet for 1 h".
+- Night log: when your child woke up and for how long, night by night. Kept only on your device, for 30 days.
 - Talk-back: hold to talk through the station's speaker.
 - Camera on demand: the camera is off whenever nobody is looking, and the station shows when it sends.
 - Several stations and listeners: follow up to 8 stations at once, each with its own volume, mute and solo. A station serves up to 8 listeners.
 - Alerts that work while muted: when a quiet room starts to sound, when a station is unreachable, and when a station's battery is low.
 - Calm at night: warm, low-glare colours, a night and a day theme and a dimmed station screen.
 - Works across platforms: stations and listeners on Android, iPhone, iPad, Linux, macOS, Windows and in the browser.
+- In 11 languages: English, Dutch, French, German, Spanish, Italian, Portuguese (Brazil), Polish, Swedish, Danish and Norwegian.
 
 PRIVATE BY DESIGN
 - No account and no cloud. On your home network, or over your own VPN, devices talk directly.
@@ -23,4 +28,4 @@ PRIVATE BY DESIGN
 OPEN SOURCE
 Nestwatch is free software under the GNU AGPL 3.0 or later. The source code is at https://github.com/jeroentrappers/nestwatch
 
-Nestwatch is not a medical device and does not replace supervision.
+Nestwatch is not a medical device and does not replace supervision. It listens for sound: a quiet room does not mean your child is asleep.

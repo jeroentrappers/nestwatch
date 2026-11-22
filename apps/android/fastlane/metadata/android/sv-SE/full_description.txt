@@ -1,0 +1,31 @@
+Nestwatch gör om telefonerna, surfplattorna och datorerna du redan har till en babyvakt. Ljud och bild går direkt från en av dina enheter till en annan, totalsträckskrypterat. Du behöver inget konto och det finns inget moln emellan.
+
+SÅ FUNKAR DET
+- Ställ i ordning en babystation: lägg en enhet nära ditt barn och välj att den här enheten vakar. Den lyssnar på rummet och visar ljudnivån. Skärmen kan dämpas medan den fortsätter att vaka.
+- Parkoppla en föräldraenhet: tryck på parkoppla på babystationen och skanna QR-koden med telefonen, öppna inbjudningslänken eller skriv in koden på 10 tecken. Båda skärmarna visar samma siffra, så du kan kontrollera att ingen sitter emellan.
+- Lyssna, prata, titta: föräldraenheten spelar upp rummet när det hörs något, varnar dig, låter dig prata medan du håller in knappen och slår bara på kameran när du ber om det.
+
+FUNKTIONER
+- Ljudaktivering med din egen tröskel och en kort förinspelning, så att början på gråten aldrig klipps bort. Eller ha ljudet på hela tiden.
+- Larm som blir starkare: om ljudet fortsätter och ingen svarar på aviseringen ringer ett larm, allt starkare, även i ljudlöst läge. Välj efter hur lång tid, eller stäng av det.
+- "Inte bebisen": ett syskon, hunden eller en bil som kör förbi? Ett tryck pausar aviseringarna i 10 minuter.
+- Rummets status: se direkt hur det är i rummet, till exempel "Vaken i 4 min" eller "Tyst i 1 h".
+- Nattlogg: när ditt barn vaknade och hur länge, natt för natt. Sparas bara på din enhet, i 30 dagar.
+- Prata tillbaka: håll in knappen och prata genom babystationens högtalare.
+- Kamera på begäran: kameran är avstängd när ingen tittar, och babystationen visar när den sänder.
+- Flera babystationer och föräldraenheter: följ upp till 8 babystationer samtidigt, var och en med egen volym, ljud av och solo. En babystation klarar upp till 8 föräldraenheter.
+- Aviseringar som fungerar även när ljudet är avstängt: när ett tyst rum börjar låta, när en babystation inte går att nå och när dess batteri är lågt.
+- Lugnt på natten: varma färger som inte bländar, ett natt- och ett dagtema och en dämpad skärm på babystationen.
+- På alla plattformar: babystationer och föräldraenheter på Android, iPhone, iPad, Linux, macOS, Windows och i webbläsaren.
+- På 11 språk: svenska, engelska, nederländska, franska, tyska, spanska, italienska, portugisiska (Brasilien), polska, danska och norska.
+
+PRIVAT FRÅN GRUNDEN
+- Inget konto och inget moln. På ditt hemnätverk eller via ditt eget VPN pratar enheterna direkt med varandra.
+- Hemifrån skickar en valfri reläserver vidare den krypterade strömmen utan att kunna läsa den. Använd projektets reläserver eller kör en egen.
+- Varje anslutning krypteras och autentiseras med Noise Protocol Framework. Bara enheter som du har parkopplat kan höra, se eller prata via en babystation.
+- Ingen analys, ingen reklam, ingen spårning, inga inspelningar. Ljud och bild sparas aldrig.
+
+ÖPPEN KÄLLKOD
+Nestwatch är fri programvara under GNU AGPL 3.0 eller senare. Källkoden finns på https://github.com/jeroentrappers/nestwatch
+
+Nestwatch är inte en medicinteknisk produkt och ersätter inte tillsyn. Den lyssnar efter ljud: ett tyst rum betyder inte att ditt barn sover.

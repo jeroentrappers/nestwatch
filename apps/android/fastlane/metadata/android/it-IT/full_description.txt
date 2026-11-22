@@ -1,0 +1,31 @@
+Nestwatch trasforma i telefoni, i tablet e i computer che hai già in un baby monitor. Audio e video viaggiano direttamente da un tuo dispositivo all'altro, con crittografia end-to-end. Nessun account da creare e nessun cloud in mezzo.
+
+COME FUNZIONA
+- Prepara una stazione bebè: metti un dispositivo vicino al tuo bambino e scegli che questo dispositivo sorvegli. Ascolta la stanza e mostra il livello del suono. Lo schermo si può oscurare mentre continua a sorvegliare.
+- Associa un dispositivo genitore: sulla stazione bebè avvia l'associazione e inquadra il codice QR con il telefono, apri il link di invito o digita il codice di 10 caratteri. Entrambi gli schermi mostrano lo stesso numero, così puoi verificare che nessuno si sia messo in mezzo.
+- Ascolta, parla, guarda: il dispositivo genitore riproduce la stanza quando c'è suono, ti avvisa, ti fa parlare tenendo premuto e accende la videocamera solo quando lo chiedi tu.
+
+FUNZIONI
+- Attivazione vocale con la tua soglia e un breve pre-ascolto, così l'inizio di un pianto non va mai perso. Oppure tieni il suono sempre acceso.
+- Allarme crescente: se il suono continua e nessuno risponde all'avviso, suona un allarme, sempre più forte, anche in modalità silenziosa. Scegli dopo quanto tempo, oppure disattivalo.
+- "Non è il bebè": un fratellino, il cane o un'auto che passa? Con un tocco metti in pausa gli avvisi per 10 minuti.
+- Stato della stanza: vedi a colpo d'occhio com'è la situazione, per esempio "Sveglio da 4 min" o "Tranquillo da 1 h".
+- Diario notturno: quando il tuo bambino si è svegliato e per quanto tempo, notte dopo notte. Conservato solo sul tuo dispositivo, per 30 giorni.
+- Parla al bebè: tieni premuto per parlare attraverso l'altoparlante della stazione bebè.
+- Videocamera su richiesta: la videocamera è spenta quando nessuno guarda, e la stazione bebè mostra quando trasmette.
+- Più stazioni e dispositivi: segui fino a 8 stazioni bebè contemporaneamente, ognuna con il proprio volume, silenzioso e solo. Una stazione bebè serve fino a 8 dispositivi genitore.
+- Avvisi che funzionano anche con l'audio disattivato: quando una stanza tranquilla inizia a fare rumore, quando una stazione bebè non è raggiungibile e quando la sua batteria è scarica.
+- Tranquillo di notte: colori caldi che non abbagliano, un tema notte e un tema giorno e uno schermo oscurato sulla stazione bebè.
+- Su tutte le piattaforme: stazioni e dispositivi genitore su Android, iPhone, iPad, Linux, macOS, Windows e nel browser.
+- In 11 lingue: italiano, inglese, olandese, francese, tedesco, spagnolo, portoghese (Brasile), polacco, svedese, danese e norvegese.
+
+PRIVATO PER SCELTA
+- Nessun account e nessun cloud. Sulla rete di casa o tramite la tua VPN, i dispositivi comunicano direttamente.
+- Fuori casa, un server relay opzionale inoltra il flusso cifrato senza poterlo leggere. Usa il relay del progetto o gestisci il tuo.
+- Ogni connessione è cifrata e autenticata con il Noise Protocol Framework. Solo i dispositivi che hai associato possono sentire, vedere o parlare tramite una stazione bebè.
+- Niente statistiche, niente pubblicità, niente tracciamento, niente registrazioni. Audio e video non vengono mai salvati.
+
+OPEN SOURCE
+Nestwatch è software libero con licenza GNU AGPL 3.0 o successiva. Il codice sorgente è su https://github.com/jeroentrappers/nestwatch
+
+Nestwatch non è un dispositivo medico e non sostituisce la sorveglianza di un adulto. Ascolta i suoni: una stanza tranquilla non significa che il tuo bambino stia dormendo.

@@ -1,1 +1,1 @@
-A baby monitor on the devices you already own. Sound, talk-back and an on-demand camera, end-to-end encrypted. No account, no cloud, open source.
+Now with an escalating alarm, room status and a night log. A baby monitor on the devices you already own: end-to-end encrypted, no account, no cloud, open source.

@@ -1,0 +1,31 @@
+O Nestwatch transforma os celulares, tablets e computadores que você já tem em uma babá eletrônica. Som e imagem vão direto de um aparelho seu para outro, com criptografia de ponta a ponta. Não é preciso criar conta e não há nenhuma nuvem no meio.
+
+COMO FUNCIONA
+- Prepare uma estação do bebê: coloque um aparelho perto da criança e escolha que este aparelho vigia. Ele escuta o quarto e mostra o nível de som. A tela pode ficar escurecida enquanto ele continua vigiando.
+- Pareie um dispositivo dos pais: na estação do bebê, toque em parear e escaneie o QR code com o celular, abra o link de convite ou digite o código de 10 caracteres. As duas telas mostram o mesmo número, assim você confere que ninguém está no meio.
+- Ouça, fale, veja: o dispositivo dos pais toca o som do quarto quando há barulho, avisa você, deixa você falar enquanto segura o botão e só liga a câmera quando você pede.
+
+RECURSOS
+- Ativação por som com o seu próprio limite e uma breve pré-escuta, para o começo de um choro nunca ficar de fora. Ou deixe o som sempre ligado.
+- Alarme progressivo: se o som continua e ninguém responde ao alerta, um alarme toca, cada vez mais alto, também no modo silencioso. Escolha depois de quanto tempo, ou desative.
+- "Não é o bebê": o irmão, o cachorro ou um carro passando? Um toque pausa os alertas por 10 minutos.
+- Status do quarto: veja num relance como está o quarto, por exemplo "Acordado há 4 min" ou "Tranquilo há 1 h".
+- Registro da noite: quando a criança acordou e por quanto tempo, noite a noite. Guardado só no seu aparelho, por 30 dias.
+- Falar com o bebê: segure o botão para falar pelo alto-falante da estação do bebê.
+- Câmera sob demanda: a câmera fica desligada quando ninguém está olhando, e a estação do bebê mostra quando está transmitindo.
+- Várias estações e dispositivos: acompanhe até 8 estações do bebê ao mesmo tempo, cada uma com seu volume, mudo e solo. Uma estação do bebê atende até 8 dispositivos dos pais.
+- Alertas que funcionam mesmo no mudo: quando um quarto tranquilo começa a fazer barulho, quando uma estação do bebê fica inacessível e quando a bateria dela está fraca.
+- Calma à noite: cores quentes que não ofuscam, um tema noturno e um diurno e uma tela escurecida na estação do bebê.
+- Multiplataforma: estações e dispositivos dos pais no Android, iPhone, iPad, Linux, macOS, Windows e no navegador.
+- Em 11 idiomas: português (Brasil), inglês, holandês, francês, alemão, espanhol, italiano, polonês, sueco, dinamarquês e norueguês.
+
+PRIVACIDADE DESDE A ORIGEM
+- Sem conta e sem nuvem. Na rede de casa ou pela sua própria VPN, os aparelhos se comunicam diretamente.
+- Fora de casa, um servidor de retransmissão opcional repassa o fluxo criptografado sem conseguir lê-lo. Use o servidor do projeto ou rode o seu.
+- Toda conexão é criptografada e autenticada com o Noise Protocol Framework. Só os aparelhos que você pareou podem ouvir, ver ou falar por uma estação do bebê.
+- Sem análises, sem anúncios, sem rastreamento, sem gravações. Som e imagem nunca são armazenados.
+
+CÓDIGO ABERTO
+O Nestwatch é software livre sob a GNU AGPL 3.0 ou posterior. O código-fonte está em https://github.com/jeroentrappers/nestwatch
+
+O Nestwatch não é um dispositivo médico e não substitui a supervisão de um adulto. Ele escuta o som: um quarto tranquilo não significa que a criança está dormindo.

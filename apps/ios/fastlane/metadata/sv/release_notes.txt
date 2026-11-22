@@ -1,0 +1,6 @@
+Nytt i 0.3.0
+- Larm som blir starkare: om ljudet fortsätter och ingen svarar på aviseringen ringer ett larm, allt starkare, även i ljudlöst läge.
+- "Inte bebisen": ett tryck pausar aviseringarna i 10 minuter.
+- Rummets status: "Vaken i 4 min" eller "Tyst i 1 h" på varje babystation.
+- Nattlogg: när ditt barn vaknade, sparas bara på din enhet i 30 dagar.
+- Nestwatch finns nu på 11 språk.

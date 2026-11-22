@@ -1,1 +1,6 @@
-First release on the App Store. Pair a listener by scanning the station's QR code, opening its invitation link or typing its code.
+New in 0.3.0
+- Escalating alarm: if the sound goes on and nobody answers the alert, an alarm rings, louder and louder, also in silent mode.
+- "Not the baby": one tap pauses the alerts for 10 minutes.
+- Room status: "Awake for 4 min" or "Quiet for 1 h" on each station.
+- Night log: your child's wake-ups, kept only on your device for 30 days.
+- Nestwatch now speaks 11 languages.

@@ -1,0 +1,6 @@
+Novità della versione 0.3.0
+- Allarme crescente: se il suono continua e nessuno risponde all'avviso, suona un allarme sempre più forte, anche in modalità silenziosa.
+- "Non è il bebè": con un tocco metti in pausa gli avvisi per 10 minuti.
+- Stato della stanza: "Sveglio da 4 min" o "Tranquillo da 1 h" su ogni stazione bebè.
+- Diario notturno: i risvegli del tuo bambino, conservati 30 giorni solo sul tuo dispositivo.
+- Nestwatch ora è disponibile in 11 lingue.

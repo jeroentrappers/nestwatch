@@ -1,0 +1,31 @@
+Nestwatch convierte los móviles, tabletas y ordenadores que ya tienes en un vigilabebés. El sonido y la imagen van directamente de uno de tus dispositivos a otro, con cifrado de extremo a extremo. No tienes que crear ninguna cuenta y no hay ninguna nube de por medio.
+
+CÓMO FUNCIONA
+- Prepara una estación del bebé: deja un dispositivo cerca de tu hijo y elige que este dispositivo vigile. Escucha la habitación y muestra el nivel de sonido. Puedes atenuar la pantalla y sigue vigilando.
+- Vincula un dispositivo de los padres: en la estación del bebé, toca vincular y escanea el código QR con tu móvil, abre el enlace de invitación o escribe el código de 10 caracteres. Las dos pantallas muestran el mismo número, así compruebas que nadie se ha colado entre ambos.
+- Escucha, habla, mira: el dispositivo de los padres reproduce la habitación cuando hay sonido, te avisa, te deja hablar mientras mantienes pulsado y solo enciende la cámara cuando tú lo pides.
+
+FUNCIONES
+- Activación por sonido con tu propio umbral y una breve preescucha, para que nunca se pierda el comienzo de un llanto. O deja el sonido siempre activado.
+- Alarma progresiva: si el sonido continúa y nadie responde al aviso, suena una alarma, cada vez más fuerte, también en modo silencio. Elige al cabo de cuánto tiempo o desactívala.
+- «No es el bebé»: ¿un hermano, el perro o un coche que pasa? Con un toque pausas los avisos durante 10 minutos.
+- Estado de la habitación: ve de un vistazo cómo está la habitación, por ejemplo «Despierto desde hace 4 min» o «Tranquilo desde hace 1 h».
+- Registro nocturno: cuándo se despertó tu hijo y durante cuánto tiempo, noche a noche. Se guarda solo en tu dispositivo, durante 30 días.
+- Hablar al bebé: mantén pulsado para hablar por el altavoz de la estación del bebé.
+- Cámara a petición: la cámara está apagada mientras nadie mira, y la estación del bebé indica cuándo transmite.
+- Varias estaciones y dispositivos: sigue hasta 8 estaciones del bebé a la vez, cada una con su volumen, silencio y modo solo. Cada estación del bebé atiende hasta 8 dispositivos de los padres.
+- Avisos que funcionan aunque silencies el sonido: cuando una habitación tranquila empieza a sonar, cuando una estación del bebé no está disponible y cuando le queda poca batería.
+- Tranquilidad por la noche: colores cálidos que no deslumbran, un tema de noche y otro de día y una pantalla atenuada en la estación del bebé.
+- Multiplataforma: estaciones y dispositivos de los padres en Android, iPhone, iPad, Linux, macOS, Windows y en el navegador.
+- En 11 idiomas: español, inglés, neerlandés, francés, alemán, italiano, portugués (Brasil), polaco, sueco, danés y noruego.
+
+PRIVADO DESDE EL DISEÑO
+- Sin cuenta y sin nube. En tu red de casa o a través de tu propia VPN, los dispositivos se comunican directamente.
+- Fuera de casa, un servidor de retransmisión opcional transmite el flujo cifrado sin poder leerlo. Usa el del proyecto o instala el tuyo.
+- Cada conexión está cifrada y autenticada con Noise Protocol Framework. Solo los dispositivos que has vinculado pueden oír, ver o hablar a través de una estación del bebé.
+- Sin analíticas, sin anuncios, sin rastreo, sin grabaciones. El sonido y la imagen nunca se guardan.
+
+CÓDIGO ABIERTO
+Nestwatch es software libre bajo la GNU AGPL 3.0 o posterior. El código fuente está en https://github.com/jeroentrappers/nestwatch
+
+Nestwatch no es un dispositivo médico y no sustituye la supervisión de un adulto. Escucha el sonido: una habitación tranquila no significa que tu hijo esté dormido.

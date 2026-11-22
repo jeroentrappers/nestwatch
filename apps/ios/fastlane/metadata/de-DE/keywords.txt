@@ -1,0 +1,1 @@
+Babyfon,Baby,Kamera,Audio,Video,Gegensprechen,Schlaf,Alarm,Nachtprotokoll,verschlüsselt,Open Source

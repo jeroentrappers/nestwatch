@@ -1,0 +1,6 @@
+Nyt i 0.3.0
+- Alarm, der bliver højere: hvis lyden fortsætter, og ingen svarer på beskeden, ringer en alarm, højere og højere, også i lydløs tilstand.
+- "Ikke babyen": et tryk sætter beskederne på pause i 10 minutter.
+- Værelsets status: "Vågen i 4 min" eller "Stille i 1 t" på hver babystation.
+- Natlog: hvornår dit barn vågnede, gemt kun på din enhed i 30 dage.
+- Nestwatch findes nu på 11 sprog.

@@ -1,0 +1,6 @@
+Nouveautés de la version 0.3.0
+- Alarme progressive : si le bruit continue et que personne ne répond à l'alerte, une alarme sonne de plus en plus fort, même en mode silencieux.
+- « Ce n'est pas bébé » : un geste suspend les alertes pendant 10 minutes.
+- État de la chambre : « Éveillé depuis 4 min » ou « Calme depuis 1 h » sur chaque station bébé.
+- Journal de nuit : les réveils de votre enfant, conservés 30 jours uniquement sur votre appareil.
+- Nestwatch existe maintenant en 11 langues.

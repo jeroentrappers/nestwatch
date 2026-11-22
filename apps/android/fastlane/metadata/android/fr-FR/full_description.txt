@@ -1,0 +1,31 @@
+Nestwatch transforme les téléphones, tablettes et ordinateurs que vous avez déjà en babyphone. Le son et l'image passent directement d'un appareil à l'autre, chiffrés de bout en bout. Aucun compte à créer, aucun cloud entre les deux.
+
+COMMENT ÇA MARCHE
+- Installez une station bébé : posez un appareil près de votre enfant et indiquez qu'il veille. Il écoute la chambre et affiche le niveau sonore. L'écran peut être assombri, la surveillance continue.
+- Associez un appareil parent : sur la station bébé, lancez l'association, puis scannez le QR code avec votre téléphone, ouvrez le lien d'invitation ou saisissez le code de 10 caractères. Les deux écrans affichent le même nombre : vous vérifiez ainsi que personne ne s'est glissé entre les deux.
+- Écouter, parler, regarder : l'appareil parent diffuse la chambre quand il y a du bruit, vous alerte, vous laisse parler en maintenant le bouton et n'allume la caméra que si vous le demandez.
+
+FONCTIONNALITÉS
+- Activation par le son avec votre propre seuil et une courte pré-écoute, pour ne jamais manquer le début d'un pleur. Ou gardez le son toujours actif.
+- Alarme progressive : si le bruit continue et que personne ne répond à l'alerte, une alarme sonne, de plus en plus fort, même en mode silencieux. Choisissez le délai ou désactivez-la.
+- « Ce n'est pas bébé » : un grand frère, le chien ou une voiture qui passe ? Un geste suffit pour suspendre les alertes pendant 10 minutes.
+- État de la chambre : voyez d'un coup d'œil où en est la chambre, par exemple « Éveillé depuis 4 min » ou « Calme depuis 1 h ».
+- Journal de nuit : quand votre enfant s'est réveillé et combien de temps, nuit après nuit. Conservé uniquement sur votre appareil, pendant 30 jours.
+- Parler au bébé : maintenez le bouton pour parler dans le haut-parleur de la station bébé.
+- Caméra à la demande : la caméra est éteinte tant que personne ne regarde, et la station bébé indique quand elle transmet.
+- Plusieurs stations et appareils parents : suivez jusqu'à 8 stations bébé à la fois, chacune avec son volume, sa sourdine et son mode solo. Une station bébé accepte jusqu'à 8 appareils parents.
+- Des alertes qui fonctionnent même en sourdine : quand une chambre calme devient bruyante, quand une station bébé est injoignable et quand sa batterie est faible.
+- Tout en douceur la nuit : des couleurs chaudes qui n'éblouissent pas, un thème de nuit et un thème de jour, et un écran assombri sur la station bébé.
+- Multiplateforme : stations et appareils parents sur Android, iPhone, iPad, Linux, macOS, Windows et dans le navigateur.
+- En 11 langues : français, anglais, néerlandais, allemand, espagnol, italien, portugais (Brésil), polonais, suédois, danois et norvégien.
+
+PRIVÉ PAR CONCEPTION
+- Ni compte ni cloud. Sur votre réseau domestique ou via votre propre VPN, les appareils communiquent directement.
+- Hors de chez vous, un serveur relais optionnel transmet le flux chiffré sans pouvoir le lire. Utilisez le relais du projet ou hébergez le vôtre.
+- Chaque connexion est chiffrée et authentifiée avec le Noise Protocol Framework. Seuls les appareils que vous avez associés peuvent entendre, voir ou parler via une station bébé.
+- Pas de statistiques, pas de publicité, pas de pistage, pas d'enregistrement. Le son et l'image ne sont jamais conservés.
+
+OPEN SOURCE
+Nestwatch est un logiciel libre sous licence GNU AGPL 3.0 ou ultérieure. Le code source est disponible sur https://github.com/jeroentrappers/nestwatch
+
+Nestwatch n'est pas un dispositif médical et ne remplace pas la surveillance d'un adulte. Il écoute le son : une chambre calme ne signifie pas que votre enfant dort.

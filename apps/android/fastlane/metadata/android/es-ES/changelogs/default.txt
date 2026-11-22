@@ -1,0 +1,6 @@
+Novedades de la versión 0.3.0
+- Alarma progresiva: si el sonido continúa y nadie responde al aviso, suena una alarma cada vez más fuerte, también en modo silencio.
+- «No es el bebé»: con un toque pausas los avisos durante 10 minutos.
+- Estado de la habitación: «Despierto desde hace 4 min» o «Tranquilo desde hace 1 h» en cada estación.
+- Registro nocturno: los despertares de tu hijo, guardados 30 días solo en tu dispositivo.
+- Nestwatch ya está disponible en 11 idiomas.

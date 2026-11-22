@@ -1,1 +1,1 @@
-baby monitor,babyphone,baby,nursery,audio monitor,camera,talk back,private,encrypted,open source
+babyphone,nursery,audio,camera,talk back,private,encrypted,open source,night log,alarm,sleep,infant
